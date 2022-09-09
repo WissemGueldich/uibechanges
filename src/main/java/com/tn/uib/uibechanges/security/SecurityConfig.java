@@ -52,7 +52,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                     .permitAll()
                 .antMatchers(HttpMethod.POST,"/api/v1/serveurs/**")
                 	.hasAuthority(SERVEUR_WRITE.getPermission())
-                .antMatchers(HttpMethod.GET,"/api/v1/serveurs/get/*")
+                .antMatchers(HttpMethod.PUT,"/api/v1/serveurs/**")
+                	.hasAuthority(SERVEUR_WRITE.getPermission())
+                .antMatchers(HttpMethod.DELETE,"/api/v1/serveurs/**")
+                	.hasAuthority(SERVEUR_WRITE.getPermission())
+                .antMatchers(HttpMethod.GET,"/api/v1/serveurs/**")
                 	.hasAnyRole(NWADMIN.name(),ADMIN.name())
                 
 				.anyRequest()
