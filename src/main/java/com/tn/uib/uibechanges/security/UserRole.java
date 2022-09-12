@@ -1,15 +1,14 @@
 package com.tn.uib.uibechanges.security;
 
+import static com.tn.uib.uibechanges.security.UserPermission.SERVEUR_READ;
+import static com.tn.uib.uibechanges.security.UserPermission.SERVEUR_WRITE;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.checkerframework.common.reflection.qual.NewInstance;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.google.common.collect.Sets;
-
-import static com.tn.uib.uibechanges.security.UserPermission.*;
 
 public enum UserRole {
 	USER(Sets.newHashSet()),

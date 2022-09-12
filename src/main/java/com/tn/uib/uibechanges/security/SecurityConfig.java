@@ -1,6 +1,5 @@
 package com.tn.uib.uibechanges.security;
 
-import static com.tn.uib.uibechanges.security.UserPermission.SERVEUR_READ;
 import static com.tn.uib.uibechanges.security.UserPermission.SERVEUR_WRITE;
 import static com.tn.uib.uibechanges.security.UserRole.ADMIN;
 import static com.tn.uib.uibechanges.security.UserRole.NWADMIN;
@@ -10,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -19,10 +18,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	private final PasswordEncoder passwordEncoder;
@@ -35,7 +35,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity http) throws Exception{
 		http
-				.cors().and().csrf().disable()
+				.csrf().disable()
+				//.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+				//.and()
 				.authorizeRequests()
 				.antMatchers("/",
                         "/favicon.ico",
@@ -50,14 +52,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                     
                 .antMatchers("/api/auth/**")
                     .permitAll()
-                .antMatchers(HttpMethod.POST,"/api/v1/serveurs/**")
+                /*.antMatchers(HttpMethod.POST,"/api/v1/serveurs/**")
                 	.hasAuthority(SERVEUR_WRITE.getPermission())
                 .antMatchers(HttpMethod.PUT,"/api/v1/serveurs/**")
                 	.hasAuthority(SERVEUR_WRITE.getPermission())
                 .antMatchers(HttpMethod.DELETE,"/api/v1/serveurs/**")
                 	.hasAuthority(SERVEUR_WRITE.getPermission())
                 .antMatchers(HttpMethod.GET,"/api/v1/serveurs/**")
-                	.hasAnyRole(NWADMIN.name(),ADMIN.name())
+                	.hasAnyRole(NWADMIN.name(),ADMIN.name())*/
                 
 				.anyRequest()
 				.authenticated()

@@ -3,6 +3,7 @@ package com.tn.uib.uibechanges.serveur;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,9 @@ public class ServeurController {
 	);
 			
 	
+	
 	@GetMapping(path = "{id}")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_NWADMIN')")
 	public Serveur getServeur(@PathVariable("id") int id) {
 		return SERVEURS.stream()
 				.filter(serveur -> id==serveur.getId())
@@ -35,18 +38,22 @@ public class ServeurController {
 	};
 	
 	@GetMapping
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_NWADMIN')")
 	public List<Serveur> getServeurs() {
 		return SERVEURS;
 
 	};
 	
+	
 	@PostMapping
+	@PreAuthorize("hasAuthority('serveur:write')")
 	public Serveur addServeur(@RequestBody Serveur serv) {
 		return serv;
 		
 	};
 	
 	@DeleteMapping(path="{id}")
+	@PreAuthorize("hasAuthority('serveur:write')")
 	public void deleteServeur(@PathVariable("id") int id) {
 		System.out.println("delete serveur with id: "+id);
 		System.out.println(SERVEURS.stream()
@@ -56,6 +63,7 @@ public class ServeurController {
 	};
 	
 	@PutMapping(path = "{id}")
+	@PreAuthorize("hasAuthority('serveur:write')")
 	public void updateServeur(@PathVariable("id") int id) {
 		System.out.println("update serveur with id: "+id);
 		System.out.println(SERVEURS.stream()
