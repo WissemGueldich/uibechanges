@@ -1,6 +1,5 @@
 package com.tn.uib.uibechanges.security;
 
-import static com.tn.uib.uibechanges.security.UserPermission.SERVEUR_WRITE;
 import static com.tn.uib.uibechanges.security.UserRole.ADMIN;
 import static com.tn.uib.uibechanges.security.UserRole.NWADMIN;
 import static com.tn.uib.uibechanges.security.UserRole.USER;
@@ -8,17 +7,18 @@ import static com.tn.uib.uibechanges.security.UserRole.USER;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+
+//import com.tn.uib.uibechanges.security.jwt.JwtUsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -36,8 +36,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	protected void configure(HttpSecurity http) throws Exception{
 		http
 				.csrf().disable()
-				//.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-				//.and()
+//				.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//				.and()
+//				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//				.and()
+//				.addFilter(new JwtUsernamePasswordAuthenticationFilter(authenticationManager()))
 				.authorizeRequests()
 				.antMatchers("/",
                         "/favicon.ico",
@@ -52,6 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                     
                 .antMatchers("/api/auth/**")
                     .permitAll()
+                .antMatchers("/users")
+                	.permitAll()
                 /*.antMatchers(HttpMethod.POST,"/api/v1/serveurs/**")
                 	.hasAuthority(SERVEUR_WRITE.getPermission())
                 .antMatchers(HttpMethod.PUT,"/api/v1/serveurs/**")

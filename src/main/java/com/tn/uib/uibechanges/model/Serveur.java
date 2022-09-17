@@ -1,4 +1,4 @@
-package com.tn.uib.uibechanges.serveur;
+package com.tn.uib.uibechanges.model;
 
 
 
