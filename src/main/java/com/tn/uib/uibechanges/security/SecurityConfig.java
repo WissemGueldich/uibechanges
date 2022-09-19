@@ -1,8 +1,10 @@
 package com.tn.uib.uibechanges.security;
 
-import static com.tn.uib.uibechanges.security.UserRole.ADMIN;
-import static com.tn.uib.uibechanges.security.UserRole.NWADMIN;
-import static com.tn.uib.uibechanges.security.UserRole.USER;
+import static com.tn.uib.uibechanges.security.PermissionType.READ;
+import static com.tn.uib.uibechanges.security.PermissionType.WRITE;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -75,25 +76,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Override
 	@Bean
 	protected UserDetailsService userDetailsService() {
+		
+		UserRole user = new UserRole("user", new HashSet<UserPermission>());
+		
+		Set<UserPermission> permissions1 = new HashSet<UserPermission>();
+		permissions1.add(new UserPermission("serveur",READ));
+		UserRole nwadmin = new UserRole("nwadmin", permissions1);
+		Set<UserPermission> permissions = new HashSet<UserPermission>();
+		permissions.add(new UserPermission("serveur",READ));
+		permissions.add(new UserPermission("serveur",WRITE));
+		UserRole admin = new UserRole("admin", permissions);
 			UserDetails testUser = User.builder()
 					.username("user")
 					.password(passwordEncoder.encode("user123"))
 					//.roles(USER.name())
-					.authorities(USER.getGrantedAuthorities())
+					.authorities(user.getGrantedAuthorities())
 					.build();
 			
 			UserDetails testAdmin = User.builder()
 					.username("admin")
 					.password(passwordEncoder.encode("admin123"))
 					//.roles(ADMIN.name())
-					.authorities(ADMIN.getGrantedAuthorities())
+					.authorities(admin.getGrantedAuthorities())
 					.build();
 			
 			UserDetails noWriteAdmin = User.builder()
 					.username("nwadmin")
 					.password(passwordEncoder.encode("nwadmin123"))
 					//.roles(NWADMIN.name())
-					.authorities(NWADMIN.getGrantedAuthorities())
+					.authorities(nwadmin.getGrantedAuthorities())
 					.build();
 			
 			return new InMemoryUserDetailsManager(

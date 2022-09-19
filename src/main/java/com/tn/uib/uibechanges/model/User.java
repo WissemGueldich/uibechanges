@@ -1,26 +1,29 @@
 package com.tn.uib.uibechanges.model;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import org.springframework.security.core.GrantedAuthority;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.tn.uib.uibechanges.security.UserRole;
 
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = { "email" }) })
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = { "email","username","matricule" }) })
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,7 +63,13 @@ public class User {
 	@JsonFormat(pattern = "yyyy/MM/dd")
 	private Date updated;
 	
-	//private Set<? extends GrantedAuthority> grantedAuthorities;
+	
+
+	@ManyToMany(cascade = {CascadeType.ALL},fetch = FetchType.LAZY)
+	@JoinTable(	name = "user_roles", 
+				joinColumns = @JoinColumn(name = "user_id"), 
+				inverseJoinColumns = @JoinColumn(name = "user_role_id"))
+	private Set<UserRole> userRole;
 	
     @Column(name = "is_enabled")
     private boolean isEnabled;
@@ -69,7 +78,7 @@ public class User {
 			@NotBlank @Size(max = 50) @Email String email, @NotBlank @Size(max = 120) String matricule,
 			@NotBlank @Size(min = 4, max = 40) String firstName, @NotBlank @Size(min = 4, max = 40) String lastName,
 			Date created, Date updated
-			//,Set<? extends GrantedAuthority> grantedAuthorities
+			,Set<UserRole> userRole
 			) {
 		this.id = id;
 		this.username = username;
@@ -81,7 +90,7 @@ public class User {
 		this.lastName = lastName;
 		this.created = created;
 		this.updated = updated;
-		//this.grantedAuthorities = grantedAuthorities;
+		this.userRole = userRole;
 	}
 
 	public String getUsername() {
@@ -115,10 +124,6 @@ public class User {
 	public void setMatricule(String matricule) {
 		this.matricule = matricule;
 	}
-
-//	public void setGrantedAuthorities(Set<? extends GrantedAuthority> grantedAuthorities) {
-//		this.grantedAuthorities = grantedAuthorities;
-//	}
 
 	public Date getCreated() {
 		return created;
@@ -154,12 +159,6 @@ public class User {
 	}
 
 
-//	@ManyToMany(fetch = FetchType.LAZY)
-//	@JoinTable(	name = "user_roles", 
-//				joinColumns = @JoinColumn(name = "user_id"), 
-//				inverseJoinColumns = @JoinColumn(name = "role_id"))
-//	private Set<Role> roles = new HashSet<>();
-
 	public User() {
 	}
 
@@ -187,20 +186,20 @@ public class User {
 	}
 
 
-//	public Set<? extends GrantedAuthority> getGrantedAuthorities () {
-//		return grantedAuthorities;
-//	}
-//
-//	public void setRoles(List<? extends GrantedAuthority> grantedAuthorities) {
-//		this.grantedAuthorities = grantedAuthorities;
-//	}
+	public Set<UserRole> getRoles () {
+		return userRole;
+	}
+
+	public void setRoles(Set<UserRole> userRole) {
+		this.userRole = userRole;
+	}
 
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", email=" + email + ", matricule=" + matricule
 				+ ", firstName=" + firstName + ", lastName=" + lastName + ", created=" + created + ", updated="
 				+ updated + 
-				//", authorities=" + grantedAuthorities +
+				", role=" + userRole +
 				"]";
 	}
 	
