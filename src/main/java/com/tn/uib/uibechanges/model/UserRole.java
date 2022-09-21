@@ -1,5 +1,6 @@
-package com.tn.uib.uibechanges.security;
+package com.tn.uib.uibechanges.model;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,8 @@ import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "roles", uniqueConstraints = {@UniqueConstraint(columnNames = { "name" }) })
 public class UserRole {
@@ -30,13 +33,27 @@ public class UserRole {
 	private String name;
 	
 	
-	@ManyToMany(cascade = {CascadeType.ALL},fetch = FetchType.LAZY)
+	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinTable(	name = "role_permissions", 
 				joinColumns = @JoinColumn(name = "role_id"), 
 				inverseJoinColumns = @JoinColumn(name = "permission_id"))
 	private Set<UserPermission> permissions;
 	
+	@ManyToMany(fetch = FetchType.LAZY,
+		      cascade = CascadeType.ALL,
+		      mappedBy = "roles")
+	@JsonIgnore
+	private Set<User> users = new HashSet<>();
+	
 
+
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
 
 	public void setPermissions(Set<UserPermission> permissions) {
 		this.permissions = permissions;
@@ -67,5 +84,13 @@ public class UserRole {
 			.collect(Collectors.toSet());		
 		permissions.add(new SimpleGrantedAuthority(this.getName()));
 		return permissions;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

@@ -7,15 +7,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tn.uib.uibechanges.model.User;
+import com.tn.uib.uibechanges.model.UserRole;
 import com.tn.uib.uibechanges.repository.UserRepository;
+import com.tn.uib.uibechanges.repository.UserRoleRepository;
 
 @Service
+@Transactional
 public class UserService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private UserRoleRepository userRoleRepository;
 	
 	@Autowired
 	PasswordEncoder encoder;
@@ -35,7 +42,23 @@ public class UserService {
 		}
 		user.setCreated(new Date());
 		user.setUpdated(new Date());
+		System.out.println("adding user fffffffffffffffffffffffffffffffffffffffff");
+		System.out.println(user);
 		return new ResponseEntity<User>(userRepository.save(user), HttpStatus.CREATED);
+	}
+	
+	public ResponseEntity<?> addRoleToUser(int userId, int roleId) {
+		User user = userRepository.findById(userId);
+		UserRole role = userRoleRepository.findById(roleId);
+		user.getRoles().add(role);
+		return new ResponseEntity<>(userRepository.save(user),HttpStatus.OK);
+	}
+	
+	public ResponseEntity<?> removeRoleFromUser(int userId, int roleId) {
+		User user = userRepository.findById(userId);
+		UserRole role = userRoleRepository.findById(roleId);
+		user.getRoles().remove(role);
+		return new ResponseEntity<>(userRepository.save(user),HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> getUsers() {
@@ -43,11 +66,11 @@ public class UserService {
 	}
 
 	public ResponseEntity<?> getUser(int id) {
-		return new ResponseEntity<>(userRepository.findById(id).get(), HttpStatus.OK);
+		return new ResponseEntity<>(userRepository.findById(id), HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> getUser(String matricule) {
-		return new ResponseEntity<>(userRepository.findByMatricule(matricule).get(), HttpStatus.OK);
+		return new ResponseEntity<>(userRepository.findByMatricule(matricule), HttpStatus.OK);
 	}
 	
 	public ResponseEntity<?> changeState(Integer id, Boolean etat) {
@@ -57,7 +80,19 @@ public class UserService {
 	}
 
 	public ResponseEntity<?> updateUser(User user) {
-		User oldUser = userRepository.findById(user.getId()).get();
+		User oldUser = userRepository.findById(user.getId());
+		if (!oldUser.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
+			return new ResponseEntity<>("Email already taken !", HttpStatus.FOUND);
+		} else {
+			if (!oldUser.getUsername().equals(user.getUsername()) && userRepository.existsByUsername(user.getUsername())) {
+				return new ResponseEntity<>("Username already taken !", HttpStatus.FOUND);
+				
+			}else {
+				if (!oldUser.getMatricule().equals(user.getMatricule()) && userRepository.existsByMatricule(user.getMatricule())) {
+					return new ResponseEntity<>("Matricule already taken !", HttpStatus.FOUND);
+				}
+			}
+		}
 		oldUser.setUsername(user.getUsername());
 		oldUser.setFirstName(user.getFirstName());
 		oldUser.setLastName(user.getLastName());
@@ -68,6 +103,8 @@ public class UserService {
 		}
 		oldUser.setEnabled(user.isEnabled());
 		oldUser.setMatricule(user.getMatricule());
+		oldUser.getRoles().clear();
+		user.getRoles().forEach(role -> { oldUser.getRoles().add( userRoleRepository.findById(role.getId())); });
 		return new ResponseEntity<>(userRepository.save(oldUser), HttpStatus.OK);
 	}
 

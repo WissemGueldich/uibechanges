@@ -19,6 +19,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+import com.tn.uib.uibechanges.model.UserPermission;
+import com.tn.uib.uibechanges.model.UserRole;
+
 //import com.tn.uib.uibechanges.security.jwt.JwtUsernamePasswordAuthenticationFilter;
 
 @Configuration

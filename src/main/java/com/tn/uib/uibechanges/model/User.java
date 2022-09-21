@@ -20,7 +20,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.tn.uib.uibechanges.security.UserRole;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = { "email","username","matricule" }) })
@@ -65,11 +64,11 @@ public class User {
 	
 	
 
-	@ManyToMany(cascade = {CascadeType.ALL},fetch = FetchType.LAZY)
+	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinTable(	name = "user_roles", 
 				joinColumns = @JoinColumn(name = "user_id"), 
-				inverseJoinColumns = @JoinColumn(name = "user_role_id"))
-	private Set<UserRole> userRole;
+				inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private Set<UserRole> roles;
 	
     @Column(name = "is_enabled")
     private boolean isEnabled;
@@ -78,7 +77,7 @@ public class User {
 			@NotBlank @Size(max = 50) @Email String email, @NotBlank @Size(max = 120) String matricule,
 			@NotBlank @Size(min = 4, max = 40) String firstName, @NotBlank @Size(min = 4, max = 40) String lastName,
 			Date created, Date updated
-			,Set<UserRole> userRole
+			,Set<UserRole> roles
 			) {
 		this.id = id;
 		this.username = username;
@@ -90,7 +89,7 @@ public class User {
 		this.lastName = lastName;
 		this.created = created;
 		this.updated = updated;
-		this.userRole = userRole;
+		this.roles =roles;
 	}
 
 	public String getUsername() {
@@ -187,11 +186,11 @@ public class User {
 
 
 	public Set<UserRole> getRoles () {
-		return userRole;
+		return roles;
 	}
 
-	public void setRoles(Set<UserRole> userRole) {
-		this.userRole = userRole;
+	public void setRoles(Set<UserRole> roles) {
+		this.roles = roles;
 	}
 
 	@Override
@@ -199,7 +198,7 @@ public class User {
 		return "User [id=" + id + ", email=" + email + ", matricule=" + matricule
 				+ ", firstName=" + firstName + ", lastName=" + lastName + ", created=" + created + ", updated="
 				+ updated + 
-				", role=" + userRole +
+				", role=" + roles +
 				"]";
 	}
 	
