@@ -1,10 +1,5 @@
 package com.tn.uib.uibechanges.controller;
 
-import static com.tn.uib.uibechanges.security.PermissionType.READ;
-import static com.tn.uib.uibechanges.security.PermissionType.WRITE;
-
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tn.uib.uibechanges.model.UserPermission;
 import com.tn.uib.uibechanges.model.UserRole;
 import com.tn.uib.uibechanges.service.UserRoleService;
 
@@ -28,12 +22,7 @@ public class UserRoleController {
 	private UserRoleService userRoleService;
 	
 	@PostMapping
-	private ResponseEntity<?> addRole (@RequestBody UserRole role){
-	/////////////////////////////////////////////////////////
-
-	role.setPermissions(Set.of(new UserPermission("serveur",READ),new UserPermission("serveur",WRITE)));
-	/////////////////////////////////////////////////////////
-	
+	private ResponseEntity<?> addRole (@RequestBody UserRole role){	
 		return userRoleService.addRole(role);
 	}
 	

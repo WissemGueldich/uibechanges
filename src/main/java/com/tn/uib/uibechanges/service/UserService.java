@@ -1,6 +1,8 @@
 package com.tn.uib.uibechanges.service;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,10 +42,14 @@ public class UserService {
 				}
 			}
 		}
+		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreated(new Date());
 		user.setUpdated(new Date());
-		System.out.println("adding user fffffffffffffffffffffffffffffffffffffffff");
-		System.out.println(user);
+		if(user.getRoles()!=null){
+			Set<UserRole> newRoles = new HashSet<>();
+		user.getRoles().forEach(role -> {newRoles.add(userRoleRepository.findById(role.getId()));});
+		user.setRoles(newRoles);
+		}
 		return new ResponseEntity<User>(userRepository.save(user), HttpStatus.CREATED);
 	}
 	
@@ -109,6 +115,8 @@ public class UserService {
 	}
 
 	public ResponseEntity<?> deleteUser(int id) {
+		User user = userRepository.findById(id);
+		user.getRoles().clear();
 		userRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

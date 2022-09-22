@@ -3,7 +3,6 @@ package com.tn.uib.uibechanges.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,17 +23,9 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
-
-	@Autowired
-	private PasswordEncoder encoder;
 	
 	@PostMapping
 	private ResponseEntity<?> addUser (@RequestBody User user){
-//	/////////////////////////////////////////////////////////
-//		Set<UserPermission> permissions = Set.of(new UserPermission("test",READ));
-//		user.setRoles(Set.of(new UserRole("default", permissions)));
-//	/////////////////////////////////////////////////////////
-		user.setPassword(encoder.encode(user.getPassword()));
 		return userService.addUser(user);
 	}
 	@GetMapping

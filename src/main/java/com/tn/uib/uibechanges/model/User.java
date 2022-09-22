@@ -73,13 +73,11 @@ public class User {
     @Column(name = "is_enabled")
     private boolean isEnabled;
 
-	public User(int id, @NotBlank @Size(max = 20) String username, @NotBlank @Size(max = 120) String password, boolean isEnabled,
+	public User(@NotBlank @Size(max = 20) String username, @NotBlank @Size(max = 120) String password, boolean isEnabled,
 			@NotBlank @Size(max = 50) @Email String email, @NotBlank @Size(max = 120) String matricule,
-			@NotBlank @Size(min = 4, max = 40) String firstName, @NotBlank @Size(min = 4, max = 40) String lastName,
-			Date created, Date updated
+			@NotBlank @Size(min = 4, max = 40) String firstName, @NotBlank @Size(min = 4, max = 40) String lastName
 			,Set<UserRole> roles
 			) {
-		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.isEnabled = isEnabled;
@@ -87,8 +85,6 @@ public class User {
 		this.matricule = matricule;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.created = created;
-		this.updated = updated;
 		this.roles =roles;
 	}
 
