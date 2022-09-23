@@ -60,8 +60,8 @@ public class UibechangesApplication {
 			userService.addUser(new User( "user", "password", true,"user@user.com", "M123", "userfname", "userlastName", new HashSet<>()));
 			userService.addUser(new User( "admin", "password", true,"admin@admin.com", "M1234", "adminfname", "adminlastName", new HashSet<>()));
 			userService.addUser(new User( "nwadmin", "password", true,"nwadmin@nwadmin.com", "M12345", "nwadminfname", "nwadminlastName", new HashSet<>()));
-			userService.addUser(new User( "test", "password", true,"test@test.com", "M123456", "testfname", "testlastName", new HashSet<>()));
 			userService.addUser(new User( "default", "password", true,"default@default.com", "M1234567", "defaultfname", "defaultlastName", new HashSet<>()));
+			userService.addUser(new User( "test", "password", true,"test@test.com", "M123456", "testfname", "testlastName", new HashSet<>()));
 			userService.addUser(new User( "god", "password", true,"god@god.com", "M12", "godfname", "godlastName", new HashSet<>()));
 			userService.addRoleToUser(1, 1);
 			userService.addRoleToUser(2, 2);

@@ -55,7 +55,7 @@ public class ServeurController {
 	};
 	
 	@DeleteMapping(path="{id}")
-	@PreAuthorize("hasAuthority('serveur:write')")
+	@PreAuthorize("hasAuthority('job:write')")
 	public void deleteServeur(@PathVariable("id") int id) {
 		System.out.println("delete serveur with id: "+id);
 		System.out.println(SERVEURS.stream()
