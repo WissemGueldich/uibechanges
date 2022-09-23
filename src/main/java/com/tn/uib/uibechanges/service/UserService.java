@@ -1,12 +1,20 @@
 package com.tn.uib.uibechanges.service;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.management.relation.Role;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorityAuthorizationDecision;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +26,25 @@ import com.tn.uib.uibechanges.repository.UserRoleRepository;
 
 @Service
 @Transactional
-public class UserService {
+public class UserService implements UserDetailsService{
 	
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		User user = userRepository.findByUsername(username);
+		if (user==null) {
+			throw new UsernameNotFoundException("user not found");
+		}
+		Collection<SimpleGrantedAuthority> authorities = new HashSet<>();
+		if (user.getRoles()!=null) {
+			user.getRoles().forEach(role -> {
+				role.getGrantedAuthorities().forEach(authority -> {
+					authorities.add(authority);
+				});
+			});
+		}
+		return new org.springframework.security.core.userdetails.User( user.getUsername(), user.getPassword(),authorities);
+	}
+
 	@Autowired
 	private UserRepository userRepository;
 	
