@@ -5,7 +5,6 @@ package com.tn.uib.uibechanges.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -69,41 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 }
 
-//package com.tn.uib.uibechanges.security;
-//
-//import static com.tn.uib.uibechanges.security.PermissionType.READ;
-//import static com.tn.uib.uibechanges.security.PermissionType.WRITE;
-//
-//import java.util.HashSet;
-//import java.util.Set;
-//
-//import org.aspectj.weaver.ast.And;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.http.HttpMethod;
-//import org.springframework.security.authentication.AuthenticationManager;
-//import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-//import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-//import org.springframework.security.config.http.SessionCreationPolicy;
-//import org.springframework.security.core.userdetails.User;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-//import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-//
-//import com.tn.uib.uibechanges.model.UserPermission;
-//import com.tn.uib.uibechanges.model.UserRole;
-//import com.tn.uib.uibechanges.security.jwt.AuthTokenFilter;
-//import com.tn.uib.uibechanges.service.UserService;
-//
-////import com.tn.uib.uibechanges.security.jwt.JwtUsernamePasswordAuthenticationFilter;
-//
+
 //@Configuration
 //@EnableWebSecurity
 //@EnableGlobalMethodSecurity(prePostEnabled = true)

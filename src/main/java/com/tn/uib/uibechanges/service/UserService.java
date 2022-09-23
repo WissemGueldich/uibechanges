@@ -5,12 +5,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.management.relation.Role;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authorization.AuthorityAuthorizationDecision;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -70,10 +67,13 @@ public class UserService implements UserDetailsService{
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreated(new Date());
 		user.setUpdated(new Date());
+		user.setEnabled(true);
 		if(user.getRoles()!=null){
 			Set<UserRole> newRoles = new HashSet<>();
 		user.getRoles().forEach(role -> {newRoles.add(userRoleRepository.findById(role.getId()));});
 		user.setRoles(newRoles);
+		}else {
+			user.setRoles(Set.of(userRoleRepository.findByName("ROLE_USER")));
 		}
 		return new ResponseEntity<User>(userRepository.save(user), HttpStatus.CREATED);
 	}
