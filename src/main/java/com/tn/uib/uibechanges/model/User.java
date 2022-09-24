@@ -22,17 +22,13 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = { "email","username","matricule" }) })
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = { "email","matricule" }) })
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_user")
 	private int id;
 
-	@NotBlank
-	@Size(max = 20)
-	private String username;
-	
 	@NotBlank
 	@Size(max = 120)
 	private String password;
@@ -62,23 +58,25 @@ public class User {
 	@JsonFormat(pattern = "yyyy/MM/dd")
 	private Date updated;
 	
+	@Column(name = "is_enabled")
+    private boolean isEnabled;
 	
-
 	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinTable(	name = "user_roles", 
 				joinColumns = @JoinColumn(name = "user_id"), 
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<UserRole> roles;
 	
-    @Column(name = "is_enabled")
-    private boolean isEnabled;
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinTable(name = "user_profiles", 
+    			joinColumns = @JoinColumn(name = "user_id"), 
+    			inverseJoinColumns = @JoinColumn(name = "profile_id"))
+    private Set<Profile> profiles;
 
-	public User(@NotBlank @Size(max = 20) String username, @NotBlank @Size(max = 120) String password, boolean isEnabled,
-			@NotBlank @Size(max = 50) @Email String email, @NotBlank @Size(max = 120) String matricule,
-			@NotBlank @Size(min = 4, max = 40) String firstName, @NotBlank @Size(min = 4, max = 40) String lastName
-			,Set<UserRole> roles
+	public User(@NotBlank @Size(max = 120) String matricule, @NotBlank @Size(max = 120) String password,
+			@NotBlank @Size(max = 50) @Email String email, @NotBlank @Size(min = 4, max = 40) String firstName, 
+			@NotBlank @Size(min = 4, max = 40) String lastName, boolean isEnabled, Set<UserRole> roles, Set<Profile> profiles
 			) {
-		this.username = username;
 		this.password = password;
 		this.isEnabled = isEnabled;
 		this.email = email;
@@ -86,15 +84,9 @@ public class User {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.roles =roles;
+		this.profiles = profiles;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
 
 	public String getPassword() {
 		return password;
@@ -188,14 +180,21 @@ public class User {
 	public void setRoles(Set<UserRole> roles) {
 		this.roles = roles;
 	}
+	
+	public Set<Profile> getProfiles() {
+		return profiles;
+	}
+
+
+	public void setProfiles(Set<Profile> profiles) {
+		this.profiles = profiles;
+	}
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", email=" + email + ", matricule=" + matricule
-				+ ", firstName=" + firstName + ", lastName=" + lastName + ", created=" + created + ", updated="
-				+ updated + 
-				", role=" + roles +
-				"]";
+		return "User [id=" + id + ", matricule=" + matricule + ", email=" + email + 
+				", firstName=" + firstName + ", lastName=" + lastName + ", created=" + created + ", updated="
+				+ updated + ", roles=" + roles + ", profiles=" + profiles + "]";
 	}
-	
+
 }

@@ -7,10 +7,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import com.tn.uib.uibechanges.model.Profile;
 import com.tn.uib.uibechanges.model.User;
 import com.tn.uib.uibechanges.model.UserPermission;
 import com.tn.uib.uibechanges.model.UserRole;
 import com.tn.uib.uibechanges.security.PermissionType;
+import com.tn.uib.uibechanges.service.ProfileService;
 import com.tn.uib.uibechanges.service.UserRoleService;
 import com.tn.uib.uibechanges.service.UserService;
 
@@ -22,8 +24,9 @@ public class UibechangesApplication {
 	}
 	
 	@Bean
-	CommandLineRunner run(UserRoleService userRoleService , UserService userService) {
+	CommandLineRunner run(UserRoleService userRoleService , UserService userService, ProfileService profileService) {
 		return args -> {
+			profileService.addProfile(new Profile("test profile"));
 			userRoleService.addPermission(new UserPermission("user",PermissionType.READ));
 			userRoleService.addPermission(new UserPermission("user",PermissionType.WRITE));
 			userRoleService.addPermission(new UserPermission("config",PermissionType.READ));
@@ -57,12 +60,12 @@ public class UibechangesApplication {
 			userRoleService.addPermissionToRole(5, 6);
 			userRoleService.addPermissionToRole(5, 7);
 			userRoleService.addPermissionToRole(5, 8);
-			userService.addUser(new User( "user", "password", true,"user@user.com", "M123", "userfname", "userlastName", new HashSet<>()));
-			userService.addUser(new User( "admin", "password", true,"admin@admin.com", "M1234", "adminfname", "adminlastName", new HashSet<>()));
-			userService.addUser(new User( "nwadmin", "password", true,"nwadmin@nwadmin.com", "M12345", "nwadminfname", "nwadminlastName", new HashSet<>()));
-			userService.addUser(new User( "default", "password", true,"default@default.com", "M1234567", "defaultfname", "defaultlastName", new HashSet<>()));
-			userService.addUser(new User( "test", "password", true,"test@test.com", "M123456", "testfname", "testlastName", new HashSet<>()));
-			userService.addUser(new User( "god", "password", true,"god@god.com", "M12", "godfname", "godlastName", new HashSet<>()));
+			userService.addUser(new User( "user", "password", "user@user.com", "userfname", "userlastName",true, new HashSet<>(),new HashSet<>()));
+			userService.addUser(new User( "admin", "password", "admin@admin.com", "adminfname", "adminlastName",true, new HashSet<>(), new HashSet<>()));
+			userService.addUser(new User( "nwadmin", "password", "nwadmin@nwadmin.com", "nwadminfname", "nwadminlastName",true, new HashSet<>(), new HashSet<>()));
+			userService.addUser(new User( "default", "password", "default@default.com", "defaultfname", "defaultlastName",true, new HashSet<>(), new HashSet<>()));
+			userService.addUser(new User( "test", "password", "test@test.com", "testfname", "testlastName",true, new HashSet<>(), new HashSet<>()));
+			userService.addUser(new User( "god", "password", "god@god.com", "godfname", "godlastName",true, new HashSet<>(),new HashSet<>()));
 			userService.addRoleToUser(1, 1);
 			userService.addRoleToUser(2, 2);
 			userService.addRoleToUser(3, 3);
@@ -73,7 +76,7 @@ public class UibechangesApplication {
 			userService.addRoleToUser(6, 3);
 			userService.addRoleToUser(6, 4);
 			userService.addRoleToUser(6, 5);
-
+			
 			
 
 

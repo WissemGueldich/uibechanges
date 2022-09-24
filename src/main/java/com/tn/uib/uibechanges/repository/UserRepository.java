@@ -10,16 +10,12 @@ import com.tn.uib.uibechanges.model.User;
 public interface UserRepository extends JpaRepository<User, Integer> {
 	
 	User findById(int id);
-	
-	User findByUsername(String username);
-	
+		
 	User findByEmail(String email);
 
 	User findByMatricule(String matricule);
 	
 	Boolean existsById(int id);
-
-	Boolean existsByUsername(String username);
 	
 	Boolean existsByEmail(String email);
 

@@ -1,4 +1,4 @@
-package com.tn.uib.uibechanges.security.jwt;
+package com.tn.uib.uibechanges.security;
 
 public class AuthRequest {
 	

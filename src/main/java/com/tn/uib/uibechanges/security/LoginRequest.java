@@ -6,17 +6,17 @@ import javax.validation.constraints.NotBlank;
 
 public class LoginRequest {
 	@NotBlank
-	private String username;
+	private String matricule;
 
 	@NotBlank
 	private String password;
 
-	public String getUsername() {
-		return username;
+	public String getMatricule() {
+		return matricule;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setMatricule(String matricule) {
+		this.matricule = matricule;
 	}
 
 	public String getPassword() {

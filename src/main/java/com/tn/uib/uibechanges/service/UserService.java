@@ -16,8 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tn.uib.uibechanges.model.Profile;
 import com.tn.uib.uibechanges.model.User;
 import com.tn.uib.uibechanges.model.UserRole;
+import com.tn.uib.uibechanges.repository.ProfileRepository;
 import com.tn.uib.uibechanges.repository.UserRepository;
 import com.tn.uib.uibechanges.repository.UserRoleRepository;
 
@@ -26,8 +28,8 @@ import com.tn.uib.uibechanges.repository.UserRoleRepository;
 public class UserService implements UserDetailsService{
 	
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findByUsername(username);
+	public UserDetails loadUserByUsername(String matricule) throws UsernameNotFoundException {
+		User user = userRepository.findByMatricule(matricule);
 		if (user==null) {
 			throw new UsernameNotFoundException("user not found");
 		}
@@ -39,7 +41,7 @@ public class UserService implements UserDetailsService{
 				});
 			});
 		}
-		return new org.springframework.security.core.userdetails.User( user.getUsername(), user.getPassword(),authorities);
+		return new org.springframework.security.core.userdetails.User( user.getMatricule(), user.getPassword(),authorities);
 	}
 
 	@Autowired
@@ -49,21 +51,20 @@ public class UserService implements UserDetailsService{
 	private UserRoleRepository userRoleRepository;
 	
 	@Autowired
+	private ProfileRepository profileRepository;
+	
+	@Autowired
 	PasswordEncoder encoder;
 
 	public ResponseEntity<?> addUser(User user) {
 		if (userRepository.existsByEmail(user.getEmail())) {
 			return new ResponseEntity<>("Email already taken !", HttpStatus.FOUND);
 		} else {
-			if (userRepository.existsByUsername(user.getUsername())) {
-				return new ResponseEntity<>("Username already taken !", HttpStatus.FOUND);
-				
-			}else {
-				if (userRepository.existsByMatricule(user.getMatricule())) {
-					return new ResponseEntity<>("Matricule already taken !", HttpStatus.FOUND);
-				}
+			if (userRepository.existsByMatricule(user.getMatricule())) {
+				return new ResponseEntity<>("Matricule already taken !", HttpStatus.FOUND);
 			}
 		}
+		
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreated(new Date());
 		user.setUpdated(new Date());
@@ -75,6 +76,12 @@ public class UserService implements UserDetailsService{
 		}else {
 			user.setRoles(Set.of(userRoleRepository.findByName("ROLE_USER")));
 		}
+		if(user.getProfiles()!=null){
+			Set<Profile> newProfiles = new HashSet<>();
+		user.getProfiles().forEach(profile -> {newProfiles.add(profileRepository.findById(profile.getId()).get());});
+		user.setProfiles(newProfiles);
+		}
+		
 		return new ResponseEntity<User>(userRepository.save(user), HttpStatus.CREATED);
 	}
 	
@@ -97,11 +104,11 @@ public class UserService implements UserDetailsService{
 	}
 
 	public ResponseEntity<?> getUser(int id) {
-		return new ResponseEntity<>(userRepository.findById(id), HttpStatus.OK);
+		return new ResponseEntity<User>(userRepository.findById(id), HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> getUser(String matricule) {
-		return new ResponseEntity<>(userRepository.findByMatricule(matricule), HttpStatus.OK);
+		return new ResponseEntity<User>(userRepository.findByMatricule(matricule), HttpStatus.OK);
 	}
 	
 	public ResponseEntity<?> changeState(Integer id, Boolean etat) {
@@ -114,17 +121,12 @@ public class UserService implements UserDetailsService{
 		User oldUser = userRepository.findById(user.getId());
 		if (!oldUser.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
 			return new ResponseEntity<>("Email already taken !", HttpStatus.FOUND);
-		} else {
-			if (!oldUser.getUsername().equals(user.getUsername()) && userRepository.existsByUsername(user.getUsername())) {
-				return new ResponseEntity<>("Username already taken !", HttpStatus.FOUND);
-				
-			}else {
-				if (!oldUser.getMatricule().equals(user.getMatricule()) && userRepository.existsByMatricule(user.getMatricule())) {
-					return new ResponseEntity<>("Matricule already taken !", HttpStatus.FOUND);
-				}
+		}else {
+			if (!oldUser.getMatricule().equals(user.getMatricule()) && userRepository.existsByMatricule(user.getMatricule())) {
+				return new ResponseEntity<>("Matricule already taken !", HttpStatus.FOUND);
 			}
 		}
-		oldUser.setUsername(user.getUsername());
+		
 		oldUser.setFirstName(user.getFirstName());
 		oldUser.setLastName(user.getLastName());
 		oldUser.setEmail(user.getEmail());
@@ -135,7 +137,9 @@ public class UserService implements UserDetailsService{
 		oldUser.setEnabled(user.isEnabled());
 		oldUser.setMatricule(user.getMatricule());
 		oldUser.getRoles().clear();
+		oldUser.getProfiles().clear();
 		user.getRoles().forEach(role -> { oldUser.getRoles().add( userRoleRepository.findById(role.getId())); });
+		user.getProfiles().forEach(profile -> { oldUser.getProfiles().add( profileRepository.findById(profile.getId()).get());});
 		return new ResponseEntity<>(userRepository.save(oldUser), HttpStatus.OK);
 	}
 
