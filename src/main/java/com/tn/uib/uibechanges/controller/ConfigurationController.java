@@ -1,5 +1,7 @@
 package com.tn.uib.uibechanges.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tn.uib.uibechanges.model.Configuration;
+import com.tn.uib.uibechanges.model.Server;
 import com.tn.uib.uibechanges.service.ConfigurationService;
 
 
@@ -46,8 +49,17 @@ public class ConfigurationController {
 		return configurationService.deleteConfiguration(id);
 	}
 	
-	@GetMapping("/useros")
-	private ResponseEntity<?> getConfigs(@RequestBody SearchRequest searchRequest){
+	@GetMapping("/user")
+	private ResponseEntity<?> getUserConfigurationsBy(@RequestBody SearchRequest searchRequest){
 		return configurationService.getUserConfigurations(searchRequest.getAutomatic(),searchRequest.getMatricule());
 	}
+	
+	@GetMapping("/server")
+	private ResponseEntity<?> getServersConfigurations(@RequestBody Map<String, Server> json){
+		return configurationService.getConfigurationsByServers(json.get("source"), json.get("destination"));
+	}
+	
+	
+	
+	
 }

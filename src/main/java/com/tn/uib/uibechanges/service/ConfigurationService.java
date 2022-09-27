@@ -38,9 +38,15 @@ public class ConfigurationService {
 		return new ResponseEntity<>(configurationRepository.findById(id), HttpStatus.OK);
 	}
 	
-	public ResponseEntity<?> getConfigurationsByServers(Server sourceServer, Server DestinationServer) {
-		return new ResponseEntity<>(
-				configurationRepository.findBySourceServerAndDestinationServer(sourceServer,DestinationServer), HttpStatus.OK);
+	public ResponseEntity<?> getConfigurationsByServers(Server sourceServer, Server destinationServer) {
+		Set<Configuration> configs = new HashSet<>();
+		Set<Configuration> sConfigs = configurationRepository.findBySourceServer(sourceServer);
+		sConfigs.forEach(config ->{
+			if (config.getDestinationServer()!=null && config.getDestinationServer().getId() == destinationServer.getId()) {
+				configs.add(config);
+			}
+		});
+		return new ResponseEntity<>(configs, HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> updateConfiguration(Configuration configuration) {

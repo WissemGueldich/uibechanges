@@ -121,7 +121,7 @@ public class Configuration {
 
 	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
 			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
-			String destinationArchivingPath, Server destinationServer, Server sourceServer) {
+			String destinationArchivingPath, Server sourceServer, Server destinationServer) {
 		super();
 		this.filter = filter;
 		this.overwrite = overwrite;
