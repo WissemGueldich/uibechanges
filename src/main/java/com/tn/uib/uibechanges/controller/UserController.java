@@ -1,6 +1,8 @@
 package com.tn.uib.uibechanges.controller;
 
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tn.uib.uibechanges.model.User;
+import com.tn.uib.uibechanges.model.UserRole;
+import com.tn.uib.uibechanges.service.ConfigurationService;
 import com.tn.uib.uibechanges.service.UserService;
 
 @RestController
@@ -49,20 +53,34 @@ public class UserController {
 
 	}
 	
-	@PostMapping(path="/add/{userId}/{roleId}")
-	private ResponseEntity<?> addRoleToUser(@PathVariable int userId, @PathVariable int roleId){
+	@PostMapping(path="/add/{userId}")
+	private ResponseEntity<?> addRoleToUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
 
-		return userService.addRoleToUser(userId, roleId);
+		return userService.addRoleToUser(userId, roles);
 	}
 	
-	@PostMapping(path="/remove/{userId}/{roleId}")
-	private ResponseEntity<?> removeRoleFromUser(@PathVariable int userId, @PathVariable int roleId){
+	@PostMapping(path="/remove/{userId}")
+	private ResponseEntity<?> removeRoleFromUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
 
-		return userService.removeRoleFromUser(userId, roleId);
+		return userService.removeRoleFromUser(userId, roles);
 	}
+	////////////////////////////////////////////////////////
+	@Autowired
+	private ConfigurationService configurationService;
+	
+	@GetMapping("/configs")
+	private ResponseEntity<?> getConfigs(@RequestBody SearchRequest searchRequest){
+		return configurationService.getUserConfigurations(searchRequest.getAutomatic(),searchRequest.getMatricule());
+	}
+	////////////////////////////////////////////////////////
+	
 	
 
 }
+
+
+
+
 
 
 

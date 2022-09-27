@@ -14,9 +14,11 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 
 @Component
+@SuppressWarnings("deprecation")
 public class JwtUtils {
 	private static final String jwtSecret = "d0b96606cb5e6025b49bb668e1c9c10c72e7086733e87471a5a69346a12a708e651651ezf65165g161065ezr6516516g516516ze1r961651g96z81e61651g6ze16516g6e5f8994363202e0f6z10ef650051f0";
 	
+
 	public String generateJwtToken(Authentication authentication) {		
 		return Jwts.builder()
 				.setSubject(authentication.getName())

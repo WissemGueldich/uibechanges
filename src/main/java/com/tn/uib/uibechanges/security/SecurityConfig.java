@@ -21,6 +21,7 @@ import com.tn.uib.uibechanges.security.jwt.AuthTokenFilter;
 import com.tn.uib.uibechanges.service.UserService;
 
 
+@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(

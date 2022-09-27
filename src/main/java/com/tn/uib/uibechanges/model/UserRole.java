@@ -39,9 +39,7 @@ public class UserRole {
 				inverseJoinColumns = @JoinColumn(name = "permission_id"))
 	private Set<UserPermission> permissions;
 	
-	@ManyToMany(fetch = FetchType.LAZY,
-		      cascade = CascadeType.ALL,
-		      mappedBy = "roles")
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "roles")
 	@JsonIgnore
 	private Set<User> users = new HashSet<>();
 	

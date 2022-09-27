@@ -1,18 +1,23 @@
 package com.tn.uib.uibechanges;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.Profile;
+import com.tn.uib.uibechanges.model.Server;
 import com.tn.uib.uibechanges.model.User;
 import com.tn.uib.uibechanges.model.UserPermission;
 import com.tn.uib.uibechanges.model.UserRole;
 import com.tn.uib.uibechanges.security.PermissionType;
+import com.tn.uib.uibechanges.service.ConfigurationService;
 import com.tn.uib.uibechanges.service.ProfileService;
+import com.tn.uib.uibechanges.service.ServerService;
 import com.tn.uib.uibechanges.service.UserRoleService;
 import com.tn.uib.uibechanges.service.UserService;
 
@@ -24,58 +29,72 @@ public class UibechangesApplication {
 	}
 	
 	@Bean
-	CommandLineRunner run(UserRoleService userRoleService , UserService userService, ProfileService profileService) {
+	
+	CommandLineRunner run(UserRoleService userRoleService , UserService userService, 
+						ProfileService profileService, ServerService serverService, 
+						ConfigurationService configurationService) {
 		return args -> {
-			profileService.addProfile(new Profile("test profile"));
+			Profile profDefault = new Profile("default profile");
+			Profile profTest = new Profile("test profile");
+			Profile profAdmin = new Profile("admin profile");
+			profileService.addProfile(profDefault);
+			profileService.addProfile(profTest);
+			profileService.addProfile(profAdmin);
+			
+			Server serv1 = new Server("192.168.14.22",81,"test libelle","155.114.23.6","164.244.3.24");
+			Server serv2 = new Server("156.66.126.23",25,"sdfg gf ","123.45.67.89","189.63.57.14.28");
+			serverService.addServer(serv1);
+			serverService.addServer(serv2);
+			
+			Configuration config1 = new Configuration("filet test", false, "libelle source ", true, true, false, "/path/test", "/archive/test",
+					"/path/dest","/archive/dest",serv1,serv2);
+			Configuration config2 = new Configuration("filet test", false, "tlibelle destination", true, true, false, "/path/test", "/archive/test", 
+					"/path/dest","/archive/dest");
+			Configuration config3 = new Configuration("filet test", false, "tlibelle hkhhjk", true, true, false, "/path/test", "/archive/test", 
+					"/path/dest","/archive/dest");
+			Configuration config4 = new Configuration("filet false", false, "tlibelle destinghfdgation", true, false, false, "/path/test", "/archive/test", 
+					"/path/dest","/archive/dest");
+			configurationService.addConfiguration(config1);
+			configurationService.addConfiguration(config2);
+			configurationService.addConfiguration(config3);
+			configurationService.addConfiguration(config4);
+
 			userRoleService.addPermission(new UserPermission("user",PermissionType.READ));
 			userRoleService.addPermission(new UserPermission("user",PermissionType.WRITE));
 			userRoleService.addPermission(new UserPermission("config",PermissionType.READ));
 			userRoleService.addPermission(new UserPermission("config",PermissionType.WRITE));
-			userRoleService.addPermission(new UserPermission("transfert",PermissionType.READ));
-			userRoleService.addPermission(new UserPermission("transfert",PermissionType.WRITE));
-			userRoleService.addPermission(new UserPermission("job",PermissionType.READ));
-			userRoleService.addPermission(new UserPermission("job",PermissionType.WRITE));
-			userRoleService.addRole(new UserRole("user",new HashSet<>()));
-			userRoleService.addRole(new UserRole("admin",new HashSet<>()));
-			userRoleService.addRole(new UserRole("nwadmin",new HashSet<>()));
-			userRoleService.addRole(new UserRole("default",new HashSet<>()));
-			userRoleService.addRole(new UserRole("test",new HashSet<>()));
+			
+			UserRole roleUser = new UserRole("user",new HashSet<>());
+			UserRole roleAdmin = new UserRole("admin",new HashSet<>());
+			userRoleService.addRole(roleUser);
+			userRoleService.addRole(roleAdmin);
+			
 			userRoleService.addPermissionToRole(2, 1);
 			userRoleService.addPermissionToRole(2, 2);
 			userRoleService.addPermissionToRole(2, 3);
 			userRoleService.addPermissionToRole(2, 4);
-			userRoleService.addPermissionToRole(2, 5);
-			userRoleService.addPermissionToRole(2, 6);
-			userRoleService.addPermissionToRole(2, 7);
-			userRoleService.addPermissionToRole(2, 8);
-			userRoleService.addPermissionToRole(3, 1);
-			userRoleService.addPermissionToRole(3, 3);
-			userRoleService.addPermissionToRole(3, 5);
-			userRoleService.addPermissionToRole(3, 7);
-			userRoleService.addPermissionToRole(4, 1);
-			userRoleService.addPermissionToRole(4, 2);
-			userRoleService.addPermissionToRole(4, 3);
-			userRoleService.addPermissionToRole(4, 4);
-			userRoleService.addPermissionToRole(5, 5);
-			userRoleService.addPermissionToRole(5, 6);
-			userRoleService.addPermissionToRole(5, 7);
-			userRoleService.addPermissionToRole(5, 8);
-			userService.addUser(new User( "user", "password", "user@user.com", "userfname", "userlastName",true, new HashSet<>(),new HashSet<>()));
+			
+			userService.addUser(new User( "user", "password", "user@user.com", "userfname", "userlastName",true, new HashSet<>(), new HashSet<>()));
 			userService.addUser(new User( "admin", "password", "admin@admin.com", "adminfname", "adminlastName",true, new HashSet<>(), new HashSet<>()));
-			userService.addUser(new User( "nwadmin", "password", "nwadmin@nwadmin.com", "nwadminfname", "nwadminlastName",true, new HashSet<>(), new HashSet<>()));
-			userService.addUser(new User( "default", "password", "default@default.com", "defaultfname", "defaultlastName",true, new HashSet<>(), new HashSet<>()));
-			userService.addUser(new User( "test", "password", "test@test.com", "testfname", "testlastName",true, new HashSet<>(), new HashSet<>()));
-			userService.addUser(new User( "god", "password", "god@god.com", "godfname", "godlastName",true, new HashSet<>(),new HashSet<>()));
-			userService.addRoleToUser(1, 1);
-			userService.addRoleToUser(2, 2);
-			userService.addRoleToUser(3, 3);
-			userService.addRoleToUser(4, 4);
-			userService.addRoleToUser(5, 5);
-			userService.addRoleToUser(6, 1);
-			userService.addRoleToUser(6, 2);
-			userService.addRoleToUser(6, 3);
-			userService.addRoleToUser(6, 4);
-			userService.addRoleToUser(6, 5);
+			
+			userService.addRoleToUser(1, Set.of(roleUser));
+			userService.addRoleToUser(2, Set.of(roleAdmin,roleUser));
+			
+			userService.addProfileToUser(1, Set.of(profDefault));
+			userService.addProfileToUser(2, Set.of(profAdmin));
+			userService.addProfileToUser(2, Set.of(profTest));
+			
+			profileService.addConfigurationToProfile(1, Set.of(config1));
+			profileService.addConfigurationToProfile(2, Set.of(config1,config2));
+			profileService.addConfigurationToProfile(3, Set.of(config2));
+			profileService.addConfigurationToProfile(3, Set.of(config3,config4));
+			
+			System.out.println(configurationService.getUserConfigurations(true, "user")); 
+
+
+			
+			
+			
 			
 			
 

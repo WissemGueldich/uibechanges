@@ -1,11 +1,17 @@
 package com.tn.uib.uibechanges.model;
 
+import java.util.Set;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "servers", uniqueConstraints = {@UniqueConstraint(columnNames = { "mainAddress" }) })
@@ -25,15 +31,46 @@ public class Server {
 
 	private String secondaryAddress;
 
-//    @OneToMany(fetch = FetchType.LAZY, cascade = {}, mappedBy = "serveurSource")
-//    private Set<Configuration> configurationSet;
-//    @OneToMany(fetch = FetchType.LAZY, cascade = {}, mappedBy = "serveurDestination")
-//    private Set<Configuration> configurationSet1;
+    @OneToMany(fetch = FetchType.LAZY, cascade = {}, mappedBy = "sourceServer")
+    @JsonIgnore
+    private Set<Configuration> sourceConfigurations;
+    
+    @OneToMany(fetch = FetchType.LAZY, cascade = {}, mappedBy = "destinationServer")
+    @JsonIgnore
+    private Set<Configuration> destionationConfigurations;
+    
 //    @ManyToMany(fetch = FetchType.EAGER, cascade = {}, mappedBy = "serveurSet")
 //    private Set<UtilisateurSysteme> utilisateurSystemeSet;
 
 
-    public Server() {
+    public Set<Configuration> getSourceConfigurations() {
+		return sourceConfigurations;
+	}
+
+	public Server(String address, int port, String libelle, String mainAddress, String secondaryAddress,
+			Set<Configuration> sourceConfigurations, Set<Configuration> destionationConfigurations) {
+		this.address = address;
+		this.port = port;
+		this.libelle = libelle;
+		this.mainAddress = mainAddress;
+		this.secondaryAddress = secondaryAddress;
+		this.sourceConfigurations = sourceConfigurations;
+		this.destionationConfigurations = destionationConfigurations;
+	}
+
+	public void setSourceConfigurations(Set<Configuration> sourceConfigurations) {
+		this.sourceConfigurations = sourceConfigurations;
+	}
+
+	public Set<Configuration> getDestionationConfigurations() {
+		return destionationConfigurations;
+	}
+
+	public void setDestionationConfigurations(Set<Configuration> destionationConfigurations) {
+		this.destionationConfigurations = destionationConfigurations;
+	}
+
+	public Server() {
 	}
     
 	public Server(String address, int port, String libelle, String secondaryAddress,
@@ -93,5 +130,14 @@ public class Server {
 	public void setMainAddress(String mainAddress) {
 		this.mainAddress = mainAddress;
 	}
+	
+    public void changeToSecodaryAddress(boolean secondary){
+        if(secondary){
+            this.address = this.secondaryAddress;
+        } else {
+            this.address = this.mainAddress;
+        }
+    }
+
 
 }

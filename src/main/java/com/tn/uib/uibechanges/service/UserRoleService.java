@@ -6,7 +6,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,19 +23,16 @@ public class UserRoleService {
 	
 	@Autowired
 	private UserPermissionRepository userPermissionRepository;
-	
-	@Autowired
-	PasswordEncoder encoder;
 
 	public ResponseEntity<?> addRole(UserRole role) {
 		if (userRoleRepository.existsByName(role.getName())) {
 			return new ResponseEntity<>("Role name already taken !", HttpStatus.FOUND);
 		}
+		Set<UserPermission> newPermissions = new HashSet<>();
 		if(role.getPermissions()!=null){
-			Set<UserPermission> newPermissions = new HashSet<>();
-		role.getPermissions().forEach(permission -> {newPermissions.add(userPermissionRepository.findById(permission.getId()));});
-		role.setPermissions(newPermissions);
+			role.getPermissions().forEach(permission -> {newPermissions.add(userPermissionRepository.findById(permission.getId()));});
 		}
+		role.setPermissions(newPermissions);
 		return new ResponseEntity<UserRole>(userRoleRepository.save(role), HttpStatus.CREATED);
 	}
 
@@ -60,8 +56,10 @@ public class UserRoleService {
 			return new ResponseEntity<>("Role name already taken !", HttpStatus.FOUND);
 		}
 		oldRole.setName(role.getName());
-		oldRole.getPermissions().clear();
-		role.getPermissions().forEach(permission -> { oldRole.getPermissions().add( userPermissionRepository.findById(permission.getId())); });
+		if(role.getPermissions() != null) {
+			oldRole.getPermissions().clear();
+			role.getPermissions().forEach(permission -> { oldRole.getPermissions().add( userPermissionRepository.findById(permission.getId())); });
+		}
 		
 		return new ResponseEntity<>(userRoleRepository.save(oldRole), HttpStatus.OK);
 	}
@@ -89,6 +87,12 @@ public class UserRoleService {
 	}
 	
 	public ResponseEntity<?> addPermissionToRole(int roleId, int permissionId) {
+		if(userRoleRepository.existsById(roleId) ) {
+			return new ResponseEntity<>("role not found",HttpStatus.NOT_FOUND);
+		}
+		if(userPermissionRepository.existsById(permissionId)) {
+			return new ResponseEntity<>("per;ission not found",HttpStatus.NOT_FOUND);
+		}
 		UserRole role = userRoleRepository.findById(roleId);
 		UserPermission permission = userPermissionRepository.findById(permissionId);
 		role.getPermissions().add(permission);
@@ -96,11 +100,16 @@ public class UserRoleService {
 	}
 	
 	public ResponseEntity<?> removePermissionFromRole(int roleId, int permissionId) {
+		if(userRoleRepository.existsById(roleId) ) {
+			return new ResponseEntity<>("role not found",HttpStatus.NOT_FOUND);
+		}
+		if(userPermissionRepository.existsById(permissionId)) {
+			return new ResponseEntity<>("per;ission not found",HttpStatus.NOT_FOUND);
+		}
 		UserRole role = userRoleRepository.findById(roleId);
 		UserPermission permission = userPermissionRepository.findById(permissionId);
 		role.getPermissions().remove(permission);
 		return new ResponseEntity<>(userRoleRepository.save(role),HttpStatus.OK);
 	}
-	
 	
 }

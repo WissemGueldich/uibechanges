@@ -9,6 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
@@ -18,16 +20,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "profiles")
 public class Profile {
 	
-    @Id
+   
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     private String libelle;
-//    @JoinTable(name = "profile_configuration", joinColumns = {
-//        @JoinColumn(name = "profile", referencedColumnName = "id")}, inverseJoinColumns = {
-//        @JoinColumn(name = "configuration", referencedColumnName = "id")})
-//    @ManyToMany(fetch = FetchType.EAGER)
-//    private Set<Configuration> configurationSet;
+    
+    
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "profile_configurations", 
+    		joinColumns = @JoinColumn(name = "profile_id"), 
+			inverseJoinColumns = @JoinColumn(name = "configuration_id"))
+    private Set<Configuration> configurations;
+    
     @ManyToMany(fetch = FetchType.LAZY, 
     		cascade = CascadeType.ALL, 
     		mappedBy = "profiles")
@@ -50,6 +57,11 @@ public class Profile {
     public Profile( String libelle) {
         this.libelle = libelle;
     }
+    
+    public Profile(String libelle, Set<Configuration> configurations) {
+		this.libelle = libelle;
+		this.configurations = configurations;
+	}
 
     public Integer getId() {
         return id;
@@ -75,16 +87,13 @@ public class Profile {
 		this.users = users;
 	}
 
+    public Set<Configuration> getConfigurations() {
+        return configurations;
+    }
 
-//    @XmlTransient
-//    public Set<Configuration> getConfigurationSet() {
-//        return configurationSet;
-//    }
-//
-//    public void setConfigurationSet(Set<Configuration> configurationSet) {
-//        this.configurationSet = configurationSet;
-//    }
-//
+    public void setConfigurations(Set<Configuration> configurations) {
+        this.configurations = configurations;
+    }
 
     @Override
     public int hashCode() {

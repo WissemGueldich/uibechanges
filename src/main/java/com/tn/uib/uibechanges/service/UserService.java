@@ -27,6 +27,19 @@ import com.tn.uib.uibechanges.repository.UserRoleRepository;
 @Transactional
 public class UserService implements UserDetailsService{
 	
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private UserRoleRepository userRoleRepository;
+	
+	@Autowired
+	private ProfileRepository profileRepository;
+	
+	@Autowired
+	PasswordEncoder encoder;
+	
+	
 	@Override
 	public UserDetails loadUserByUsername(String matricule) throws UsernameNotFoundException {
 		User user = userRepository.findByMatricule(matricule);
@@ -44,59 +57,50 @@ public class UserService implements UserDetailsService{
 		return new org.springframework.security.core.userdetails.User( user.getMatricule(), user.getPassword(),authorities);
 	}
 
-	@Autowired
-	private UserRepository userRepository;
-	
-	@Autowired
-	private UserRoleRepository userRoleRepository;
-	
-	@Autowired
-	private ProfileRepository profileRepository;
-	
-	@Autowired
-	PasswordEncoder encoder;
-
 	public ResponseEntity<?> addUser(User user) {
 		if (userRepository.existsByEmail(user.getEmail())) {
 			return new ResponseEntity<>("Email already taken !", HttpStatus.FOUND);
-		} else {
-			if (userRepository.existsByMatricule(user.getMatricule())) {
-				return new ResponseEntity<>("Matricule already taken !", HttpStatus.FOUND);
-			}
+		}
+		if (userRepository.existsByMatricule(user.getMatricule())) {
+			return new ResponseEntity<>("Matricule already taken !", HttpStatus.FOUND);
 		}
 		
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreated(new Date());
 		user.setUpdated(new Date());
 		user.setEnabled(true);
+		Set<UserRole> newRoles = new HashSet<>();
+		Set<Profile> newProfiles = new HashSet<>();
 		if(user.getRoles()!=null){
-			Set<UserRole> newRoles = new HashSet<>();
 		user.getRoles().forEach(role -> {newRoles.add(userRoleRepository.findById(role.getId()));});
+		}
 		user.setRoles(newRoles);
-		}else {
-			user.setRoles(Set.of(userRoleRepository.findByName("ROLE_USER")));
-		}
 		if(user.getProfiles()!=null){
-			Set<Profile> newProfiles = new HashSet<>();
 		user.getProfiles().forEach(profile -> {newProfiles.add(profileRepository.findById(profile.getId()).get());});
-		user.setProfiles(newProfiles);
 		}
+		user.setProfiles(newProfiles);
 		
 		return new ResponseEntity<User>(userRepository.save(user), HttpStatus.CREATED);
 	}
 	
-	public ResponseEntity<?> addRoleToUser(int userId, int roleId) {
-		User user = userRepository.findById(userId);
-		UserRole role = userRoleRepository.findById(roleId);
-		user.getRoles().add(role);
-		return new ResponseEntity<>(userRepository.save(user),HttpStatus.OK);
+	public ResponseEntity<?> addRoleToUser(int userId, Set<UserRole> roles) {
+		if(!userRepository.existsById(userId) ) {
+			return new ResponseEntity<>("user not found",HttpStatus.NOT_FOUND);
+		}
+		User oldUser = userRepository.findById(userId);
+		oldUser.getRoles().addAll(roles);
+		return new ResponseEntity<>(userRepository.save(oldUser),HttpStatus.OK);
+
 	}
 	
-	public ResponseEntity<?> removeRoleFromUser(int userId, int roleId) {
-		User user = userRepository.findById(userId);
-		UserRole role = userRoleRepository.findById(roleId);
-		user.getRoles().remove(role);
-		return new ResponseEntity<>(userRepository.save(user),HttpStatus.OK);
+	public ResponseEntity<?> removeRoleFromUser(int userId, Set<UserRole> roles) {
+		if(!userRepository.existsById(userId) ) {
+			return new ResponseEntity<>("user not found",HttpStatus.NOT_FOUND);
+		}
+
+		User oldUser = userRepository.findById(userId);
+		oldUser.getRoles().removeAll(roles);
+		return new ResponseEntity<>(userRepository.save(oldUser),HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> getUsers() {
@@ -136,18 +140,35 @@ public class UserService implements UserDetailsService{
 		}
 		oldUser.setEnabled(user.isEnabled());
 		oldUser.setMatricule(user.getMatricule());
-		oldUser.getRoles().clear();
-		oldUser.getProfiles().clear();
-		user.getRoles().forEach(role -> { oldUser.getRoles().add( userRoleRepository.findById(role.getId())); });
-		user.getProfiles().forEach(profile -> { oldUser.getProfiles().add( profileRepository.findById(profile.getId()).get());});
+		if (user.getRoles()!=null) {
+			oldUser.getRoles().clear();
+			user.getRoles().forEach(role -> { oldUser.getRoles().add( userRoleRepository.findById(role.getId())); });
+		}
+		if (user.getProfiles()!=null) {
+			oldUser.getProfiles().clear();
+			user.getProfiles().forEach(profile -> { oldUser.getProfiles().add( profileRepository.findById(profile.getId()).get());});
+		}
+
 		return new ResponseEntity<>(userRepository.save(oldUser), HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> deleteUser(int id) {
 		User user = userRepository.findById(id);
 		user.getRoles().clear();
+		user.getProfiles().clear();
 		userRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+	
+	public ResponseEntity<?> addProfileToUser(int userId, Set<Profile> profiles) {
+		if(!userRepository.existsById(userId) ) {
+			return new ResponseEntity<>("user not found",HttpStatus.NOT_FOUND);
+		}
+		User oldUser = userRepository.findById(userId);
+		oldUser.getProfiles().addAll(profiles);
+		return new ResponseEntity<>(userRepository.save(oldUser),HttpStatus.OK);
+
+	}
+	
 
 }

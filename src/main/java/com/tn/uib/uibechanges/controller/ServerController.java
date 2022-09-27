@@ -16,37 +16,32 @@ import com.tn.uib.uibechanges.service.ServerService;
 
 
 @RestController
-@RequestMapping("api/v1/serveurs")
+@RequestMapping("servers")
 public class ServerController {
 	
 	@Autowired
 	ServerService serverService;
-			
 	
 	@PostMapping
 	//@PreAuthorize("hasAuthority('serveur:write')")
 	public ResponseEntity<?> addServeur(@RequestBody Server server) {
 		return serverService.addServer(server);
-		
 	};
 	
 	@GetMapping
 	//@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_NWADMIN')")
 	public ResponseEntity<?> getServeurs() {
 		return serverService.getServers();
-
 	};
 	
 	@GetMapping(path = "{id}")
 	public ResponseEntity<?> getServeur(@PathVariable int id) {
 		return serverService.getServer(id);
-
 	};
 	
 	@PutMapping
 	public ResponseEntity<?> updateServeur(@RequestBody Server server) {
 		return serverService.updateServer(server);
-		
 	};
 	
 	@DeleteMapping(path="{id}")
