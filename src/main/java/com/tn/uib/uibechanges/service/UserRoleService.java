@@ -87,23 +87,24 @@ public class UserRoleService {
 	}
 	
 	public ResponseEntity<?> addPermissionToRole(int roleId, int permissionId) {
-		if(userRoleRepository.existsById(roleId) ) {
+		if(!userRoleRepository.existsById(roleId) ) {
 			return new ResponseEntity<>("role not found",HttpStatus.NOT_FOUND);
 		}
-		if(userPermissionRepository.existsById(permissionId)) {
-			return new ResponseEntity<>("per;ission not found",HttpStatus.NOT_FOUND);
+		if(!userPermissionRepository.existsById(permissionId)) {
+			return new ResponseEntity<>("permission not found",HttpStatus.NOT_FOUND);
 		}
 		UserRole role = userRoleRepository.findById(roleId);
 		UserPermission permission = userPermissionRepository.findById(permissionId);
 		role.getPermissions().add(permission);
+		System.out.println("added permission "+permission.getName()+" to role "+role.getName());
 		return new ResponseEntity<>(userRoleRepository.save(role),HttpStatus.OK);
 	}
 	
 	public ResponseEntity<?> removePermissionFromRole(int roleId, int permissionId) {
-		if(userRoleRepository.existsById(roleId) ) {
+		if(!userRoleRepository.existsById(roleId) ) {
 			return new ResponseEntity<>("role not found",HttpStatus.NOT_FOUND);
 		}
-		if(userPermissionRepository.existsById(permissionId)) {
+		if(!userPermissionRepository.existsById(permissionId)) {
 			return new ResponseEntity<>("per;ission not found",HttpStatus.NOT_FOUND);
 		}
 		UserRole role = userRoleRepository.findById(roleId);

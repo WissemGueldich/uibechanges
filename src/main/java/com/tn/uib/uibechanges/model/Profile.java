@@ -20,14 +20,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "profiles")
 public class Profile {
 	
-   
-
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String libelle;
-    
     
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "profile_configurations", 
@@ -35,12 +32,9 @@ public class Profile {
 			inverseJoinColumns = @JoinColumn(name = "configuration_id"))
     private Set<Configuration> configurations;
     
-    @ManyToMany(fetch = FetchType.LAZY, 
-    		cascade = CascadeType.ALL, 
-    		mappedBy = "profiles")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "profiles")
     @JsonIgnore
     private Set<User> users = new HashSet<>();
-
 
 	public Profile() {
     }
@@ -94,15 +88,13 @@ public class Profile {
     public void setConfigurations(Set<Configuration> configurations) {
         this.configurations = configurations;
     }
-
-    @Override
+    
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
-    @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Profile)) {
@@ -115,7 +107,6 @@ public class Profile {
         return true;
     }
 
-    @Override
     public String toString() {
         return "com.tn.uib.uibechanges.dal.entities.Profile[ id=" + id + " ]";
     }

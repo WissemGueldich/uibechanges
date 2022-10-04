@@ -1,6 +1,5 @@
 package com.tn.uib.uibechanges.model;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "roles", uniqueConstraints = {@UniqueConstraint(columnNames = { "name" }) })
+@Table(name = "roles", uniqueConstraints = {@UniqueConstraint(columnNames = { "name" })})
 public class UserRole {
 
 	@Id
@@ -32,8 +31,7 @@ public class UserRole {
 	@NotBlank
 	private String name;
 	
-	
-	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	@JoinTable(	name = "role_permissions", 
 				joinColumns = @JoinColumn(name = "role_id"), 
 				inverseJoinColumns = @JoinColumn(name = "permission_id"))
@@ -41,10 +39,8 @@ public class UserRole {
 	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "roles")
 	@JsonIgnore
-	private Set<User> users = new HashSet<>();
+	private Set<User> users;
 	
-
-
 	public Set<User> getUsers() {
 		return users;
 	}

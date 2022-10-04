@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tn.uib.uibechanges.model.User;
 import com.tn.uib.uibechanges.model.UserRole;
-import com.tn.uib.uibechanges.service.ConfigurationService;
 import com.tn.uib.uibechanges.service.UserService;
 
 @RestController
@@ -32,25 +31,25 @@ public class UserController {
 	private ResponseEntity<?> addUser (@RequestBody User user){
 		return userService.addUser(user);
 	}
+	
 	@GetMapping
 	private ResponseEntity<?> getUsers (){
 		return userService.getUsers();
 	}
+	
 	@GetMapping(path = "{id}")
 	private ResponseEntity<?> getUser (@PathVariable int id ){
 		return userService.getUser(id);
-
 	}
+	
 	@PutMapping
 	private ResponseEntity<?> updateUser (@RequestBody User user ){
-
 		return userService.updateUser(user);
-
 	}
+	
 	@DeleteMapping(path="{id}")
 	private ResponseEntity<?> deleteUser (@PathVariable int id){
 		return userService.deleteUser(id);
-
 	}
 	
 	@PostMapping(path="/add/{userId}")
@@ -64,17 +63,6 @@ public class UserController {
 
 		return userService.removeRoleFromUser(userId, roles);
 	}
-	////////////////////////////////////////////////////////
-	@Autowired
-	private ConfigurationService configurationService;
-	
-	@GetMapping("/configs")
-	private ResponseEntity<?> getConfigs(@RequestBody SearchRequest searchRequest){
-		return configurationService.getUserConfigurations(searchRequest.getAutomatic(),searchRequest.getMatricule());
-	}
-	////////////////////////////////////////////////////////
-	
-	
 
 }
 

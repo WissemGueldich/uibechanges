@@ -35,9 +35,7 @@ public class UserPermission {
 	@JsonIgnore
 	private PermissionType permissionType;
 	
-	@ManyToMany(fetch = FetchType.LAZY,
-		      cascade = CascadeType.ALL,
-		      mappedBy = "permissions")
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "permissions")
 	@JsonIgnore
 	Set<UserRole> userRoles = new HashSet<>();
 
@@ -81,8 +79,5 @@ public class UserPermission {
 	public void setName(String name) {
 		this.name = name + permissionType.getType();
 	}
-
-	
-	
 
 }

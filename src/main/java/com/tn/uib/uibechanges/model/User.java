@@ -75,8 +75,7 @@ public class User {
 
 	public User(@NotBlank @Size(max = 120) String matricule, @NotBlank @Size(max = 120) String password,
 			@NotBlank @Size(max = 50) @Email String email, @NotBlank @Size(min = 4, max = 40) String firstName, 
-			@NotBlank @Size(min = 4, max = 40) String lastName, boolean isEnabled, Set<UserRole> roles, Set<Profile> profiles
-			) {
+			@NotBlank @Size(min = 4, max = 40) String lastName, boolean isEnabled, Set<UserRole> roles, Set<Profile> profiles) {
 		this.password = password;
 		this.isEnabled = isEnabled;
 		this.email = email;
@@ -86,7 +85,6 @@ public class User {
 		this.roles =roles;
 		this.profiles = profiles;
 	}
-
 
 	public String getPassword() {
 		return password;
@@ -162,8 +160,6 @@ public class User {
 		this.id = id;
 	}
 
-
-
 	public String getEmail() {
 		return email;
 	}
@@ -171,7 +167,6 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
 
 	public Set<UserRole> getRoles () {
 		return roles;
@@ -185,12 +180,10 @@ public class User {
 		return profiles;
 	}
 
-
 	public void setProfiles(Set<Profile> profiles) {
 		this.profiles = profiles;
 	}
 
-	@Override
 	public String toString() {
 		return "User [id=" + id + ", matricule=" + matricule + ", email=" + email + 
 				", firstName=" + firstName + ", lastName=" + lastName + ", created=" + created + ", updated="

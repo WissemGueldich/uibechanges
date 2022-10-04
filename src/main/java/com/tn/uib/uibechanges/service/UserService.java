@@ -39,7 +39,6 @@ public class UserService implements UserDetailsService{
 	@Autowired
 	PasswordEncoder encoder;
 	
-	
 	@Override
 	public UserDetails loadUserByUsername(String matricule) throws UsernameNotFoundException {
 		User user = userRepository.findByMatricule(matricule);

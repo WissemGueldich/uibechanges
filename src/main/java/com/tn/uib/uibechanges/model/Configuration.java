@@ -33,22 +33,6 @@ public class Configuration {
 
 	private boolean automatic;
 
-	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
-			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
-			String destinationArchivingPath) {
-		super();
-		this.filter = filter;
-		this.overwrite = overwrite;
-		this.libelle = libelle;
-		this.move = move;
-		this.automatic = automatic;
-		this.archive = archive;
-		this.sourcePath = sourcePath;
-		this.sourceArchivingPath = sourceArchivingPath;
-		this.destinationPath = destinationPath;
-		this.destinationArchivingPath = destinationArchivingPath;
-	}
-
 	private boolean archive;
 
 	private String sourcePath;
@@ -71,29 +55,27 @@ public class Configuration {
 	@JsonIgnore
 	private Set<Profile> profiles;
 
-//    @ManyToOne(optional = false)
-//    private UtilisateurSysteme utilisateurSource;
+    @ManyToOne
+    private SystemUser sourceUser;
 
-//    @ManyToOne(optional = false)
-//    private UtilisateurSysteme utilisateurDestination;
+    @ManyToOne
+    private SystemUser destinationUser;
 
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "configuration", fetch = FetchType.LAZY)
-//    private Set<ConfigurationJob> jobSet;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "configurations")
+    @JsonIgnore
+    private Set<Job> jobs;
 
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "configuration", fetch = FetchType.LAZY)
-//    private Set<ApplicationConfiguration> applicationSet;
-//    
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "configurations")
+    @JsonIgnore
+	private Set<Application> applications ;
 
 	public Configuration() {
 	}
 
-	public Configuration(Integer id) {
-		this.id = id;
-	}
-
 	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
 			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
-			String destinationArchivingPath, Server sourceServer, Server destinationServer, Set<Profile> profiles) {
+			String destinationArchivingPath, Server destinationServer, Server sourceServer,
+			SystemUser sourceUser, SystemUser destinationUser) {
 		this.filter = filter;
 		this.overwrite = overwrite;
 		this.libelle = libelle;
@@ -106,23 +88,13 @@ public class Configuration {
 		this.destinationArchivingPath = destinationArchivingPath;
 		this.destinationServer = destinationServer;
 		this.sourceServer = sourceServer;
-		this.profiles = profiles;
-	}
-
-	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
-			boolean archive) {
-		this.filter = filter;
-		this.overwrite = overwrite;
-		this.libelle = libelle;
-		this.move = move;
-		this.automatic = automatic;
-		this.archive = archive;
+		this.sourceUser = sourceUser;
+		this.destinationUser = destinationUser;
 	}
 
 	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
 			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
 			String destinationArchivingPath, Server sourceServer, Server destinationServer) {
-		super();
 		this.filter = filter;
 		this.overwrite = overwrite;
 		this.libelle = libelle;
@@ -137,6 +109,20 @@ public class Configuration {
 		this.sourceServer = sourceServer;
 	}
 
+	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
+			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
+			String destinationArchivingPath) {
+		this.filter = filter;
+		this.overwrite = overwrite;
+		this.libelle = libelle;
+		this.move = move;
+		this.automatic = automatic;
+		this.archive = archive;
+		this.sourcePath = sourcePath;
+		this.sourceArchivingPath = sourceArchivingPath;
+		this.destinationPath = destinationPath;
+		this.destinationArchivingPath = destinationArchivingPath;
+	}
 	public Integer getId() {
 		return id;
 	}
@@ -217,49 +203,21 @@ public class Configuration {
 		this.sourceServer = sourceServer;
 	}
 
-//    @XmlTransient
-//    public Set<ConfigurationJob> getJobSet() {
-//        return jobSet;
-//    }
-//
-//    public void setJobSet(Set<ConfigurationJob> jobSet) {
-//        this.jobSet = jobSet;
-//    }
-//
-//    @XmlTransient
-//    public Set<ApplicationConfiguration> getApplicationSet() {
-//        return applicationSet;
-//    }
-//
-//    public void setApplicationSet(Set<ApplicationConfiguration> applicationSet) {
-//        this.applicationSet = applicationSet;
-//    }
+    public Set<Job> getJobs() {
+        return jobs;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		hash += (id != null ? id.hashCode() : 0);
-		return hash;
-	}
+    public void setJobs(Set<Job> jobs) {
+        this.jobs = jobs;
+    }
 
-	@Override
-	public boolean equals(Object object) {
-		// TODO: Warning - this methisod won't work in thise case thise id fields are
-		// not set
-		if (!(object instanceof Configuration)) {
-			return false;
-		}
-		Configuration othiser = (Configuration) object;
-		if ((this.id == null && othiser.id != null) || (this.id != null && !this.id.equals(othiser.id))) {
-			return false;
-		}
-		return true;
-	}
+    public Set<Application> getApplications() {
+        return applications;
+    }
 
-	@Override
-	public String toString() {
-		return "com.tn.uib.uibechanges.dal.entities.Configuration[ id=" + id + " ]";
-	}
+    public void setApplications(Set<Application> applications) {
+        this.applications = applications;
+    }
 
 	public String getSourcePath() {
 		return sourcePath;
@@ -293,19 +251,43 @@ public class Configuration {
 		this.destinationArchivingPath = destinationArchivingPath;
 	}
 
-//    public UtilateurSysteme getUtilateurSource() {
-//        return utilateurSource;
-//    }
-//
-//    public void setUtilateurSource(UtilateurSysteme utilateurSource) {
-//        this.utilateurSource = utilateurSource;
-//    }
-//
-//    public UtilateurSysteme getUtilateurDination() {
-//        return utilateurDination;
-//    }
-//
-//    public void setUtilateurDination(UtilateurSysteme utilateurDination) {
-//        this.utilateurDination = utilateurDination;
-//    }
+    public SystemUser getSourceUser() {
+        return sourceUser;
+    }
+
+    public void setSourceUser(SystemUser sourceUser) {
+        this.sourceUser = sourceUser;
+    }
+
+    public SystemUser getDestinationUser() {
+        return destinationUser;
+    }
+
+    public void setDestinationUser(SystemUser destinationUser) {
+        this.destinationUser = destinationUser;
+    }
+    
+	public int hashCode() {
+		int hash = 0;
+		hash += (id != null ? id.hashCode() : 0);
+		return hash;
+	}
+
+	public boolean equals(Object object) {
+		// TODO: Warning - this methisod won't work in thise case thise id fields are
+		// not set
+		if (!(object instanceof Configuration)) {
+			return false;
+		}
+		Configuration othiser = (Configuration) object;
+		if ((this.id == null && othiser.id != null) || (this.id != null && !this.id.equals(othiser.id))) {
+			return false;
+		}
+		return true;
+	}
+	
+	public String toString() {
+		return "com.tn.uib.uibechanges.dal.entities.Configuration[ id=" + id + " ]";
+	}
+	
 }

@@ -13,7 +13,7 @@ public interface ConfigurationRepository extends JpaRepository<Configuration, In
 	
 	Set<Configuration> findBySourceServer(Server sourceServer);
 	Set<Configuration> findByDestinationServer(Server sourceServer);
-		
+	Configuration findById(int id);
 	
 
 }
