@@ -11,11 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tn.uib.uibechanges.model.Application;
+import com.tn.uib.uibechanges.model.ApplicationConfiguration;
+import com.tn.uib.uibechanges.model.ApplicationConfigurationPK;
 import com.tn.uib.uibechanges.model.ApplicationExecution;
 import com.tn.uib.uibechanges.model.Configuration;
+import com.tn.uib.uibechanges.repository.ApplicationConfigurationRepository;
 import com.tn.uib.uibechanges.repository.ApplicationExecutionRepository;
 import com.tn.uib.uibechanges.repository.ApplicationRepository;
-import com.tn.uib.uibechanges.repository.ConfigurationRepository;
 
 @Service
 @Transactional
@@ -28,16 +30,24 @@ public class ApplicationService {
 	private ApplicationExecutionRepository applicationExecutionRepository;
 	
 	@Autowired
-	private ConfigurationRepository configurationRepository;
+	private ApplicationConfigurationRepository applicationConfigurationRepository;
 	
 	 public ResponseEntity<?> addApplication(Application application, Set<Configuration> configurations) {
 	        if (application.getConfigurations() == null) {
-	            application.setConfigurations(new HashSet<Configuration>());
+	            application.setConfigurations(new HashSet<ApplicationConfiguration>());
 	        }
-	        configurations.forEach(config -> {
-	        	application.getConfigurations().add(configurationRepository.findById(config.getId()).get()); 
-	        });
-	        application.getConfigurations().addAll(configurations);
+	        applicationRepository.save(application);
+	        
+	        int i = 1;
+	        for (Configuration conf : configurations) {
+	            ApplicationConfiguration appConfig = new ApplicationConfiguration();
+	            appConfig.setConfiguration(conf);
+	            appConfig.setApplication(application);
+	            appConfig.setRank(i);
+	            appConfig.setApplicationConfigurationPK(new ApplicationConfigurationPK(application.getId(), conf.getId()));
+	            applicationConfigurationRepository.save(appConfig);
+	            i++;
+	        }
 	        return new ResponseEntity<>(applicationRepository.save(application), HttpStatus.CREATED);
 	    }
 
@@ -51,16 +61,31 @@ public class ApplicationService {
         return new  ResponseEntity<>(applicationRepository.findByIdentifier(identifier),HttpStatus.OK);
     }
     
-    public ResponseEntity<?> updateApplication(Application application, Set<Configuration> configurations) {
-        if (application.getConfigurations() == null) {
-            application.setConfigurations(new HashSet<Configuration>());
+    public ResponseEntity<?> updateApplication(Application oldApplication, Set<Configuration> configurations) {
+    	Application application = applicationRepository.findById(oldApplication.getId()).get();
+    	if (application.getConfigurations() == null) {
+            application.setConfigurations(new HashSet<ApplicationConfiguration>());
         }
-    	Application oldApplication = applicationRepository.findById(application.getId()).get();
-    	oldApplication.getConfigurations().clear();
-    	oldApplication.getConfigurations().addAll(configurations);
-    	oldApplication.setAddress(application.getAddress());
-    	oldApplication.setIdentifier(application.getIdentifier());
-    	oldApplication.setName(application.getName());
+
+        for (ApplicationConfiguration appConfig : application.getConfigurations()) {
+            applicationConfigurationRepository.delete(appConfig);
+        }
+        application.getConfigurations().clear();
+
+        Set<ApplicationConfiguration> applicationConfigurations = new HashSet<>();
+        int i = 1;
+        for (Configuration conf : configurations) {
+            ApplicationConfiguration appConf = new ApplicationConfiguration();
+            appConf.setConfiguration(conf);
+            appConf.setApplication(application);
+            appConf.setRank(i);
+            i++;
+            appConf.setApplicationConfigurationPK(new ApplicationConfigurationPK(application.getId(), conf.getId()));
+            applicationConfigurations.add(appConf);
+            applicationConfigurationRepository.save(appConf);
+        }
+        application.getConfigurations().addAll(applicationConfigurations);
+        applicationRepository.save(application);
         return new ResponseEntity<>(applicationRepository.save(oldApplication),HttpStatus.OK);
     }
 
@@ -69,7 +94,11 @@ public class ApplicationService {
     }
     
     public ResponseEntity<?> deleteApplication(Application application) {
-    	applicationRepository.deleteById(application.getId());
+        Application app = applicationRepository.findById(application.getId()).get();
+        for (ApplicationConfiguration appConf : app.getConfigurations()) {
+            applicationConfigurationRepository.delete(appConf);
+        }
+    	applicationRepository.delete(app);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

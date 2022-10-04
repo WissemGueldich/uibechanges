@@ -22,9 +22,6 @@ public class ConfigurationService {
 	@Autowired
 	private UserRepository userRepository;
 	
-	
-	//TODO link server to configuration
-
 	public ResponseEntity<?> addConfiguration(Configuration configuration) {
 		return new ResponseEntity<> (configurationRepository.save(configuration),HttpStatus.CREATED);
 	}

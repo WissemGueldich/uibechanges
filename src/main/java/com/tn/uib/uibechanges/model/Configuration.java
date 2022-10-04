@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -65,9 +66,9 @@ public class Configuration {
     @JsonIgnore
     private Set<Job> jobs;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "configurations")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "configuration", fetch = FetchType.LAZY)
     @JsonIgnore
-	private Set<Application> applications ;
+    private Set<ApplicationConfiguration> applications ;
 
 	public Configuration() {
 	}
@@ -211,11 +212,11 @@ public class Configuration {
         this.jobs = jobs;
     }
 
-    public Set<Application> getApplications() {
+    public Set<ApplicationConfiguration> getApplications() {
         return applications;
     }
 
-    public void setApplications(Set<Application> applications) {
+    public void setApplications(Set<ApplicationConfiguration> applications) {
         this.applications = applications;
     }
 

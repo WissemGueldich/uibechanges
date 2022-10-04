@@ -9,9 +9,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -35,11 +32,9 @@ public class Application {
     @Column(name = "address")
     private String address;
     
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-	@JoinTable(	name = "application_configurations", 
-				joinColumns = @JoinColumn(name = "application_id"), 
-				inverseJoinColumns = @JoinColumn(name = "configuration_id"))
-	private Set<Configuration> configurations;
+    @OneToMany(mappedBy = "application", fetch = FetchType.EAGER)
+    @JsonIgnore
+	private Set<ApplicationConfiguration> configurations;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "application")
     @JsonIgnore
@@ -90,11 +85,11 @@ public class Application {
         this.address = address;
     }
     
-    public Set<Configuration> getConfigurations() {
+    public Set<ApplicationConfiguration> getConfigurations() {
         return configurations;
     }
 
-    public void setConfigurations(Set<Configuration> configurations) {
+    public void setConfigurations(Set<ApplicationConfiguration> configurations) {
         this.configurations = configurations;
     }
 
