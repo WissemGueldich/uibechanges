@@ -48,11 +48,9 @@ public class Job {
     			inverseJoinColumns = @JoinColumn(name = "day_id"))
     private Set<Day> days;
     
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "job_configurations", 
-    			joinColumns = @JoinColumn(name = "job_id"), 
-    			inverseJoinColumns = @JoinColumn(name = "configuration_id"))
-    private Set<Configuration> configurations;
+    @OneToMany(mappedBy = "job", fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Set<ConfigurationJob> configurations;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "job")
     @JsonIgnore
@@ -142,11 +140,11 @@ public class Job {
         this.days = days;
     }
  
-    public Set<Configuration> getConfigurations() {
+    public Set<ConfigurationJob> getConfigurations() {
         return configurations;
     }
 
-    public void setConfigurations(Set<Configuration> configurations) {
+    public void setConfigurations(Set<ConfigurationJob> configurations) {
         this.configurations = configurations;
     }
 

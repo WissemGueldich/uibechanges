@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import com.tn.uib.uibechanges.model.Configuration;
+import com.tn.uib.uibechanges.model.ConfigurationJob;
+import com.tn.uib.uibechanges.model.ConfigurationJobPK;
 import com.tn.uib.uibechanges.model.Day;
 import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.model.JobExecution;
-import com.tn.uib.uibechanges.repository.ConfigurationRepository;
-import com.tn.uib.uibechanges.repository.DayRepository;
+import com.tn.uib.uibechanges.repository.ConfigurationJobRepository;
 import com.tn.uib.uibechanges.repository.JobExecutionRepository;
 import com.tn.uib.uibechanges.repository.JobRepository;
 
@@ -26,37 +28,41 @@ public class JobService {
 	private JobRepository jobRepository;
 	
 	@Autowired
-	private ConfigurationRepository configurationRepository;
-	
-	@Autowired
-	private DayRepository dayRepository;
-	
-	@Autowired
 	private JobExecutionRepository jobExecutionRepository;
+	
+	@Autowired
+	private ConfigurationJobRepository configurationJobRepository;
 	
 
     public ResponseEntity<?> addJob(Job job, Set<Configuration> configurations, Set<Day> days) {
 
-        if (job.getConfigurations() == null) {
-            job.setConfigurations(new HashSet<Configuration>());
+    	if (job.getConfigurations() == null) {
+            job.setConfigurations(new HashSet<ConfigurationJob>());
         }
 
         if (job.getDays() == null) {
             job.setDays(new HashSet<Day>());
         }
-        days.forEach(day -> {
-        	job.getDays().add(dayRepository.findById(day.getId()).get());
-        });
-        configurations.forEach(config -> {
-        	job.getConfigurations().add(configurationRepository.findById(config.getId()).get());
-        });
+        job.getDays().addAll(days);
+        jobRepository.save(job);
+
+        int i = 1;
+        for (Configuration conf : configurations) {
+            ConfigurationJob confJob = new ConfigurationJob();
+            confJob.setConfiguration(conf);
+            confJob.setJob(job);
+            confJob.setRank(i);
+            confJob.setConfigurationJobPK(new ConfigurationJobPK(job.getId(), conf.getId()));
+            configurationJobRepository.save(confJob);
+            i++;
+        }
         return new ResponseEntity<>(jobRepository.save(job), HttpStatus.CREATED);
     }
     
     public ResponseEntity<?> addJob(Job job) {
 
         if (job.getConfigurations() == null) {
-            job.setConfigurations(new HashSet<Configuration>());
+            job.setConfigurations(new HashSet<ConfigurationJob>());
         }
 
         if (job.getDays() == null) {
@@ -71,20 +77,38 @@ public class JobService {
 
     
     public ResponseEntity<?> updateJob(Job job, Set<Configuration> configurations, Set<Day> days) {
-        if (job.getConfigurations() == null) {
-            job.setConfigurations(new HashSet<Configuration>());
-        }
+
         Job oldJob = jobRepository.findById(job.getId()).get();
         oldJob.setEndHour(job.getEndHour());
         oldJob.setFrequency(job.getFrequency());
         oldJob.setLibelle(job.getLibelle());
         oldJob.setStartHour(job.getStartHour());
         oldJob.setState(job.getState());
-        oldJob.setType(job.getType());
+        oldJob.setType(job.getType());        
+        //
+        for (ConfigurationJob confJob : oldJob.getConfigurations()) {
+            configurationJobRepository.delete(confJob);
+        }
         oldJob.getConfigurations().clear();
-        configurations.forEach(config -> {oldJob.getConfigurations().add(configurationRepository.findById(config.getId()).get());});
+
+        Set<ConfigurationJob> configurationsJob = new HashSet<>();
+        int i = 1;
+        for (Configuration conf : configurations) {
+            ConfigurationJob confJob = new ConfigurationJob();
+            confJob.setConfiguration(conf);
+            confJob.setJob(oldJob);
+            confJob.setRank(i);
+            i++;
+            confJob.setConfigurationJobPK(new ConfigurationJobPK(oldJob.getId(), conf.getId()));
+            configurationsJob.add(confJob);
+            configurationJobRepository.save(confJob);
+        }
+        oldJob.getConfigurations().addAll(configurationsJob);
+        if (oldJob.getDays() == null) {
+        	oldJob.setDays(new HashSet<Day>());
+        }
         oldJob.getDays().clear();
-        days.forEach(day -> {job.getDays().add(dayRepository.findById(day.getId()).get());});
+        job.getDays().addAll(days);
         return new ResponseEntity<>(jobRepository.save(oldJob),HttpStatus.OK);
     }
 
@@ -100,23 +124,19 @@ public class JobService {
         return new ResponseEntity<>(jobRepository.save(oldJob),HttpStatus.OK);
     }
 
-    
     public ResponseEntity<?> getJobs() {
         return new ResponseEntity<>(jobRepository.findAll(),HttpStatus.OK);
     }
 
-    
     public ResponseEntity<?> deleteJob(Job job) {
     	jobRepository.deleteById(job.getId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    
     public ResponseEntity<?> getJobExecutions(Job job) {
         return new ResponseEntity<>(jobExecutionRepository.findByJob(job),HttpStatus.OK);
     }
-
-    
+   
     public ResponseEntity<?> getAllJobExecutions() {
         return new ResponseEntity<>(jobExecutionRepository.findAll(),HttpStatus.OK);
     }
@@ -124,8 +144,7 @@ public class JobService {
     public ResponseEntity<?> addJobExecution(JobExecution jobExecution) {
         return new ResponseEntity<>(jobExecutionRepository.save(jobExecution),HttpStatus.CREATED);
     }
-
-    
+   
     public ResponseEntity<?> updateJobExecution(JobExecution jobExecution) {
         JobExecution oldJobExecution = jobExecutionRepository.findById(jobExecution.getId()).get();
         oldJobExecution.setEndDate(jobExecution.getEndDate());

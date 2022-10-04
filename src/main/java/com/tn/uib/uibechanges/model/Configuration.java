@@ -62,9 +62,9 @@ public class Configuration {
     @ManyToOne
     private SystemUser destinationUser;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "configurations")
+    @OneToMany(mappedBy = "job", fetch = FetchType.EAGER)
     @JsonIgnore
-    private Set<Job> jobs;
+    private Set<ConfigurationJob> jobs;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "configuration", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -204,11 +204,11 @@ public class Configuration {
 		this.sourceServer = sourceServer;
 	}
 
-    public Set<Job> getJobs() {
+    public Set<ConfigurationJob> getJobs() {
         return jobs;
     }
 
-    public void setJobs(Set<Job> jobs) {
+    public void setJobs(Set<ConfigurationJob> jobs) {
         this.jobs = jobs;
     }
 
