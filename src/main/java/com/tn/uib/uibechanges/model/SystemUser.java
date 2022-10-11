@@ -63,16 +63,13 @@ public class SystemUser {
 		this.password = password;
 		this.enabled = enabled;
 	}
-    
-    public SystemUser(String libelle, String login, String password, boolean enabled, Set<Server> servers,
-			Set<Configuration> configurationsAsSource, Set<Configuration> configurationsAsDestination) {
+
+	public SystemUser(String libelle, String login, String password, boolean enabled, Set<Server> servers) {
 		this.libelle = libelle;
 		this.login = login;
 		this.password = password;
 		this.enabled = enabled;
 		this.servers = servers;
-		this.configurationsAsSource = configurationsAsSource;
-		this.configurationsAsDestination = configurationsAsDestination;
 	}
 
 	public Integer getId() {
@@ -123,29 +120,6 @@ public class SystemUser {
         this.servers = servers;
     }
 
-    
-    public int hashCode() {
-        Integer hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SystemUser)) {
-            return false;
-        }
-        SystemUser other = (SystemUser) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    public String toString() {
-        return "com.tn.uib.uibechanges.dal.entities.SystemUser[ id=" + id + " ]";
-    }
-    
     public Set<Configuration> getConfigurationsAsSource() {
         return configurationsAsSource;
     }
@@ -161,6 +135,26 @@ public class SystemUser {
     public void setConfigurationsAsDestination(Set<Configuration> configurationsAsDestination) {
         this.configurationsAsDestination = configurationsAsDestination;
     }
+    
+    public int hashCode() {
+        Integer hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
 
+    public boolean equals(Object object) {
+        if (!(object instanceof SystemUser)) {
+            return false;
+        }
+        SystemUser other = (SystemUser) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    public String toString() {
+        return "com.tn.uib.uibechanges.dal.entities.SystemUser[ id=" + id + " ]";
+    }
 
 }

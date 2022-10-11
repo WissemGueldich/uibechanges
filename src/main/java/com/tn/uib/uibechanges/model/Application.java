@@ -43,17 +43,23 @@ public class Application {
     public Application() {
     }
 
-    public Application(Integer id) {
-        this.id = id;
-    }
+    public Application(String identifier, String name, String address, Set<ApplicationConfiguration> configurations) {
+		this.identifier = identifier;
+		this.name = name;
+		this.address = address;
+		this.configurations = configurations;
+	}
+    
+	public Application(String identifier, String name, String address, Set<ApplicationConfiguration> configurations,
+			Set<ApplicationExecution> applicationExecutions) {
+		this.identifier = identifier;
+		this.name = name;
+		this.address = address;
+		this.configurations = configurations;
+		this.applicationExecutions = applicationExecutions;
+	}
 
-    public Application( String identifier, String name, String address) {
-        this.identifier = identifier;
-        this.name = name;
-        this.address = address;
-    }
-
-    public Integer getId() {
+	public Integer getId() {
         return id;
     }
 
@@ -108,7 +114,6 @@ public class Application {
     }
 
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Application)) {
             return false;
         }

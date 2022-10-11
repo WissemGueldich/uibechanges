@@ -47,37 +47,18 @@ public class Server {
 	public Server() {
 	}
     
-	public Server(String address, int port, String libelle, String secondaryAddress,
-			String mainAddress) {
+	public Server(String address, int port, String libelle) {
 		this.address = address;
 		this.port = port;
 		this.libelle = libelle;
-		this.secondaryAddress = secondaryAddress;
-		this.mainAddress = mainAddress;
 	}
 
-	public Server(String address, int port, String libelle, String mainAddress, String secondaryAddress,
-			Set<Configuration> sourceConfigurations, Set<Configuration> destionationConfigurations) {
+	public Server(String address, int port, String libelle, String mainAddress, String secondaryAddress) {
 		this.address = address;
 		this.port = port;
 		this.libelle = libelle;
 		this.mainAddress = mainAddress;
 		this.secondaryAddress = secondaryAddress;
-		this.sourceConfigurations = sourceConfigurations;
-		this.destionationConfigurations = destionationConfigurations;
-	}
-	
-	public Server(String address, int port, String libelle, String mainAddress, String secondaryAddress,
-			Set<Configuration> sourceConfigurations, Set<Configuration> destionationConfigurations,
-			Set<SystemUser> systemUsers) {
-		this.address = address;
-		this.port = port;
-		this.libelle = libelle;
-		this.mainAddress = mainAddress;
-		this.secondaryAddress = secondaryAddress;
-		this.sourceConfigurations = sourceConfigurations;
-		this.destionationConfigurations = destionationConfigurations;
-		this.systemUsers = systemUsers;
 	}
 
 	public int getId() {

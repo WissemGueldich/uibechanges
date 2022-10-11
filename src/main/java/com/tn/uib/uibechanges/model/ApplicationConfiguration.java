@@ -10,7 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "application_configurations")
-public class ApplicationConfiguration {
+public class ApplicationConfiguration implements Comparable<ApplicationConfiguration>{
 	
 	@EmbeddedId
     protected ApplicationConfigurationPK applicationConfigurationPK;
@@ -69,4 +69,9 @@ public class ApplicationConfiguration {
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
     }
+
+	@Override
+	public int compareTo(ApplicationConfiguration o) {
+		return this.getRank().compareTo(o.getRank());
+	}
 }

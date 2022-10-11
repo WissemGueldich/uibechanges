@@ -72,11 +72,11 @@ public class Configuration {
 
 	public Configuration() {
 	}
-
+	
 	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
 			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
-			String destinationArchivingPath, Server destinationServer, Server sourceServer,
-			SystemUser sourceUser, SystemUser destinationUser) {
+			String destinationArchivingPath, Server destinationServer, Server sourceServer, SystemUser sourceUser,
+			SystemUser destinationUser) {
 		this.filter = filter;
 		this.overwrite = overwrite;
 		this.libelle = libelle;
@@ -93,37 +93,6 @@ public class Configuration {
 		this.destinationUser = destinationUser;
 	}
 
-	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
-			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
-			String destinationArchivingPath, Server sourceServer, Server destinationServer) {
-		this.filter = filter;
-		this.overwrite = overwrite;
-		this.libelle = libelle;
-		this.move = move;
-		this.automatic = automatic;
-		this.archive = archive;
-		this.sourcePath = sourcePath;
-		this.sourceArchivingPath = sourceArchivingPath;
-		this.destinationPath = destinationPath;
-		this.destinationArchivingPath = destinationArchivingPath;
-		this.destinationServer = destinationServer;
-		this.sourceServer = sourceServer;
-	}
-
-	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
-			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
-			String destinationArchivingPath) {
-		this.filter = filter;
-		this.overwrite = overwrite;
-		this.libelle = libelle;
-		this.move = move;
-		this.automatic = automatic;
-		this.archive = archive;
-		this.sourcePath = sourcePath;
-		this.sourceArchivingPath = sourceArchivingPath;
-		this.destinationPath = destinationPath;
-		this.destinationArchivingPath = destinationArchivingPath;
-	}
 	public Integer getId() {
 		return id;
 	}
@@ -275,8 +244,6 @@ public class Configuration {
 	}
 
 	public boolean equals(Object object) {
-		// TODO: Warning - this methisod won't work in thise case thise id fields are
-		// not set
 		if (!(object instanceof Configuration)) {
 			return false;
 		}

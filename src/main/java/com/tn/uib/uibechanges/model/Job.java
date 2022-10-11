@@ -19,6 +19,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "jobs")
 public class Job {
+	
+	//TODO check hours
+	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -67,16 +70,32 @@ public class Job {
         this.id = id;
     }
 
-    public Job( String libelle, String startHour, String endHour, int frequency, boolean state, String type) {
-        this.libelle = libelle;
-        this.startHour = startHour;
-        this.endHour = endHour;
-        this.frequency = frequency;
-        this.state = state;
-        this.type = type;
-    }
+    public Job(String libelle, String startHour, String endHour, int frequency, boolean state, String type,
+			Set<Day> days, Set<ConfigurationJob> configurations) {
+		this.libelle = libelle;
+		this.startHour = startHour;
+		this.endHour = endHour;
+		this.frequency = frequency;
+		this.state = state;
+		this.type = type;
+		this.days = days;
+		this.configurations = configurations;
+	}
 
-    public Integer getId() {
+	public Job(String libelle, String startHour, String endHour, int frequency, boolean state, String type,
+			Set<Day> days, Set<ConfigurationJob> configurations, Set<JobExecution> jobExecutions) {
+		this.libelle = libelle;
+		this.startHour = startHour;
+		this.endHour = endHour;
+		this.frequency = frequency;
+		this.state = state;
+		this.type = type;
+		this.days = days;
+		this.configurations = configurations;
+		this.jobExecutions = jobExecutions;
+	}
+
+	public Integer getId() {
         return id;
     }
 
@@ -171,7 +190,6 @@ public class Job {
     }
 
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Job)) {
             return false;
         }

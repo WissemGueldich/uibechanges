@@ -73,6 +73,10 @@ public class User {
     			inverseJoinColumns = @JoinColumn(name = "profile_id"))
     private Set<Profile> profiles;
 
+	public User() {
+
+	}
+
 	public User(@NotBlank @Size(max = 120) String matricule, @NotBlank @Size(max = 120) String password,
 			@NotBlank @Size(max = 50) @Email String email, @NotBlank @Size(min = 4, max = 40) String firstName, 
 			@NotBlank @Size(min = 4, max = 40) String lastName, boolean isEnabled, Set<UserRole> roles, Set<Profile> profiles) {
@@ -141,15 +145,6 @@ public class User {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-
-	public User() {
-	}
-
-	public User( String email, String matricule) {
-		this.email = email;
-		this.matricule = matricule;
 	}
 
 	public int getId() {

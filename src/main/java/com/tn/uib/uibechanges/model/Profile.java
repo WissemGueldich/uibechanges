@@ -39,25 +39,12 @@ public class Profile {
 	public Profile() {
     }
 
-    public Profile(Integer id) {
-        this.id = id;
-    }
-
-    public Profile(Integer id, String libelle) {
-        this.id = id;
-        this.libelle = libelle;
-    }
-    
-    public Profile( String libelle) {
-        this.libelle = libelle;
-    }
-    
     public Profile(String libelle, Set<Configuration> configurations) {
 		this.libelle = libelle;
 		this.configurations = configurations;
 	}
 
-    public Integer getId() {
+	public Integer getId() {
         return id;
     }
 
@@ -96,7 +83,6 @@ public class Profile {
     }
 
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Profile)) {
             return false;
         }

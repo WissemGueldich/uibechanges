@@ -85,7 +85,6 @@ public class JobService {
         oldJob.setStartHour(job.getStartHour());
         oldJob.setState(job.getState());
         oldJob.setType(job.getType());        
-        //
         for (ConfigurationJob confJob : oldJob.getConfigurations()) {
             configurationJobRepository.delete(confJob);
         }
