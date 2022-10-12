@@ -38,11 +38,11 @@ public class UibechangesApplication {
 		return args -> {
 			Server server = new Server("192.168.75.128", 22, "the server");
 			SystemUser systemUser = new SystemUser("libelle Suser", "sftpuser", "sftppassword", true, Set.of(server));
-			Configuration config = new Configuration("bla.txt", false, "config libelle", false, false, false, "/sftpuser/", 
-					"/sftpuser/", "/sftpuser/", "/sftpuser/archhive/", server, server, systemUser, systemUser);
+			Configuration config = new Configuration("the_file.txt", false, "config libelle", false, false, false, "/sftpuser/", 
+					"/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server, server, systemUser, systemUser);
 			FileTransferUtility fileTransferUtility = new FileTransferUtility();
 			fileTransferUtility.setConfig(config);
-			fileTransferUtility.transfer();
+			fileTransferUtility.upload();
 			
 		};
 	}
