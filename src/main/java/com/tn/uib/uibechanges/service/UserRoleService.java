@@ -28,6 +28,7 @@ public class UserRoleService {
 		if (userRoleRepository.existsByName(role.getName())) {
 			return new ResponseEntity<>("Role name already taken !", HttpStatus.FOUND);
 		}
+		role.setName("ROLE_"+role.getName().toUpperCase());
 		Set<UserPermission> newPermissions = new HashSet<>();
 		if(role.getPermissions()!=null){
 			role.getPermissions().forEach(permission -> {newPermissions.add(userPermissionRepository.findById(permission.getId()));});
@@ -48,6 +49,10 @@ public class UserRoleService {
 	public ResponseEntity<?> getRole(String name) {
 		return new ResponseEntity<>(userRoleRepository.findByName(name), HttpStatus.OK);
 	}
+	
+	public ResponseEntity<?> getPermissions() {
+		return new ResponseEntity<>(userPermissionRepository.findAll(), HttpStatus.OK);
+	}
 
 	public ResponseEntity<?> updateRole(UserRole role) {
 		
@@ -55,7 +60,7 @@ public class UserRoleService {
 		if (!oldRole.getName().equals(role.getName()) && userRoleRepository.existsByName(role.getName())) {
 			return new ResponseEntity<>("Role name already taken !", HttpStatus.FOUND);
 		}
-		oldRole.setName(role.getName());
+		oldRole.setName("ROLE_"+role.getName().toUpperCase());
 		if(role.getPermissions() != null) {
 			oldRole.getPermissions().clear();
 			role.getPermissions().forEach(permission -> { oldRole.getPermissions().add( userPermissionRepository.findById(permission.getId())); });
@@ -66,7 +71,10 @@ public class UserRoleService {
 
 	public ResponseEntity<?> deleteRole(int id) {
 		UserRole role =	userRoleRepository.findById(id);
+		role.getPermissions().forEach(perm->{ perm.getUserRoles().remove(role); });
 		role.getPermissions().clear();
+		role.getUsers().forEach(user->{user.getRoles().remove(role);});
+		role.getUsers().clear();
 		userRoleRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -105,7 +113,7 @@ public class UserRoleService {
 			return new ResponseEntity<>("role not found",HttpStatus.NOT_FOUND);
 		}
 		if(!userPermissionRepository.existsById(permissionId)) {
-			return new ResponseEntity<>("per;ission not found",HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("permission not found",HttpStatus.NOT_FOUND);
 		}
 		UserRole role = userRoleRepository.findById(roleId);
 		UserPermission permission = userPermissionRepository.findById(permissionId);

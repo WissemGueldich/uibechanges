@@ -21,7 +21,7 @@ import com.tn.uib.uibechanges.service.UserService;
 
 @RestController
 @CrossOrigin(origins = "*",allowedHeaders = "*")
-@RequestMapping(path = "users")
+@RequestMapping(path = "/api/users")
 public class UserController {
 	
 	@Autowired
@@ -55,13 +55,13 @@ public class UserController {
 	@PostMapping(path="/add/{userId}")
 	private ResponseEntity<?> addRoleToUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
 
-		return userService.addRoleToUser(userId, roles);
+		return userService.addRolesToUser(userId, roles);
 	}
 	
 	@PostMapping(path="/remove/{userId}")
 	private ResponseEntity<?> removeRoleFromUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
 
-		return userService.removeRoleFromUser(userId, roles);
+		return userService.removeRolesFromUser(userId, roles);
 	}
 
 }

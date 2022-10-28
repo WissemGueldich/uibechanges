@@ -51,7 +51,7 @@ public class FileTransferUtility {
 		ChannelSftp channel = (ChannelSftp) this.session.openChannel("sftp");
 		channel.connect(5000);
 		System.out.println("Starting Upload..............");
-		System.out.println("Uploading from: "+"src/main/resources/tmp/"+config.getFilter()+"to: "+ config.getDestinationPath()+config.getFilter());
+		System.out.println("Uploading from: "+"src/main/resources/tmp/"+config.getFilter()+" to: "+ config.getDestinationPath()+config.getFilter());
 		channel.put("src/main/resources/tmp/"+config.getFilter(), config.getDestinationPath()+config.getFilter());
 		System.out.println("Uploaded successfully.");
 		channel.disconnect();
@@ -59,7 +59,9 @@ public class FileTransferUtility {
 		System.out.println("Deleting temporary files..............");
 	    Files.delete(temp);
 	    System.out.println("Temporary files deleted.");
-		execute("cp "+config.getDestinationPath()+config.getFilter()+" "+config.getDestinationArchivingPath()+config.getFilter().replace(".", "_archive."));
+	    if(config.getArchive()) {
+			execute("cp "+config.getDestinationPath()+config.getFilter()+" "+config.getDestinationArchivingPath()+config.getFilter().replace(".", "_archive."));
+	    }
 		killSession();
 	}
 	
@@ -83,10 +85,10 @@ public class FileTransferUtility {
 	}
 	
 	private void execute(String command) throws JSchException, IOException {
-		//server config needed to execute ssh commands for achiving
-		//nano /etc/ssh/sshd_config
-		//remove ForceCommand internal-sftp
-		//remove chroot directory
+		/*server config needed to execute ssh commands for achiving
+		nano /etc/ssh/sshd_config
+		remove ForceCommand internal-sftp
+		remove chroot directory*/
 		System.out.println("Opening exec channel..............");
 		ChannelExec channel = (ChannelExec) this.session.openChannel("exec");
 		channel.setCommand(command) ;

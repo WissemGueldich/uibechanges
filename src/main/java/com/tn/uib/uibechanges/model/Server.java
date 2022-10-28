@@ -2,6 +2,7 @@ package com.tn.uib.uibechanges.model;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -32,15 +33,15 @@ public class Server {
 
 	private String secondaryAddress;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = {}, mappedBy = "sourceServer")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "sourceServer")
     @JsonIgnore
     private Set<Configuration> sourceConfigurations;
     
-    @OneToMany(fetch = FetchType.LAZY, cascade = {}, mappedBy = "destinationServer")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "destinationServer")
     @JsonIgnore
     private Set<Configuration> destionationConfigurations;
     
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {}, mappedBy = "servers")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "servers")
     @JsonIgnore
     private Set<SystemUser> systemUsers;
 

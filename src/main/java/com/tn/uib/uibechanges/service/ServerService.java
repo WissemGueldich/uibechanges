@@ -73,8 +73,10 @@ public class ServerService {
 	}
 
 	public ResponseEntity<?> deleteServer(int id) {
-//		Server server = serverRepository.findById(id);
+		Server server = serverRepository.findById(id);
 		//TODO clear relational attributes before deleting
+		server.getSystemUsers().forEach(user->{user.getServers().remove(server);});
+		server.getSystemUsers().clear();
 		serverRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

@@ -69,20 +69,21 @@ public class UserService implements UserDetailsService{
 		user.setUpdated(new Date());
 		user.setEnabled(true);
 		Set<UserRole> newRoles = new HashSet<>();
-		Set<Profile> newProfiles = new HashSet<>();
+		newRoles.add(userRoleRepository.findByName("ROLE_SUPERVISOR"));
 		if(user.getRoles()!=null){
-		user.getRoles().forEach(role -> {newRoles.add(userRoleRepository.findById(role.getId()));});
+			user.getRoles().forEach(role -> {newRoles.add(userRoleRepository.findById(role.getId()));});
 		}
 		user.setRoles(newRoles);
+		Set<Profile> newProfiles = new HashSet<>();
 		if(user.getProfiles()!=null){
-		user.getProfiles().forEach(profile -> {newProfiles.add(profileRepository.findById(profile.getId()).get());});
+			user.getProfiles().forEach(profile -> {newProfiles.add(profileRepository.findById(profile.getId()).get());});
 		}
 		user.setProfiles(newProfiles);
 		
 		return new ResponseEntity<User>(userRepository.save(user), HttpStatus.CREATED);
 	}
 	
-	public ResponseEntity<?> addRoleToUser(int userId, Set<UserRole> roles) {
+	public ResponseEntity<?> addRolesToUser(int userId, Set<UserRole> roles) {
 		if(!userRepository.existsById(userId) ) {
 			return new ResponseEntity<>("user not found",HttpStatus.NOT_FOUND);
 		}
@@ -92,7 +93,7 @@ public class UserService implements UserDetailsService{
 
 	}
 	
-	public ResponseEntity<?> removeRoleFromUser(int userId, Set<UserRole> roles) {
+	public ResponseEntity<?> removeRolesFromUser(int userId, Set<UserRole> roles) {
 		if(!userRepository.existsById(userId) ) {
 			return new ResponseEntity<>("user not found",HttpStatus.NOT_FOUND);
 		}

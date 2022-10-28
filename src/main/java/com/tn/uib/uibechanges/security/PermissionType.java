@@ -1,8 +1,8 @@
 package com.tn.uib.uibechanges.security;
 
 public enum PermissionType {
-	READ(":read"),
-	WRITE(":write");
+	READ(":lire"),
+	WRITE(":ecrire");
 
 	private final String type;
 	

@@ -15,7 +15,7 @@ import com.tn.uib.uibechanges.model.UserRole;
 import com.tn.uib.uibechanges.service.UserRoleService;
 
 @RestController
-@RequestMapping(path = "roles")
+@RequestMapping(path = "/api/roles")
 public class UserRoleController {
 	
 	@Autowired
@@ -29,6 +29,11 @@ public class UserRoleController {
 	@GetMapping
 	private ResponseEntity<?> getRoles (){
 		return userRoleService.getRoles();
+	}
+	
+	@GetMapping("/permissions")
+	private ResponseEntity<?> getPermissions (){
+		return userRoleService.getPermissions();
 	}
 	
 	@GetMapping(path = "{id}")

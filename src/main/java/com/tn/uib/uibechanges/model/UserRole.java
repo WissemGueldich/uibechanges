@@ -41,6 +41,16 @@ public class UserRole {
 	@JsonIgnore
 	private Set<User> users;
 	
+	public UserRole(@NotBlank String name, Set<UserPermission> permissions) {
+		this.name = name;
+		this.permissions = permissions;
+	}
+	
+	public UserRole(@NotBlank String name) {
+		this.name = name;
+	}
+
+
 	public Set<User> getUsers() {
 		return users;
 	}
@@ -53,11 +63,6 @@ public class UserRole {
 		this.permissions = permissions;
 	}
 
-	public UserRole(@NotBlank String name, Set<UserPermission> permissions) {
-		this.name = "ROLE_" + name.toUpperCase();
-		this.permissions = permissions;
-	}
-
 	public Set<UserPermission> getPermissions() {
 		return permissions;
 	}	
@@ -67,7 +72,7 @@ public class UserRole {
 	}
 
 	public void setName(String name) {
-		this.name = "ROLE_" + name.toUpperCase();
+		this.name = name;
 	}
 	
 	public UserRole() {}

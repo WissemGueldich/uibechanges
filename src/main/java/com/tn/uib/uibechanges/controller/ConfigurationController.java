@@ -21,7 +21,7 @@ import com.tn.uib.uibechanges.service.ConfigurationService;
 
 @RestController
 @CrossOrigin(origins = "*",allowedHeaders = "*")
-@RequestMapping(path = "configs")
+@RequestMapping(path = "/api/configs")
 public class ConfigurationController {
 
 	@Autowired

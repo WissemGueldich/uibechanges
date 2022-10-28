@@ -12,44 +12,43 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tn.uib.uibechanges.model.Server;
-import com.tn.uib.uibechanges.service.ServerService;
-
+import com.tn.uib.uibechanges.model.SystemUser;
+import com.tn.uib.uibechanges.service.SystemUserService;
 
 @RestController
 @CrossOrigin(origins = "*",allowedHeaders = "*")
-@RequestMapping("/api/servers")
-public class ServerController {
+@RequestMapping("/api/systemUsers")
+public class SystemUserController {
 	
 	@Autowired
-	ServerService serverService;
+	private SystemUserService systemUserService;
 	
 	@PostMapping
-	//@PreAuthorize("hasAuthority('serveur:ecrire')")
-	public ResponseEntity<?> addServeur(@RequestBody Server server) {
-		return serverService.addServer(server);
+	//@PreAuthorize("hasAuthority('serveur:write')")
+	public ResponseEntity<?> addSystemUser(@RequestBody SystemUser systemUser) {
+		return systemUserService.addSystemUser(systemUser);
 	};
 	
 	@GetMapping
 	//@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_NWADMIN')")
-	public ResponseEntity<?> getServeurs() {
-		return serverService.getServers();
+	public ResponseEntity<?> getSystemUsers() {
+		return systemUserService.getSystemUsers();
 	};
 	
 	@GetMapping(path = "{id}")
-	public ResponseEntity<?> getServeur(@PathVariable int id) {
-		return serverService.getServer(id);
+	public ResponseEntity<?> getSystemUser(@PathVariable int id) {
+		return systemUserService.getSystemUser(id);
 	};
 	
 	@PutMapping
-	public ResponseEntity<?> updateServeur(@RequestBody Server server) {
-		return serverService.updateServer(server);
+	public ResponseEntity<?> updateSystemUser(@RequestBody SystemUser systemUser) {
+		return systemUserService.updateSystemUser(systemUser);
 	};
 	
 	@DeleteMapping(path="{id}")
 	//@PreAuthorize("hasAuthority('job:write')")
-	public ResponseEntity<?> deleteServeur(@PathVariable int id) {
-		return serverService.deleteServer(id);
+	public ResponseEntity<?> deleteSystemUser(@PathVariable int id) {
+		return systemUserService.deleteSystemUsers(id);
 	};
-	
-};
+//update systemuser with server set
+}

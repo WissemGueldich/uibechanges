@@ -1,5 +1,6 @@
 package com.tn.uib.uibechanges.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -36,17 +37,17 @@ public class SystemUser {
     @Column(name = "enabled")
     private boolean enabled;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER )
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY )
     @JoinTable(name = "system_user_servers", 
     			joinColumns = @JoinColumn(name = "system_user_id"), 
 				inverseJoinColumns = @JoinColumn(name = "server_id"))
-    private Set<Server> servers;
+    private Set<Server> servers=new HashSet<Server>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = {}, mappedBy = "sourceUser")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "sourceUser")
     @JsonIgnore
     private Set<Configuration> configurationsAsSource;
     
-	@OneToMany(fetch = FetchType.LAZY, cascade = {}, mappedBy = "destinationUser")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "destinationUser")
 	@JsonIgnore
     private Set<Configuration> configurationsAsDestination;
 

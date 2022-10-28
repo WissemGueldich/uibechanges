@@ -17,7 +17,7 @@ import com.tn.uib.uibechanges.service.ProfileService;
 
 @RestController
 @CrossOrigin(origins = "*",allowedHeaders = "*")
-@RequestMapping(path = "profiles")
+@RequestMapping(path = "/api/profiles")
 public class ProfileController {
 	@Autowired
 	private ProfileService profileService;

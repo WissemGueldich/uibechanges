@@ -73,9 +73,9 @@ public class Configuration {
 	public Configuration() {
 	}
 	
-	public Configuration(String filter, boolean overwrite, String libelle, boolean move, boolean automatic,
+	public Configuration(String filter, String libelle, boolean move, boolean automatic, boolean overwrite,
 			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
-			String destinationArchivingPath, Server destinationServer, Server sourceServer, SystemUser sourceUser,
+			String destinationArchivingPath, Server sourceServer, SystemUser sourceUser, Server destinationServer,
 			SystemUser destinationUser) {
 		this.filter = filter;
 		this.overwrite = overwrite;
