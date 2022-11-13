@@ -76,20 +76,13 @@ public class UibechangesApplication {
 			userRoleService.addPermission(p4);
 			
 			UserRole roleAdmin = new UserRole("admin", Set.of(p1,p2));
-			UserRole rolehGDHB = new UserRole("gdbh");
+			UserRole rolehGDHB = new UserRole("gdhb");
 			UserRole roleSupervisor = new UserRole("supervisoion", Set.of(p1));
 			UserRole roleTransfer = new UserRole("transfert", Set.of(p2));
 			userRoleService.addRole(roleAdmin);
 			userRoleService.addRole(rolehGDHB);
 			userRoleService.addRole(roleSupervisor);
 			userRoleService.addRole(roleTransfer);
-			
-			Profile profile = new Profile();
-			profile.setLibelle("profile");
-			profileService.addProfile(profile);
-			
-			User admin = new User("admin", "password", "admin@admin.com", "admin fname", "admin lname", true, Set.of(roleAdmin), Set.of(profile));
-			userService.addUser(admin);
 			
 			Server server = new Server("192.168.75.129", 22, "the server");
 			Server server1 = new Server("192.168.75.130", 22, "the server 2");
@@ -100,15 +93,26 @@ public class UibechangesApplication {
 			SystemUser systemUser1 = new SystemUser("libelle SshUser", "sshuser", "sshpassword", true, Set.of(server1));
 			systemUserService.addSystemUser(systemUser);
 			systemUserService.addSystemUser(systemUser1);
-
+			
 			Configuration config = new Configuration("the_file.txt", "config libelle", false, false, false, true, "/home/sftpuser/", 
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server1, systemUser1, server, systemUser);
 			Configuration config2 = new Configuration("the_file2.txt", "config libelle2", true, true, false, false, "/home/sftpuser/", 
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server, systemUser, server1, systemUser1);
 			configurationService.addConfiguration(config);
 			configurationService.addConfiguration(config2);
+			
+			Profile profile = new Profile();
+			profile.setLibelle("profile");
+			profile.setConfigurations(Set.of(config,config2));
+			profileService.addProfile(profile);
+			
+			User admin = new User("admin", "password", "admin@admin.com", "admin fname", "admin lname", true, Set.of(roleAdmin), Set.of(profile));
+			userService.addUser(admin);
+			
+			
 
 			
+
 //			FileTransferUtility fileTransferUtility = new FileTransferUtility();
 //			fileTransferUtility.setConfig(config);
 //			fileTransferUtility.transfer();

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tn.uib.uibechanges.model.Server;
 import com.tn.uib.uibechanges.model.SystemUser;
 import com.tn.uib.uibechanges.service.SystemUserService;
 
@@ -33,6 +34,16 @@ public class SystemUserController {
 	//@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_NWADMIN')")
 	public ResponseEntity<?> getSystemUsers() {
 		return systemUserService.getSystemUsers();
+	};
+	
+	@GetMapping("/server")
+	public ResponseEntity<?> getSystemUsersBySourceServer(@RequestBody Server server) {
+		return systemUserService.getSystemUsersByServer(server);
+	};
+	
+	@GetMapping("/server/{id}")
+	public ResponseEntity<?> getSystemUsersBySourceServer(@PathVariable int id) {
+		return systemUserService.getSystemUsersByServerId(id);
 	};
 	
 	@GetMapping(path = "{id}")

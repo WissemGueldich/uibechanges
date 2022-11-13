@@ -71,6 +71,10 @@ public class ProfileService {
         return new ResponseEntity<>(profileRepository.save(oldProfile), HttpStatus.OK);
 
     }
+    
+    public ResponseEntity<?> getProfilesByUserId(int id) {
+		return new ResponseEntity<>(profileRepository.findByUsersId(id), HttpStatus.OK);
+	}
 
 
 

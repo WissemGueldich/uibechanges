@@ -154,7 +154,9 @@ public class UserService implements UserDetailsService{
 
 	public ResponseEntity<?> deleteUser(int id) {
 		User user = userRepository.findById(id);
+		user.getRoles().forEach(role->{role.getUsers().remove(user);});
 		user.getRoles().clear();
+		user.getProfiles().forEach(prof->{prof.getUsers().remove(user);});
 		user.getProfiles().clear();
 		userRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);

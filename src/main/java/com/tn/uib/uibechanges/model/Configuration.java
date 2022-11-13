@@ -70,6 +70,10 @@ public class Configuration {
     @JsonIgnore
     private Set<ApplicationConfiguration> applications ;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "configuration")
+    @JsonIgnore
+    private Set<Transfer> transfers;
+
 	public Configuration() {
 	}
 	
@@ -99,6 +103,14 @@ public class Configuration {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Set<Transfer> getTransfers() {
+		return transfers;
+	}
+
+	public void setTransfers(Set<Transfer> transfers) {
+		this.transfers = transfers;
 	}
 
 	public String getFilter() {

@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_user")
 	private int id;
 
 	@NotBlank
@@ -58,7 +57,6 @@ public class User {
 	@JsonFormat(pattern = "yyyy/MM/dd")
 	private Date updated;
 	
-	@Column(name = "is_enabled")
     private boolean isEnabled;
 	
 	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
@@ -98,12 +96,12 @@ public class User {
 		this.password = password;
 	}
 
-	public boolean isEnabled() {
-		return isEnabled;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setEnabled(boolean isEnabled) {
-		this.isEnabled = isEnabled;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getMatricule() {
@@ -113,23 +111,6 @@ public class User {
 	public void setMatricule(String matricule) {
 		this.matricule = matricule;
 	}
-
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
-	}
-
-	public Date getUpdated() {
-		return updated;
-	}
-
-	public void setUpdated(Date updated) {
-		this.updated = updated;
-	}
-		
 
 	public String getFirstName() {
 		return firstName;
@@ -147,30 +128,38 @@ public class User {
 		this.lastName = lastName;
 	}
 
-	public int getId() {
-		return id;
+	public Date getCreated() {
+		return created;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 
-	public String getEmail() {
-		return email;
+	public Date getUpdated() {
+		return updated;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setUpdated(Date updated) {
+		this.updated = updated;
 	}
 
-	public Set<UserRole> getRoles () {
+	public boolean isEnabled() {
+		return isEnabled;
+	}
+
+	public void setEnabled(boolean isEnabled) {
+		this.isEnabled = isEnabled;
+	}
+
+	public Set<UserRole> getRoles() {
 		return roles;
 	}
 
 	public void setRoles(Set<UserRole> roles) {
 		this.roles = roles;
 	}
-	
+
 	public Set<Profile> getProfiles() {
 		return profiles;
 	}
@@ -179,10 +168,12 @@ public class User {
 		this.profiles = profiles;
 	}
 
-	public String toString() {
-		return "User [id=" + id + ", matricule=" + matricule + ", email=" + email + 
-				", firstName=" + firstName + ", lastName=" + lastName + ", created=" + created + ", updated="
-				+ updated + ", roles=" + roles + ", profiles=" + profiles + "]";
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 }

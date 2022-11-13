@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.Server;
+import com.tn.uib.uibechanges.model.SystemUser;
 import com.tn.uib.uibechanges.repository.ServerRepository;
+import com.tn.uib.uibechanges.repository.SystemUserRepository;
 
 @Service
 @Transactional
@@ -21,6 +23,9 @@ public class ServerService {
 
 	@Autowired
 	private ServerRepository serverRepository;
+	
+	@Autowired
+	private SystemUserRepository systemUserRepository;
 	
 	//TODO link server to configuration
 
@@ -67,14 +72,18 @@ public class ServerService {
 		if (server.getSourceConfigurations()!=null){
 			oldServer.setDestionationConfigurations(server.getDestionationConfigurations());
 		}
-		//TODO update relational attributes before updating
-
+		Set<SystemUser> users = new HashSet<>();
+		if (server.getSystemUsers()!=null) {
+			server.getSystemUsers().forEach(user -> {users.add(systemUserRepository.findById(user.getId()).get());});
+		}
+		oldServer.setSystemUsers(users);
 		return new ResponseEntity<>(serverRepository.save(oldServer), HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> deleteServer(int id) {
 		Server server = serverRepository.findById(id);
-		//TODO clear relational attributes before deleting
+		server.getSourceConfigurations().forEach(config->{config.setSourceServer(null);});
+		server.getDestionationConfigurations().forEach(config->{config.setDestinationServer(null);});
 		server.getSystemUsers().forEach(user->{user.getServers().remove(server);});
 		server.getSystemUsers().clear();
 		serverRepository.deleteById(id);
@@ -104,8 +113,5 @@ public class ServerService {
     	oldServer.getDestionationConfigurations().addAll(configurations);
     	return new ResponseEntity<>(serverRepository.save(oldServer),HttpStatus.OK);
     }
-    
-    
-    
-	
+
 }

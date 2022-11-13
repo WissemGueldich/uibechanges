@@ -24,7 +24,7 @@ public class JwtUtils {
 				.setSubject(authentication.getName())
 				.claim("authorities", authentication.getAuthorities())
 				.setIssuedAt(new Date())
-				.setExpiration(java.sql.Date.valueOf(LocalDate.now().plusWeeks(2)))
+				.setExpiration(java.sql.Date.valueOf(LocalDate.now().plusDays(1)))
 				.signWith(SignatureAlgorithm.HS512,jwtSecret)
 				.compact();
 	}

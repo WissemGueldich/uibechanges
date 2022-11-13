@@ -42,6 +42,11 @@ public class UserController {
 		return userService.getUser(id);
 	}
 	
+	@GetMapping(path = "/m/{matricule}")
+	private ResponseEntity<?> getUser (@PathVariable String matricule ){
+		return userService.getUser(matricule);
+	}
+	
 	@PutMapping
 	private ResponseEntity<?> updateUser (@RequestBody User user ){
 		return userService.updateUser(user);

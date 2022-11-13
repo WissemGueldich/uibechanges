@@ -41,6 +41,8 @@ public class SystemUser {
     @JoinTable(name = "system_user_servers", 
     			joinColumns = @JoinColumn(name = "system_user_id"), 
 				inverseJoinColumns = @JoinColumn(name = "server_id"))
+//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "systemUsers")
+//    @JsonIgnore
     private Set<Server> servers=new HashSet<Server>();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "sourceUser")

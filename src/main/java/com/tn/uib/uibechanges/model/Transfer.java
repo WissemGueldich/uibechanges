@@ -8,12 +8,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Table(name = "transfers")
@@ -21,130 +19,81 @@ public class Transfer {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "id")
-    private Integer id;
+    private int id;
     
     @Basic(optional = false)
-    @Column(name = "auteur")
-    private String auteur;
+    private int type;
     
-    @Basic(optional = false)
-    @Column(name = "adresse_serveur_source")
-    private String adresseServeurSource;
-    
-    @Basic(optional = false)
-    @Column(name = "adresse_serveur_destination")
-    private String adresseServeurDestination;
-    
-    @Basic(optional = false)
-    @Column(name = "nom_serveur_source")
-    private String nomServeurSource;
-    
-    @Basic(optional = false)
-    @Column(name = "nom_serveur_destination")
-    private String nomServeurDestination;
-    
-    @Basic(optional = false)
-    @Column(name = "utilisateur_source")
-    private String utilisateurSource;
-    
-    @Basic(optional = false)
-    @Column(name = "utilisateur_destination")
-    private String utilisateurDestination;
-    
-    @Basic(optional = false)
-    @Column(name = "port_serveur_source")
-    private int portServeurSource;
-    
-    @Basic(optional = false)
-    @Column(name = "port_serveur_destination")
-    private int portServeurDestination;
-    
-    @Basic(optional = false)
-    @Column(name = "dossier_source")
-    private String dossierSource;
-    
-    @Basic(optional = false)
-    @Column(name = "dossier_destination")
-    private String dossierDestination;
-    
-    @Column(name = "dossier_archive")
-    private String dossierArchive;
-    
-    @Basic(optional = false)
-    @Column(name = "fichier_source")
-    private String fichierSource;
-    
-    @Basic(optional = false)
-    @Column(name = "fichier_destination")
-    private String fichierDestination;
-    
-    @Column(name = "fichier_archive")
-    private String fichierArchive;
-    
-    @Basic(optional = false)
-    @Column(name = "deplacer")
-    private boolean deplacer;
-    
-    @Basic(optional = false)
-    @Column(name = "ecraser")
-    private boolean ecraser;
-    
-    @Basic(optional = false)
-    @Column(name = "configuration")
-    private String configuration;
-    
-    @Basic(optional = false)
-    @Column(name = "filtre_applique")
-    private String filtreApplique;
-    
-    @Basic(optional = false)
-    @Column(name = "date_transfert")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateTransfert;
-    
-    @Basic(optional = false)
-    @Column(name = "duree")
-    private long duree;
-    
-    @Basic(optional = false)
-    @Column(name = "taille_fichier")
-    private long tailleFichier;
-    
-    @Basic(optional = false)
-    @Column(name = "avec_succes")
-    private boolean avecSucces;
-    
-    @Basic(optional = false)
-    @Column(name = "trouve_destination")
-    private boolean trouveDestination;
-    
-    @Lob
-    @Column(name = "message_erreur")
-    private String messageErreur;
-    
-    @Lob
-    @Column(name = "cause_erreur")
-    private String causeErreur;
-    
-    @Basic(optional = false)
-    @Column(name = "restaurer")
-    private boolean restaurer;
-    
-    @Lob
-    @Column(name = "message_erreur_restauration")
-    private String messageErreurRestauration;
-    
-    @Lob
-    @Column(name = "cause_erreur_restauration")
-    private String causeErreurRestauration;
-    
-    @JoinColumn(name = "application", referencedColumnName = "id")
+	@Basic(optional = false)
     @ManyToOne
-    private ApplicationExecution application;
+    private Configuration configuration;
     
-    @JoinColumn(name = "job", referencedColumnName = "id")
-    @ManyToOne
-    private JobExecution job;
+    private boolean result;
+    
+    private String error;
+    
+    @Column(name = "trigger_date")
+	@JsonFormat(pattern = "yyyy/MM/dd")
+	private Date date;
+
+	public Transfer() {
+	}
+
+	public Transfer(int type, Configuration configuration, boolean result, String error) {
+		this.type = type;
+		this.configuration = configuration;
+		this.result = result;
+		this.error = error;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public boolean isResult() {
+		return result;
+	}
+
+	public void setResult(boolean result) {
+		this.result = result;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
+	}
+    
+    
 }

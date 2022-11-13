@@ -43,6 +43,11 @@ public class Server {
     
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "servers")
     @JsonIgnore
+    
+//    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY )
+//    @JoinTable(name = "server_system_users", 
+//    			joinColumns = @JoinColumn(name = "server_id"), 
+//				inverseJoinColumns = @JoinColumn(name = "system_user_id"))
     private Set<SystemUser> systemUsers;
 
 	public Server() {

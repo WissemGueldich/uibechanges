@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.tn.uib.uibechanges.job.TransferJob;
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.ConfigurationJob;
 import com.tn.uib.uibechanges.model.ConfigurationJobPK;
@@ -19,6 +20,8 @@ import com.tn.uib.uibechanges.model.JobExecution;
 import com.tn.uib.uibechanges.repository.ConfigurationJobRepository;
 import com.tn.uib.uibechanges.repository.JobExecutionRepository;
 import com.tn.uib.uibechanges.repository.JobRepository;
+import com.tn.uib.uibechanges.scheduler.SchedulerService;
+import com.tn.uib.uibechanges.scheduler.TimerInfo;
 
 @Service
 @Transactional
@@ -32,6 +35,9 @@ public class JobService {
 	
 	@Autowired
 	private ConfigurationJobRepository configurationJobRepository;
+	
+	@Autowired
+	private SchedulerService schedulerService;
 	
 
     public ResponseEntity<?> addJob(Job job, Set<Configuration> configurations, Set<Day> days) {
@@ -156,5 +162,15 @@ public class JobService {
         oldJobExecution.setTransferredFiles(jobExecution.getFoundFiles());
         return new ResponseEntity<>(jobExecutionRepository.save(oldJobExecution),HttpStatus.OK);
     }
+    
+    public void scheduleJob() {
+		final TimerInfo info = new TimerInfo();
+		info.setTotalFireCount(20);
+		info.setRepeatIntervalMS(2000);
+		info.setInitialOffsetMS(5000);
+		info.setCallbackData("job has been scheduler and running");
+		
+		schedulerService.schedule(TransferJob.class, info);
+	}
 
 }

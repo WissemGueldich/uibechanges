@@ -26,21 +26,27 @@ public class ProfileController {
 	private ResponseEntity<?> addProfile (@RequestBody Profile profile){
 		return profileService.addProfile(profile);
 	}
+	
 	@GetMapping
 	private ResponseEntity<?> getProfiles (){
 		return profileService.getProfiles();
 	}
+	
 	@GetMapping(path = "{id}")
 	private ResponseEntity<?> getProfile (@PathVariable int id ){
 		return profileService.getProfile(id);
-
 	}
+	
+	@GetMapping("/user/{id}")
+	public ResponseEntity<?> getProfilesByUserId(@PathVariable int id) {
+		return profileService.getProfilesByUserId(id);
+	};
+	
 	@PutMapping
 	private ResponseEntity<?> updateProfile (@RequestBody Profile profile ){
-
 		return profileService.updateProfile(profile);
-
 	}
+	
 	@DeleteMapping(path="{id}")
 	private ResponseEntity<?> deleteProfile (@PathVariable int id){
 		return profileService.deleteProfile(id);

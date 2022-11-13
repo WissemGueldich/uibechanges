@@ -58,6 +58,14 @@ public class SystemUserService {
 		return new ResponseEntity<>(systemUserRepository.findAll(), HttpStatus.OK);
 	}
 	
+	public ResponseEntity<?> getSystemUsersByServer(Server server) {
+		return new ResponseEntity<>(systemUserRepository.findByServers(server), HttpStatus.OK);
+	}
+	
+	public ResponseEntity<?> getSystemUsersByServerId(int id) {
+		return new ResponseEntity<>(systemUserRepository.findByServersId(id), HttpStatus.OK);
+	}
+	
 	public ResponseEntity<?> deleteSystemUsers(int id) {
 		SystemUser oldUser = systemUserRepository.findById(id).get();
 		oldUser.getConfigurationsAsDestination().forEach(config->{config.setDestinationServer(null);});
