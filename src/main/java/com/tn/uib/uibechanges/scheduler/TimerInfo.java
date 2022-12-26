@@ -1,11 +1,27 @@
 package com.tn.uib.uibechanges.scheduler;
 
+import java.util.Date;
+
 public class TimerInfo {
 	private int totalFireCount;
 	private boolean runForever;
 	private long repeatIntervalMS;
 	private long initialOffsetMS;
-	private String callbackData;
+	private Date startDate;
+	private Date endDate;
+
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	public Date getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
 	public int getTotalFireCount() {
 		return totalFireCount;
 	}
@@ -30,12 +46,5 @@ public class TimerInfo {
 	public void setInitialOffsetMS(long initialOffsetMS) {
 		this.initialOffsetMS = initialOffsetMS;
 	}
-	public String getCallbackData() {
-		return callbackData;
-	}
-	public void setCallbackData(String callbackData) {
-		this.callbackData = callbackData;
-	}
-	
 
 }

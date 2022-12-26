@@ -1,7 +1,5 @@
 package com.tn.uib.uibechanges.utils;
 
-import java.util.Date;
-
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -16,18 +14,19 @@ public class TimerUtility {
 	
 	private TimerUtility() {};
 	
-	public static JobDetail buildJobDetail(final Class jobClass, final TimerInfo info) {
+	public static JobDetail buildJobDetail(final Class jobClass, final TimerInfo info, Job job) {
 		final JobDataMap jobDataMap = new JobDataMap();
 		jobDataMap.put(jobClass.getSimpleName(), info);
-		
+		jobDataMap.put(job.getClass().getSimpleName(), job);
+
 		return JobBuilder
 					.newJob(jobClass)
-					.withIdentity(jobClass.getSimpleName())
+					.withIdentity("job_id_"+job.getId())
 					.setJobData(jobDataMap)
 					.build();
 	}
 	
-	public static Trigger buildTrigger(final Class jobClass, final TimerInfo info) {
+	public static Trigger buildTrigger(final Class jobClass, final TimerInfo info, Job job) {
 		SimpleScheduleBuilder builder = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(info.getRepeatIntervalMS());
 		if (info.isRunForever()) {
 			builder = builder.repeatForever();
@@ -36,9 +35,10 @@ public class TimerUtility {
 		}
 		return TriggerBuilder
 					.newTrigger()
-					.withIdentity(jobClass.getSimpleName())
+					.withIdentity("job_id_"+job.getId())
 					.withSchedule(builder)
-					.startAt(new Date(System.currentTimeMillis()+info.getInitialOffsetMS()))
+					.startAt(info.getStartDate())
+					.endAt(info.getEndDate())
 					.build();
 	}
 	

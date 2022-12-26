@@ -14,6 +14,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import com.tn.uib.uibechanges.model.Configuration;
+import com.tn.uib.uibechanges.model.ConfigurationJob;
+import com.tn.uib.uibechanges.model.Day;
+import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.model.Profile;
 import com.tn.uib.uibechanges.model.Server;
 import com.tn.uib.uibechanges.model.SystemUser;
@@ -108,6 +111,16 @@ public class UibechangesApplication {
 			
 			User admin = new User("admin", "password", "admin@admin.com", "admin fname", "admin lname", true, Set.of(roleAdmin), Set.of(profile));
 			userService.addUser(admin);
+						
+			Job job1 = new Job("job1", "20:31", "21:00", 5, true, "weekly");
+			jobService.addJob(job1);
+			Job job2 = new Job("job2", "8:00", "9:30", 5, false, "type1");
+			jobService.addJob(job2);
+			Job job3 = new Job("job3", "17:00", "17:30", 9, false, "daily");
+			jobService.addJob(job3);
+			Job job4 = new Job("job4", "18:00", "21:30", 7, true, "type 2");
+			jobService.addJob(job4);
+			
 			
 			
 

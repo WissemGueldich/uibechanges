@@ -10,6 +10,7 @@ import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.utils.TimerUtility;
 
 @Service
@@ -42,9 +43,9 @@ public class SchedulerService {
 		}
 	}
 	
-	public void schedule(final Class jobClass, final TimerInfo info) {
-		final JobDetail jobDetail = TimerUtility.buildJobDetail(jobClass, info);
-		final Trigger trigger = TimerUtility.buildTrigger(jobClass, info);
+	public void schedule(final Class jobClass, final TimerInfo info, Job job) {
+		final JobDetail jobDetail = TimerUtility.buildJobDetail(jobClass, info, job);
+		final Trigger trigger = TimerUtility.buildTrigger(jobClass, info, job);
 		try {
 			scheduler.scheduleJob(jobDetail, trigger);
 		} catch (SchedulerException e) {
