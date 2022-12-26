@@ -71,7 +71,7 @@ public class Job {
     }
 
     public Job(String libelle, String startHour, String endHour, int frequency, boolean state, String type,
-			Set<Day> days, Set<ConfigurationJob> configurations) {
+			Set<Day> days) {
 		this.libelle = libelle;
 		this.startHour = startHour;
 		this.endHour = endHour;
@@ -79,7 +79,15 @@ public class Job {
 		this.state = state;
 		this.type = type;
 		this.days = days;
-		this.configurations = configurations;
+	}
+
+	public Job(String libelle, String startHour, String endHour, int frequency, boolean state, String type) {
+		this.libelle = libelle;
+		this.startHour = startHour;
+		this.endHour = endHour;
+		this.frequency = frequency;
+		this.state = state;
+		this.type = type;
 	}
 
 	public Job(String libelle, String startHour, String endHour, int frequency, boolean state, String type,

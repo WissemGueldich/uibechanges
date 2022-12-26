@@ -1,5 +1,7 @@
 package com.tn.uib.uibechanges.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -163,14 +165,16 @@ public class JobService {
         return new ResponseEntity<>(jobExecutionRepository.save(oldJobExecution),HttpStatus.OK);
     }
     
-    public void scheduleJob() {
+    public void scheduleJob(Integer jobId) throws ParseException {
+        Job job = jobRepository.findById(jobId).get();
+    	SimpleDateFormat df = new SimpleDateFormat("H:mm");
 		final TimerInfo info = new TimerInfo();
-		info.setTotalFireCount(20);
+		info.setTotalFireCount(job.getFrequency());
+		info.setStartDate(df.parse(job.getStartHour()));
 		info.setRepeatIntervalMS(2000);
 		info.setInitialOffsetMS(5000);
-		info.setCallbackData("job has been scheduler and running");
 		
-		schedulerService.schedule(TransferJob.class, info);
+		schedulerService.schedule(TransferJob.class, info, job);
 	}
 
 }
