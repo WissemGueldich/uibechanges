@@ -41,9 +41,6 @@ public class Job {
     
     @Column(name = "state")
     private boolean state;
-    
-    @Column(name = "type")
-    private String type;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "job_days", 
@@ -55,11 +52,11 @@ public class Job {
     @JsonIgnore
     private Set<ConfigurationJob> configurations;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "job")
+    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "job")
     @JsonIgnore
     private Set<JobExecution> jobExecutions;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "job", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "job", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Hour> hours;
 
@@ -70,34 +67,32 @@ public class Job {
         this.id = id;
     }
 
-    public Job(String libelle, String startHour, String endHour, int frequency, boolean state, String type,
+    public Job(String libelle, String startHour, String endHour, int frequency, boolean state,
 			Set<Day> days) {
 		this.libelle = libelle;
 		this.startHour = startHour;
 		this.endHour = endHour;
 		this.frequency = frequency;
 		this.state = state;
-		this.type = type;
 		this.days = days;
 	}
 
-	public Job(String libelle, String startHour, String endHour, int frequency, boolean state, String type) {
+	public Job(String libelle, String startHour, String endHour, int frequency, boolean state) {
 		this.libelle = libelle;
 		this.startHour = startHour;
 		this.endHour = endHour;
 		this.frequency = frequency;
 		this.state = state;
-		this.type = type;
+		
 	}
 
-	public Job(String libelle, String startHour, String endHour, int frequency, boolean state, String type,
+	public Job(String libelle, String startHour, String endHour, int frequency, boolean state, 
 			Set<Day> days, Set<ConfigurationJob> configurations, Set<JobExecution> jobExecutions) {
 		this.libelle = libelle;
 		this.startHour = startHour;
 		this.endHour = endHour;
 		this.frequency = frequency;
 		this.state = state;
-		this.type = type;
 		this.days = days;
 		this.configurations = configurations;
 		this.jobExecutions = jobExecutions;
@@ -151,14 +146,6 @@ public class Job {
         this.state = state;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-    
     public Set<Day> getDays() {
         return days;
     }

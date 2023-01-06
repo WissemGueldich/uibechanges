@@ -21,10 +21,6 @@ public class UserRoleController {
 	@Autowired
 	private UserRoleService userRoleService;
 	
-	@PostMapping
-	private ResponseEntity<?> addRole (@RequestBody UserRole role){	
-		return userRoleService.addRole(role);
-	}
 	
 	@GetMapping
 	private ResponseEntity<?> getRoles (){
@@ -40,6 +36,12 @@ public class UserRoleController {
 	private ResponseEntity<?> getRole (@PathVariable int id ){
 		return userRoleService.getRole(id);
 	}
+	
+	/*@PostMapping
+	private ResponseEntity<?> addRole (@RequestBody UserRole role){	
+		return userRoleService.addRole(role);
+	}
+	
 	@PutMapping
 	private ResponseEntity<?> updateRole (@RequestBody UserRole role ){
 		return userRoleService.updateRole(role);
@@ -49,6 +51,6 @@ public class UserRoleController {
 	private ResponseEntity<?> deleteUser (@PathVariable int id){
 		return userRoleService.deleteRole(id);
 
-	}
+	}*/
 
 }

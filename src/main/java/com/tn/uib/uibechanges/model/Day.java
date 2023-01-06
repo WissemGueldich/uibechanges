@@ -25,7 +25,7 @@ public class Day {
     @Column(name = "name")
     private String name;
     
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "days")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "days")
     @JsonIgnore
     private Set<Job> jobs;
 

@@ -92,7 +92,6 @@ public class JobService {
         oldJob.setLibelle(job.getLibelle());
         oldJob.setStartHour(job.getStartHour());
         oldJob.setState(job.getState());
-        oldJob.setType(job.getType());        
         for (ConfigurationJob confJob : oldJob.getConfigurations()) {
             configurationJobRepository.delete(confJob);
         }
@@ -127,7 +126,6 @@ public class JobService {
         oldJob.setLibelle(job.getLibelle());
         oldJob.setStartHour(job.getStartHour());
         oldJob.setState(job.getState());
-        oldJob.setType(job.getType());
         return new ResponseEntity<>(jobRepository.save(oldJob),HttpStatus.OK);
     }
 

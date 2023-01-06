@@ -33,15 +33,15 @@ public class Server {
 
 	private String secondaryAddress;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "sourceServer")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "sourceServer")
     @JsonIgnore
     private Set<Configuration> sourceConfigurations;
     
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "destinationServer")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "destinationServer")
     @JsonIgnore
     private Set<Configuration> destionationConfigurations;
     
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "servers")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "servers")
     @JsonIgnore
     
 //    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY )

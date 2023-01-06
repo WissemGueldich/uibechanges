@@ -26,13 +26,13 @@ public class Profile {
 
     private String libelle;
     
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "profile_configurations", 
     		joinColumns = @JoinColumn(name = "profile_id"), 
 			inverseJoinColumns = @JoinColumn(name = "configuration_id"))
     private Set<Configuration> configurations;
     
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "profiles")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "profiles")
     @JsonIgnore
     private Set<User> users = new HashSet<>();
 

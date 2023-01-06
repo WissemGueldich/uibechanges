@@ -31,13 +31,13 @@ public class UserRole {
 	@NotBlank
 	private String name;
 	
-	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	@ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE},fetch = FetchType.LAZY)
 	@JoinTable(	name = "role_permissions", 
 				joinColumns = @JoinColumn(name = "role_id"), 
 				inverseJoinColumns = @JoinColumn(name = "permission_id"))
 	private Set<UserPermission> permissions;
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "roles")
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "roles")
 	@JsonIgnore
 	private Set<User> users;
 	

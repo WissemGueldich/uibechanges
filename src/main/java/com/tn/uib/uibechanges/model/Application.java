@@ -36,7 +36,7 @@ public class Application {
     @JsonIgnore
 	private Set<ApplicationConfiguration> configurations;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "application")
+    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "application")
     @JsonIgnore
     private Set<ApplicationExecution> applicationExecutions;
 

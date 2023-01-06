@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.tn.uib.uibechanges.model.Server;
 import com.tn.uib.uibechanges.model.SystemUser;
+import com.tn.uib.uibechanges.repository.ConfigurationRepository;
 import com.tn.uib.uibechanges.repository.ServerRepository;
 import com.tn.uib.uibechanges.repository.SystemUserRepository;
 
@@ -24,6 +25,9 @@ public class SystemUserService {
 	
 	@Autowired
 	private ServerRepository serverRepository;
+	
+	@Autowired
+	private ConfigurationRepository configurationRepository;
 	
 	public ResponseEntity<?> addSystemUser(SystemUser systemUser) {
 		Set<Server> servers = new HashSet<>();
@@ -67,10 +71,18 @@ public class SystemUserService {
 	}
 	
 	public ResponseEntity<?> deleteSystemUsers(int id) {
+		System.out.println("this is delete system user service");
 		SystemUser oldUser = systemUserRepository.findById(id).get();
-		oldUser.getConfigurationsAsDestination().forEach(config->{config.setDestinationServer(null);});
+		oldUser.getConfigurationsAsDestination().forEach(config->{
+			config.setDestinationServer(null);
+			
+		});
 		oldUser.getConfigurationsAsDestination().clear();
-		oldUser.getConfigurationsAsSource().forEach(config->{config.setSourceServer(null);});
+		oldUser.getConfigurationsAsSource().forEach(config->{
+			config.setSourceServer(null);
+			System.out.println("savingggggggggggggggggg");
+			configurationRepository.save(config);
+		});
 		oldUser.getConfigurationsAsSource().clear();
 		oldUser.getServers().clear();
 		systemUserRepository.deleteById(id);

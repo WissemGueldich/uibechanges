@@ -59,13 +59,13 @@ public class User {
 	
     private boolean isEnabled;
 	
-	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+	@ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE},fetch = FetchType.EAGER)
 	@JoinTable(	name = "user_roles", 
 				joinColumns = @JoinColumn(name = "user_id"), 
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<UserRole> roles;
 	
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE},fetch = FetchType.EAGER)
     @JoinTable(name = "user_profiles", 
     			joinColumns = @JoinColumn(name = "user_id"), 
     			inverseJoinColumns = @JoinColumn(name = "profile_id"))

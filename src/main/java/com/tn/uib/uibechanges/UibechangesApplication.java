@@ -78,9 +78,9 @@ public class UibechangesApplication {
 			userRoleService.addPermission(p3);
 			userRoleService.addPermission(p4);
 			
-			UserRole roleAdmin = new UserRole("admin", Set.of(p1,p2));
-			UserRole rolehGDHB = new UserRole("gdhb");
-			UserRole roleSupervisor = new UserRole("supervisoion", Set.of(p1));
+			UserRole roleAdmin = new UserRole("admin", Set.of(p1,p2,p3,p4));
+			UserRole rolehGDHB = new UserRole("gdhb", Set.of(p3,p4));
+			UserRole roleSupervisor = new UserRole("supervision", Set.of(p1,p3));
 			UserRole roleTransfer = new UserRole("transfert", Set.of(p2));
 			userRoleService.addRole(roleAdmin);
 			userRoleService.addRole(rolehGDHB);
@@ -112,13 +112,13 @@ public class UibechangesApplication {
 			User admin = new User("admin", "password", "admin@admin.com", "admin fname", "admin lname", true, Set.of(roleAdmin), Set.of(profile));
 			userService.addUser(admin);
 						
-			Job job1 = new Job("job1", "20:31", "21:00", 5, true, "weekly");
+			Job job1 = new Job("job1", "20:31", "21:00", 5, true);
 			jobService.addJob(job1);
-			Job job2 = new Job("job2", "8:00", "9:30", 5, false, "type1");
+			Job job2 = new Job("job2", "8:00", "9:30", 5, false);
 			jobService.addJob(job2);
-			Job job3 = new Job("job3", "17:00", "17:30", 9, false, "daily");
+			Job job3 = new Job("job3", "17:00", "17:30", 9, false);
 			jobService.addJob(job3);
-			Job job4 = new Job("job4", "18:00", "21:30", 7, true, "type 2");
+			Job job4 = new Job("job4", "18:00", "21:30", 7, true);
 			jobService.addJob(job4);
 			
 			

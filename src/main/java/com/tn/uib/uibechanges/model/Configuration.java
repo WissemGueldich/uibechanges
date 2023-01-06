@@ -52,7 +52,7 @@ public class Configuration {
 	@JoinColumn(name = "source_server", referencedColumnName = "id")
 	private Server sourceServer;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "configurations")
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "configurations")
 	@JsonIgnore
 	private Set<Profile> profiles;
 
@@ -66,7 +66,7 @@ public class Configuration {
     @JsonIgnore
     private Set<ConfigurationJob> jobs;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "configuration", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "configuration", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<ApplicationConfiguration> applications ;
 

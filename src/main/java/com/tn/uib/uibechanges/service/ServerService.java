@@ -27,6 +27,9 @@ public class ServerService {
 	@Autowired
 	private SystemUserRepository systemUserRepository;
 	
+	@Autowired
+	private SystemUserService systemUserService;
+	
 	//TODO link server to configuration
 
 	public ResponseEntity<?> addServer(Server server) {
@@ -82,9 +85,18 @@ public class ServerService {
 
 	public ResponseEntity<?> deleteServer(int id) {
 		Server server = serverRepository.findById(id);
-		server.getSourceConfigurations().forEach(config->{config.setSourceServer(null);});
+		server.getSourceConfigurations().forEach(config->{
+			config.setSourceServer(null);
+		});
 		server.getDestionationConfigurations().forEach(config->{config.setDestinationServer(null);});
-		server.getSystemUsers().forEach(user->{user.getServers().remove(server);});
+		server.getSystemUsers().forEach(user->{
+			if (user.getServers().size()>1) {
+				user.getServers().remove(server);
+			}else {
+				user.getServers().remove(server);
+				systemUserService.deleteSystemUsers(user.getId());
+			}
+		});
 		server.getSystemUsers().clear();
 		serverRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);

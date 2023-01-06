@@ -67,7 +67,7 @@ public class UserService implements UserDetailsService{
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreated(new Date());
 		user.setUpdated(new Date());
-		user.setEnabled(true);
+		user.setEnabled(user.isEnabled());
 		Set<UserRole> newRoles = new HashSet<>();
 		newRoles.add(userRoleRepository.findByName("ROLE_SUPERVISOR"));
 		if(user.getRoles()!=null){

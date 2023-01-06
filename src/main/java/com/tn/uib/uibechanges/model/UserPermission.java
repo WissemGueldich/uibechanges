@@ -28,7 +28,7 @@ public class UserPermission {
 	@NotBlank
 	private String name;
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "permissions")
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "permissions")
 	@JsonIgnore
 	Set<UserRole> userRoles = new HashSet<>();
 

@@ -57,6 +57,9 @@ public class ProfileService {
 	
 	public ResponseEntity<?> deleteProfile(int id) {
 		Profile profile = profileRepository.findById(id);
+		profile.getUsers().forEach(user->{
+			user.getProfiles().remove(profile);
+		});
 		profile.getConfigurations().clear();
 		profileRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -74,6 +77,11 @@ public class ProfileService {
     
     public ResponseEntity<?> getProfilesByUserId(int id) {
 		return new ResponseEntity<>(profileRepository.findByUsersId(id), HttpStatus.OK);
+	}
+    
+	public ResponseEntity<?> getUsersByProfileId(int id) {
+		Profile profile = profileRepository.findById(id);
+		return new ResponseEntity<>(profile.getUsers(),HttpStatus.OK);
 	}
 
 

@@ -1,5 +1,9 @@
 package com.tn.uib.uibechanges.utils;
 
+import java.text.ParseException;
+
+import org.quartz.CronExpression;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -26,7 +30,7 @@ public class TimerUtility {
 					.build();
 	}
 	
-	public static Trigger buildTrigger(final Class jobClass, final TimerInfo info, Job job) {
+	public static Trigger buildTrigger(final Class jobClass, final TimerInfo info, Job job) throws ParseException {
 		SimpleScheduleBuilder builder = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(info.getRepeatIntervalMS());
 		if (info.isRunForever()) {
 			builder = builder.repeatForever();
@@ -36,9 +40,8 @@ public class TimerUtility {
 		return TriggerBuilder
 					.newTrigger()
 					.withIdentity("job_id_"+job.getId())
-					.withSchedule(builder)
-					.startAt(info.getStartDate())
-					.endAt(info.getEndDate())
+					.withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression("0/5 * * ? * * *")))
+					.startNow()
 					.build();
 	}
 	

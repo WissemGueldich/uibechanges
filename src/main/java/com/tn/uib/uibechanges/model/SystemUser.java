@@ -15,6 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.AssertFalse;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
@@ -45,11 +46,11 @@ public class SystemUser {
 //    @JsonIgnore
     private Set<Server> servers=new HashSet<Server>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "sourceUser")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, orphanRemoval=false, mappedBy = "sourceUser")
     @JsonIgnore
     private Set<Configuration> configurationsAsSource;
     
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "destinationUser")
+	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE}, orphanRemoval=false, mappedBy = "destinationUser")
 	@JsonIgnore
     private Set<Configuration> configurationsAsDestination;
 

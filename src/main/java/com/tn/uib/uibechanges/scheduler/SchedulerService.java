@@ -1,5 +1,7 @@
 package com.tn.uib.uibechanges.scheduler;
 
+import java.text.ParseException;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -43,7 +45,7 @@ public class SchedulerService {
 		}
 	}
 	
-	public void schedule(final Class jobClass, final TimerInfo info, Job job) {
+	public void schedule(final Class jobClass, final TimerInfo info, Job job) throws ParseException {
 		final JobDetail jobDetail = TimerUtility.buildJobDetail(jobClass, info, job);
 		final Trigger trigger = TimerUtility.buildTrigger(jobClass, info, job);
 		try {
