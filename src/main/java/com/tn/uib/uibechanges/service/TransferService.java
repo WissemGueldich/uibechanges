@@ -1,7 +1,5 @@
 package com.tn.uib.uibechanges.service;
 
-import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +18,6 @@ public class TransferService {
 	private TransferRepository transferRepository;
 	
 	public Transfer addTransfer(Transfer transfer) {
-		transfer.setDate(new Date());
 		return transferRepository.save(transfer);
 	}
 	
