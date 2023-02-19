@@ -20,6 +20,7 @@ import com.tn.uib.uibechanges.model.Day;
 import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.model.JobExecution;
 import com.tn.uib.uibechanges.repository.ConfigurationJobRepository;
+import com.tn.uib.uibechanges.repository.DayRepository;
 import com.tn.uib.uibechanges.repository.JobExecutionRepository;
 import com.tn.uib.uibechanges.repository.JobRepository;
 import com.tn.uib.uibechanges.scheduler.SchedulerService;
@@ -39,20 +40,22 @@ public class JobService {
 	private ConfigurationJobRepository configurationJobRepository;
 	
 	@Autowired
+	private DayRepository dayRepository;
+	
+	@Autowired
 	private SchedulerService schedulerService;
 	
 
-    public ResponseEntity<?> addJob(Job job, Set<Configuration> configurations, Set<Day> days) {
+    public ResponseEntity<?> addJob(Job job, Set<Configuration> configurations) {
 
     	if (job.getConfigurations() == null) {
             job.setConfigurations(new HashSet<ConfigurationJob>());
         }
-
-        if (job.getDays() == null) {
-            job.setDays(new HashSet<Day>());
-        }
-        job.getDays().addAll(days);
-        jobRepository.save(job);
+		Set<Day> days = new HashSet<>();
+		if(job.getDays() != null) {
+			job.getDays().forEach(day -> {days.add(dayRepository.findById(day.getId()).get());});
+		}
+		job.setDays(days);
 
         int i = 1;
         for (Configuration conf : configurations) {
@@ -72,10 +75,12 @@ public class JobService {
         if (job.getConfigurations() == null) {
             job.setConfigurations(new HashSet<ConfigurationJob>());
         }
+		Set<Day> days = new HashSet<>();
+		if(job.getDays() != null) {
+			job.getDays().forEach(day -> {days.add(dayRepository.findById(day.getId()).get());});
+		}
+		job.setDays(days);
 
-        if (job.getDays() == null) {
-            job.setDays(new HashSet<Day>());
-        }
         return new ResponseEntity<>(jobRepository.save(job), HttpStatus.CREATED);
     }
  
@@ -84,7 +89,7 @@ public class JobService {
     }
 
     
-    public ResponseEntity<?> updateJob(Job job, Set<Configuration> configurations, Set<Day> days) {
+    public ResponseEntity<?> updateJob(Job job, Set<Configuration> configurations) {
 
         Job oldJob = jobRepository.findById(job.getId()).get();
         oldJob.setEndHour(job.getEndHour());
@@ -113,8 +118,12 @@ public class JobService {
         if (oldJob.getDays() == null) {
         	oldJob.setDays(new HashSet<Day>());
         }
+        if (job.getDays()!=null) {
+			oldJob.getDays().clear();
+			job.getDays().forEach(day -> { oldJob.getDays().add( dayRepository.findById(day.getId()).get());});
+		}
         oldJob.getDays().clear();
-        job.getDays().addAll(days);
+        oldJob.getDays().addAll(job.getDays());
         return new ResponseEntity<>(jobRepository.save(oldJob),HttpStatus.OK);
     }
 
@@ -126,6 +135,7 @@ public class JobService {
         oldJob.setLibelle(job.getLibelle());
         oldJob.setStartHour(job.getStartHour());
         oldJob.setState(job.getState());
+        oldJob.setDays(job.getDays());
         return new ResponseEntity<>(jobRepository.save(oldJob),HttpStatus.OK);
     }
 
@@ -133,8 +143,8 @@ public class JobService {
         return new ResponseEntity<>(jobRepository.findAll(),HttpStatus.OK);
     }
 
-    public ResponseEntity<?> deleteJob(Job job) {
-    	jobRepository.deleteById(job.getId());
+    public ResponseEntity<?> deleteJob(int id) {
+    	jobRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -165,12 +175,12 @@ public class JobService {
     
     public void scheduleJob(Integer jobId) throws ParseException {
         Job job = jobRepository.findById(jobId).get();
-    	SimpleDateFormat df = new SimpleDateFormat("H:mm");
 		final TimerInfo info = new TimerInfo();
-		info.setTotalFireCount(job.getFrequency());
-		info.setStartDate(df.parse(job.getStartHour()));
-		info.setRepeatIntervalMS(2000);
-		info.setInitialOffsetMS(5000);
+		info.setRunForever(true);
+		info.setStartDate(job.getStartHour());
+		info.setEndDate(job.getEndHour());
+		info.setRepeatInterval(job.getFrequency());
+		info.setDays(job.getDays());
 		
 		schedulerService.schedule(TransferJob.class, info, job);
 	}

@@ -5,16 +5,13 @@ import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import com.tn.uib.uibechanges.model.Configuration;
-import com.tn.uib.uibechanges.model.ConfigurationJob;
 import com.tn.uib.uibechanges.model.Day;
 import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.model.Profile;
@@ -23,7 +20,6 @@ import com.tn.uib.uibechanges.model.SystemUser;
 import com.tn.uib.uibechanges.model.User;
 import com.tn.uib.uibechanges.model.UserPermission;
 import com.tn.uib.uibechanges.model.UserRole;
-import com.tn.uib.uibechanges.security.PermissionType;
 import com.tn.uib.uibechanges.service.ApplicationService;
 import com.tn.uib.uibechanges.service.ConfigurationService;
 import com.tn.uib.uibechanges.service.DayService;
@@ -66,7 +62,7 @@ public class UibechangesApplication {
 						ProfileService profileService, ServerService serverService, 
 						ConfigurationService configurationService, ApplicationService applicationService, 
 						JobService jobService, GlobalSettingService globalSettingService,
-						DayService dayService, SystemUserService systemUserService) {
+						SystemUserService systemUserService, DayService dayService) {
 		return args -> {
 			
 			UserPermission p1 = new UserPermission("serveur:lire");
@@ -111,21 +107,34 @@ public class UibechangesApplication {
 			
 			User admin = new User("admin", "password", "admin@admin.com", "admin fname", "admin lname", true, Set.of(roleAdmin), Set.of(profile));
 			userService.addUser(admin);
-						
-			Job job1 = new Job("job1", "20:31", "21:00", 5, true);
+
+			Day day1 = new Day("MON");
+			dayService.addDay(day1);
+			Day day2 = new Day("TUE");
+			dayService.addDay(day2);
+			Day day3 = new Day("WED");
+			dayService.addDay(day3);
+			Day day4 = new Day("THU");
+			dayService.addDay(day4);
+			Day day5 = new Day("FRI");
+			dayService.addDay(day5);
+			Day day6 = new Day("SAT");
+			dayService.addDay(day6);
+			Day day7 = new Day("SUN");
+			dayService.addDay(day7);
+			
+			
+			Job job1 = new Job("job1", "20:57", "21:00", 5, true, Set.of(day1,day2,day3,day4,day5,day6,day7));
 			jobService.addJob(job1);
-			Job job2 = new Job("job2", "8:00", "9:30", 5, false);
+			Job job2 = new Job("job2", "8:00", "9:30", 5, false, Set.of(day3,day4));
 			jobService.addJob(job2);
-			Job job3 = new Job("job3", "17:00", "17:30", 9, false);
+			Job job3 = new Job("job3", "17:00", "17:30", 9, false, Set.of(day6,day1,day3));
 			jobService.addJob(job3);
-			Job job4 = new Job("job4", "18:00", "21:30", 7, true);
+			Job job4 = new Job("job4", "18:00", "21:30", 7, true, Set.of(day5));
 			jobService.addJob(job4);
 			
 			
 			
-
-			
-
 //			FileTransferUtility fileTransferUtility = new FileTransferUtility();
 //			fileTransferUtility.setConfig(config);
 //			fileTransferUtility.transfer();

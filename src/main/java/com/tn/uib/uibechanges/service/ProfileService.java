@@ -48,7 +48,7 @@ public class ProfileService {
 		Profile oldProfile = profileRepository.findById(profile.getId()).get();
 		if (profile.getConfigurations()!=null) {
 			oldProfile.getConfigurations().clear();
-			profile.getConfigurations().forEach(permission -> { oldProfile.getConfigurations().add( configurationRepository.findById(permission.getId()).get());});
+			profile.getConfigurations().forEach(config -> { oldProfile.getConfigurations().add( configurationRepository.findById(config.getId()).get());});
 		}
 		oldProfile.setLibelle(profile.getLibelle());
 		return new ResponseEntity<>(profileRepository.save(oldProfile), HttpStatus.OK);

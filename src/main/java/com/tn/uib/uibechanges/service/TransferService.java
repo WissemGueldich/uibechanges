@@ -38,7 +38,7 @@ public class TransferService {
 	}
 	
 	public ResponseEntity<?> updateTransfer(Transfer transfer) {
-		Transfer oldTransfer = transferRepository.findById(transfer.getId());
+		Transfer oldTransfer = transferRepository.findById(transfer.getId()).get();
 		oldTransfer.setConfiguration(transfer.getConfiguration());
 		oldTransfer.setType(transfer.getType());
 		return new ResponseEntity<>(transferRepository.save(oldTransfer), HttpStatus.OK);

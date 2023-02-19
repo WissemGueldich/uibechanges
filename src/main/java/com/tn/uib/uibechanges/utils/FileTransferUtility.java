@@ -8,8 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -18,19 +16,38 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.Transfer;
-import com.tn.uib.uibechanges.repository.TransferRepository;
 
 public class FileTransferUtility {
-
-	@Autowired
-	private TransferRepository transferRepository;
 	
 	private Configuration config;
 	private Session session;
 	private Transfer transfer;
 	
+	public Session getSession() {
+		return session;
+	}
+
+	public void setSession(Session session) {
+		this.session = session;
+	}
+
+	public Transfer getTransfer() {
+		return transfer;
+	}
+
+	public void setTransfer(Transfer transfer) {
+		this.transfer = transfer;
+	}
+
 	public FileTransferUtility() {
-		this.transfer.setConfiguration(config);
+		this.transfer  = new Transfer();
+		this.transfer.setDate(new Date());
+		this.transfer.setType(0);
+	}
+	
+	public FileTransferUtility(Configuration config, Transfer transfer) {
+		this.config = config;
+		this.transfer = transfer;
 		this.transfer.setDate(new Date());
 		this.transfer.setType(0);
 	}
@@ -70,7 +87,7 @@ public class FileTransferUtility {
 			getSession(config.getDestinationServer().getAddress(), config.getDestinationServer().getPort(),
 					config.getDestinationUser().getLogin(), config.getDestinationUser().getPassword());
 		} catch (JSchException e2) {
-			this.transfer.setError("échec de connexion au serveur "+e2);
+			this.transfer.setError("échec de connexion au serveur / "+e2);
 			this.transfer.setResult(false);
 			return false;
 		}
@@ -79,14 +96,14 @@ public class FileTransferUtility {
 		try {
 			channel = (ChannelSftp) this.session.openChannel("sftp");
 		} catch (JSchException e1) {
-			this.transfer.setError("échec de création de canal sftp avec le serveur destination "+e1);
+			this.transfer.setError("échec de création de canal sftp avec le serveur destination / "+e1);
 			this.transfer.setResult(false);
 			return false;
 		}
 		try {
 			channel.connect(5000);
 		} catch (JSchException e) {
-			this.transfer.setError("échec de connexion au canal sftp avec le serveur destination "+e);
+			this.transfer.setError("échec de connexion au canal sftp avec le serveur destination / "+e);
 			this.transfer.setResult(false);
 			return false;
 		}
@@ -97,7 +114,7 @@ public class FileTransferUtility {
 			channel.put("src/main/resources/tmp/" + config.getFilter(),
 					config.getDestinationPath() + config.getFilter());
 		} catch (SftpException e) {
-			this.transfer.setError("échec de téléchargement vers le serveur destination "+e);
+			this.transfer.setError("échec de téléchargement vers le serveur destination / "+e);
 			this.transfer.setResult(false);
 			return false;
 		}
@@ -108,7 +125,7 @@ public class FileTransferUtility {
 		try {
 			Files.delete(temp);
 		} catch (IOException e) {
-			this.transfer.setError("échec de la suppression du fichiers temporaire "+e);
+			this.transfer.setError("échec de la suppression du fichiers temporaire / "+e);
 			this.transfer.setResult(false);
 			return false;
 		}
@@ -126,7 +143,7 @@ public class FileTransferUtility {
 			getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
 					config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
 		} catch (JSchException e2) {
-			this.transfer.setError("échec de connexion au serveur source "+e2);
+			this.transfer.setError("échec de connexion au serveur source / "+e2);
 			this.transfer.setResult(false);
 			return false;
 		}
@@ -135,14 +152,14 @@ public class FileTransferUtility {
 		try {
 			channel = (ChannelSftp) this.session.openChannel("sftp");
 		} catch (JSchException e1) {
-			this.transfer.setError("échec de création du canal sftp avec le serveur source "+e1);
+			this.transfer.setError("échec de création du canal sftp avec le serveur source / "+e1);
 			this.transfer.setResult(false);
 			return false;
 		}
 		try {
 			channel.connect();
 		} catch (JSchException e) {
-			this.transfer.setError("échec de connexion au canal sftp avec le serveur source "+e);
+			this.transfer.setError("échec de connexion au canal sftp avec le serveur source / "+e);
 			this.transfer.setResult(false);
 			return false;
 		}
@@ -150,7 +167,7 @@ public class FileTransferUtility {
 		try {
 			channel.get(config.getSourcePath() + config.getFilter(), "src/main/resources/tmp/" + config.getFilter());
 		} catch (SftpException e) {
-			this.transfer.setError("échec de téléchargement à partir du serveur source "+e);
+			this.transfer.setError("échec de téléchargement à partir du serveur source / "+e);
 			this.transfer.setResult(false);
 			return false;
 		}
@@ -173,10 +190,8 @@ public class FileTransferUtility {
 		if (upload && download) {
 			this.transfer.setError("");
 			this.transfer.setResult(true);
-			transferRepository.save(this.transfer);
 			return this.transfer;
 		}
-		transferRepository.save(this.transfer);
 		return this.transfer;
 	}
 
@@ -192,7 +207,7 @@ public class FileTransferUtility {
 			channel = (ChannelExec) this.session.openChannel("exec");
 			channel.setCommand(command);
 		} catch (JSchException e) {
-			this.transfer.setError("échec de création du canal ssh "+e);
+			this.transfer.setError("échec de création du canal ssh / "+e);
 			this.transfer.setResult(false);
 			return;
 		}
@@ -204,7 +219,7 @@ public class FileTransferUtility {
 		try {
 			channel.connect();
 		} catch (JSchException e) {
-			this.transfer.setError("échec de connexion au canal ssh "+e);
+			this.transfer.setError("échec de connexion au canal ssh / "+e);
 			this.transfer.setResult(false);
 			return;
 		}

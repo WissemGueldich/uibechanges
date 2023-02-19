@@ -6,8 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.tn.uib.uibechanges.model.Day;
 
 @Repository
-public interface DayRepository extends JpaRepository<Day, Integer>{
+public interface DayRepository extends JpaRepository<Day, Integer> {
 	Day findById(int id);
-	Day findByName(String name);
-
+	boolean existsById(int id);
 }

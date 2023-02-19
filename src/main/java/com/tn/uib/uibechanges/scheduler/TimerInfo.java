@@ -1,27 +1,18 @@
 package com.tn.uib.uibechanges.scheduler;
 
-import java.util.Date;
+import java.util.Set;
+
+import com.tn.uib.uibechanges.model.Day;
 
 public class TimerInfo {
 	private int totalFireCount;
 	private boolean runForever;
-	private long repeatIntervalMS;
-	private long initialOffsetMS;
-	private Date startDate;
-	private Date endDate;
-
-	public Date getStartDate() {
-		return startDate;
-	}
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-	public Date getEndDate() {
-		return endDate;
-	}
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+	private int repeatInterval;
+	private long initialOffset;
+	private String startDate;
+	private String endDate;
+	private Set<Day> days ;
+	
 	public int getTotalFireCount() {
 		return totalFireCount;
 	}
@@ -34,17 +25,35 @@ public class TimerInfo {
 	public void setRunForever(boolean runForever) {
 		this.runForever = runForever;
 	}
-	public long getRepeatIntervalMS() {
-		return repeatIntervalMS;
+	public int getRepeatInterval() {
+		return repeatInterval;
 	}
-	public void setRepeatIntervalMS(long repeatIntervalMS) {
-		this.repeatIntervalMS = repeatIntervalMS;
+	public void setRepeatInterval(int repeatInterval) {
+		this.repeatInterval = repeatInterval;
 	}
-	public long getInitialOffsetMS() {
-		return initialOffsetMS;
+	public long getInitialOffset() {
+		return initialOffset;
 	}
-	public void setInitialOffsetMS(long initialOffsetMS) {
-		this.initialOffsetMS = initialOffsetMS;
+	public void setInitialOffset(long initialOffset) {
+		this.initialOffset = initialOffset;
+	}
+	public String getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+	public String getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+	public Set<Day> getDays() {
+		return days;
+	}
+	public void setDays(Set<Day> days) {
+		this.days = days;
 	}
 
 }

@@ -80,7 +80,6 @@ public class SystemUserService {
 		oldUser.getConfigurationsAsDestination().clear();
 		oldUser.getConfigurationsAsSource().forEach(config->{
 			config.setSourceServer(null);
-			System.out.println("savingggggggggggggggggg");
 			configurationRepository.save(config);
 		});
 		oldUser.getConfigurationsAsSource().clear();

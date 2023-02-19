@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.web.servlet.oauth2.resourceserver.OAuth2ResourceServerSecurityMarker;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.tn.uib.uibechanges.model.Configuration;
+import com.tn.uib.uibechanges.model.Email;
 import com.tn.uib.uibechanges.model.Transfer;
+import com.tn.uib.uibechanges.service.EmailService;
 import com.tn.uib.uibechanges.service.TransferService;
 import com.tn.uib.uibechanges.utils.FileTransferUtility;
 
@@ -28,39 +31,50 @@ public class TransferController {
 	@Autowired
 	private TransferService transferService;
 	
+	@Autowired
+	private EmailService emailService;
+	
+	///////////////////////////////////////////
+	@PostMapping("/email")
+	private ResponseEntity<?> mail (@RequestBody Email email) {
+		return new ResponseEntity<>(emailService.sendSimpleMail(email),HttpStatus.OK);
+	}
+	///////////////////////////////////////////
+	
 	@PostMapping
 	private ResponseEntity<?> transfer (@RequestBody Configuration config) {
+		
 		FileTransferUtility fileTransferUtility = new FileTransferUtility();
 		fileTransferUtility.setConfig(config);
-		Transfer transfer = new Transfer();
-		transfer.setConfiguration(config);
+		System.out.println("hello controller");
+
 		try {
 			try {
-				if (fileTransferUtility.transfer()) {
-					transfer.setResult(true);
-					transferService.addTransfer(transfer);
-					return new ResponseEntity<>(transferService.addTransfer(transfer),HttpStatus.OK);
+				if (fileTransferUtility.transfer().isResult()) {
+					System.out.println("hello is result");
+					return new ResponseEntity<>(transferService.addTransfer(fileTransferUtility.getTransfer()),HttpStatus.OK);
 				}
 			} catch (InterruptedException e) {
-				return new ResponseEntity<>("l'éxecution de commande ssh a été interrompue, cause: "+e.getMessage(),HttpStatus.EXPECTATION_FAILED);
+				transferService.addTransfer(fileTransferUtility.getTransfer());
+				return new ResponseEntity<>("l'éxecution de commande ssh a été interrompue, cause: "+fileTransferUtility.getTransfer().getError(),HttpStatus.ACCEPTED);
 			}
 		} catch (JSchException e) {
-			transfer.setResult(false);
-			transfer.setError(e.getMessage());
-			transferService.addTransfer(transfer);
-			return new ResponseEntity<>(e.getMessage(),HttpStatus.EXPECTATION_FAILED);
+			transferService.addTransfer(fileTransferUtility.getTransfer());
+			return new ResponseEntity<>(fileTransferUtility.getTransfer().getError(),HttpStatus.ACCEPTED);
 		} catch (IOException e) {
-			transfer.setResult(false);
-			transfer.setError(e.getMessage());
-			transferService.addTransfer(transfer);
-			return new ResponseEntity<>(e.getMessage(),HttpStatus.EXPECTATION_FAILED);
+			transferService.addTransfer(fileTransferUtility.getTransfer());
+			return new ResponseEntity<>(fileTransferUtility.getTransfer().getError(),HttpStatus.ACCEPTED);
 		} catch (SftpException e) {
-			transfer.setResult(false);
-			transfer.setError(e.getMessage());
-			transferService.addTransfer(transfer);
-			return new ResponseEntity<>(e.getMessage(),HttpStatus.EXPECTATION_FAILED);
+			transferService.addTransfer(fileTransferUtility.getTransfer());
+			return new ResponseEntity<>(fileTransferUtility.getTransfer().getError(),HttpStatus.ACCEPTED);
 		}
-		return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+		transferService.addTransfer(fileTransferUtility.getTransfer());
+		Email email = new Email();
+		email.setSubject("Échec de transfert");
+		email.setRecipient("wisseminfo0@gmail.com");
+		email.setMsgBody("Ceci est un email automatique pour vous informer q'un transfert a échoué :\n"+fileTransferUtility.getTransfer().getError()+"\n ");
+		emailService.sendSimpleMail(email);
+		return  new ResponseEntity<>(fileTransferUtility.getTransfer().getError(),HttpStatus.ACCEPTED);
 	}
 	
 	@GetMapping

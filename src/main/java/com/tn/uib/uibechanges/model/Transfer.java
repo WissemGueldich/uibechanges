@@ -20,7 +20,7 @@ public class Transfer {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Integer id;
     
     @Basic(optional = false)
     private int type;
@@ -71,11 +71,11 @@ public class Transfer {
 		this.error = error;
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

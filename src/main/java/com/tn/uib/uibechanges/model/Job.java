@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "jobs")
 public class Job {
 	
-	//TODO check hours
-	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -41,11 +39,11 @@ public class Job {
     
     @Column(name = "state")
     private boolean state;
-
-    @ManyToMany(fetch = FetchType.EAGER)
+    
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "job_days", 
-    			joinColumns = @JoinColumn(name = "job_id"), 
-    			inverseJoinColumns = @JoinColumn(name = "day_id"))
+    		joinColumns = @JoinColumn(name = "job_id"), 
+			inverseJoinColumns = @JoinColumn(name = "day_id"))
     private Set<Day> days;
     
     @OneToMany(mappedBy = "job", fetch = FetchType.EAGER)
@@ -55,10 +53,6 @@ public class Job {
     @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "job")
     @JsonIgnore
     private Set<JobExecution> jobExecutions;
-    
-    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "job", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Set<Hour> hours;
 
     public Job() {
     }
@@ -98,104 +92,76 @@ public class Job {
 		this.jobExecutions = jobExecutions;
 	}
 
+	public String getLibelle() {
+		return libelle;
+	}
+
+	public void setLibelle(String libelle) {
+		this.libelle = libelle;
+	}
+
+	public String getStartHour() {
+		return startHour;
+	}
+
+	public void setStartHour(String startHour) {
+		this.startHour = startHour;
+	}
+
+	public String getEndHour() {
+		return endHour;
+	}
+
+	public void setEndHour(String endHour) {
+		this.endHour = endHour;
+	}
+
+	public int getFrequency() {
+		return frequency;
+	}
+
+	public void setFrequency(int frequency) {
+		this.frequency = frequency;
+	}
+
+	public boolean getState() {
+		return state;
+	}
+
+	public void setState(boolean state) {
+		this.state = state;
+	}
+
+	public Set<Day> getDays() {
+		return days;
+	}
+
+	public void setDays(Set<Day> days) {
+		this.days = days;
+	}
+
+	public Set<ConfigurationJob> getConfigurations() {
+		return configurations;
+	}
+
+	public void setConfigurations(Set<ConfigurationJob> configurations) {
+		this.configurations = configurations;
+	}
+
+	public Set<JobExecution> getJobExecutions() {
+		return jobExecutions;
+	}
+
+	public void setJobExecutions(Set<JobExecution> jobExecutions) {
+		this.jobExecutions = jobExecutions;
+	}
+
 	public Integer getId() {
-        return id;
-    }
+		return id;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public String getLibelle() {
-        return libelle;
-    }
-
-    public void setLibelle(String libelle) {
-        this.libelle = libelle;
-    }
-
-    public String getStartHour() {
-        return startHour;
-    }
-
-    public void setStartHour(String startHour) {
-        this.startHour = startHour;
-    }
-
-    public String getEndHour() {
-        return endHour;
-    }
-
-    public void setEndHour(String endHour) {
-        this.endHour = endHour;
-    }
-
-    public int getFrequency() {
-        return frequency;
-    }
-
-    public void setFrequency(int frequency) {
-        this.frequency = frequency;
-    }
-
-    public boolean getState() {
-        return state;
-    }
-
-    public void setState(boolean state) {
-        this.state = state;
-    }
-
-    public Set<Day> getDays() {
-        return days;
-    }
-
-    public void setDays(Set<Day> days) {
-        this.days = days;
-    }
- 
-    public Set<ConfigurationJob> getConfigurations() {
-        return configurations;
-    }
-
-    public void setConfigurations(Set<ConfigurationJob> configurations) {
-        this.configurations = configurations;
-    }
-
-    public Set<JobExecution> getJobExecutions() {
-        return jobExecutions;
-    }
-
-    public void setJobExecutions(Set<JobExecution> jobExecutions) {
-        this.jobExecutions = jobExecutions;
-    }
-
-    public Set<Hour> getHours() {
-        return hours;
-    }
-
-    public void setHours(Set<Hour> hours) {
-        this.hours = hours;
-    }
-
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    public boolean equals(Object object) {
-        if (!(object instanceof Job)) {
-            return false;
-        }
-        Job other = (Job) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    public String toString() {
-        return "com.tn.uib.uibechanges.dal.entities.Job[ id=" + id + " ]";
-    }
 }
