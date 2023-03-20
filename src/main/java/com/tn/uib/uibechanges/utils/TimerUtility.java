@@ -2,8 +2,6 @@ package com.tn.uib.uibechanges.utils;
 
 import java.text.ParseException;
 
-import javax.management.loading.PrivateClassLoader;
-
 import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
@@ -16,7 +14,7 @@ import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.scheduler.TimerInfo;
 
 //minutesOffSet is for every hour
-
+@SuppressWarnings(value = { "rawtypes","unchecked","unused" })
 public class TimerUtility {
 
 	private TimerUtility() {
@@ -56,7 +54,6 @@ public class TimerUtility {
 	}
 
 	public static Trigger buildTrigger(final Class jobClass, final TimerInfo info, Job job) throws ParseException {
-		System.out.println("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
 		System.out.println(infoToCron(info));
 		return TriggerBuilder.newTrigger().withIdentity("job_id_" + job.getId())
 				.withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(infoToCron(info)))).startNow().build();

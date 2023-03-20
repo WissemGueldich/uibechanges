@@ -65,19 +65,42 @@ public class UibechangesApplication {
 						SystemUserService systemUserService, DayService dayService) {
 		return args -> {
 			
-			UserPermission p1 = new UserPermission("serveur:lire");
-			UserPermission p2 = new UserPermission("serveur:ecrire");
-			UserPermission p3 = new UserPermission("utilisateur:lire");
-			UserPermission p4 = new UserPermission("utilisateur:ecrire");
-			userRoleService.addPermission(p1);
-			userRoleService.addPermission(p2);
-			userRoleService.addPermission(p3);
-			userRoleService.addPermission(p4);
+			UserPermission psr = new UserPermission("server:read");
+			UserPermission psw = new UserPermission("server:write");
+			UserPermission pur = new UserPermission("user:read");
+			UserPermission puw = new UserPermission("user:write");
+			UserPermission pcr = new UserPermission("config:read");
+			UserPermission pcw = new UserPermission("config:write");
+			UserPermission pjr = new UserPermission("job:read");
+			UserPermission pjw = new UserPermission("job:write");
+			UserPermission pje = new UserPermission("job:execute");
+			UserPermission ppr = new UserPermission("profile:read");
+			UserPermission ppw = new UserPermission("profile:write");
+			UserPermission psur = new UserPermission("sys_user:read");
+			UserPermission psuw = new UserPermission("sys_user:write");
+			UserPermission ptr = new UserPermission("transfer:read");
+			UserPermission ptw = new UserPermission("transfer:write");
+			UserPermission pte = new UserPermission("transfer:execute");
 			
-			UserRole roleAdmin = new UserRole("admin", Set.of(p1,p2,p3,p4));
-			UserRole rolehGDHB = new UserRole("gdhb", Set.of(p3,p4));
-			UserRole roleSupervisor = new UserRole("supervision", Set.of(p1,p3));
-			UserRole roleTransfer = new UserRole("transfert", Set.of(p2));
+			userRoleService.addPermission(psr);
+			userRoleService.addPermission(psw);
+			userRoleService.addPermission(pur);
+			userRoleService.addPermission(puw);
+			userRoleService.addPermission(pcr);
+			userRoleService.addPermission(pcw);
+			userRoleService.addPermission(pjr);
+			userRoleService.addPermission(pjw);
+			userRoleService.addPermission(ppr);
+			userRoleService.addPermission(ppw);
+			userRoleService.addPermission(psur);
+			userRoleService.addPermission(psuw);
+			userRoleService.addPermission(ptr);
+			userRoleService.addPermission(ptw);
+
+			UserRole roleAdmin = new UserRole("admin", Set.of(psr,psw,pur,puw,pcr,pcw,pjr,pjw,ppr,ppw,psur,psuw,ptr,ptw,pje,pte));
+			UserRole rolehGDHB = new UserRole("gdhb", Set.of(pur,puw));
+			UserRole roleSupervisor = new UserRole("supervision", Set.of(ptr));
+			UserRole roleTransfer = new UserRole("transfert", Set.of(pte,ptr));
 			userRoleService.addRole(roleAdmin);
 			userRoleService.addRole(rolehGDHB);
 			userRoleService.addRole(roleSupervisor);

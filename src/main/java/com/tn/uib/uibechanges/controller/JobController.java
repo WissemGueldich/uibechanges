@@ -5,6 +5,7 @@ import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,7 @@ public class JobController {
 	private JobService jobService;
 	
 	@PostMapping("/schedule/{jobId}")
+	@PreAuthorize("hasAuthority('job:execute')")
 	private ResponseEntity<?> scheduleJob (@PathVariable Integer jobId){
 		try {
 			jobService.scheduleJob(jobId);
@@ -37,26 +39,31 @@ public class JobController {
 	}
 	
 	@GetMapping
+	@PreAuthorize("hasAuthority('job:read')")
 	private ResponseEntity<?> getJobs (){
 		return jobService.getJobs();
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('job:write')")
 	private ResponseEntity<?> addJob (@RequestBody Job Job){
 		return jobService.addJob(Job);
 	}
 
 	@GetMapping(path = "{id}")
+	@PreAuthorize("hasAuthority('job:read')")
 	private ResponseEntity<?> getJob (@PathVariable int id ){
 		return jobService.getJob(id);
 	}
 	
 	@PutMapping
+	@PreAuthorize("hasAuthority('job:write')")
 	private ResponseEntity<?> updateJob (@RequestBody Job Job ){
 		return jobService.updateJob(Job);
 	}
 	
 	@DeleteMapping(path="{id}")
+	@PreAuthorize("hasAuthority('job:write')")
 	private ResponseEntity<?> deleteJob (@PathVariable int id){
 		return jobService.deleteJob(id);
 	}

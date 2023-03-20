@@ -2,6 +2,7 @@ package com.tn.uib.uibechanges.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,36 +24,43 @@ public class ProfileController {
 	private ProfileService profileService;
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('profile:write')")
 	private ResponseEntity<?> addProfile (@RequestBody Profile profile){
 		return profileService.addProfile(profile);
 	}
 	
 	@GetMapping
+	@PreAuthorize("hasAuthority('profile:read')")
 	private ResponseEntity<?> getProfiles (){
 		return profileService.getProfiles();
 	}
 	
 	@GetMapping(path = "{id}")
+	@PreAuthorize("hasAuthority('profile:read')")
 	private ResponseEntity<?> getProfile (@PathVariable int id ){
 		return profileService.getProfile(id);
 	}
 	
 	@GetMapping("/user/{id}")
+	@PreAuthorize("hasAuthority('profile:read')")
 	public ResponseEntity<?> getProfilesByUserId(@PathVariable int id) {
 		return profileService.getProfilesByUserId(id);
 	};
 	
 	@GetMapping("/{id}/users")
+	@PreAuthorize("hasAuthority('profile:read')")
 	public ResponseEntity<?> getUsersByProfileId(@PathVariable int id) {
 		return profileService.getUsersByProfileId(id);
 	};
 	
 	@PutMapping
+	@PreAuthorize("hasAuthority('profile:write')")
 	private ResponseEntity<?> updateProfile (@RequestBody Profile profile ){
 		return profileService.updateProfile(profile);
 	}
 	
 	@DeleteMapping(path="{id}")
+	@PreAuthorize("hasAuthority('profile:write')")
 	private ResponseEntity<?> deleteProfile (@PathVariable int id){
 		return profileService.deleteProfile(id);
 

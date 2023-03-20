@@ -16,6 +16,7 @@ import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.utils.TimerUtility;
 
 @Service
+@SuppressWarnings("rawtypes")
 public class SchedulerService {
 	
 	private final Scheduler scheduler;
@@ -45,7 +46,7 @@ public class SchedulerService {
 		}
 	}
 	
-	public void schedule(final Class jobClass, final TimerInfo info, Job job) throws ParseException {
+	public void schedule( final Class jobClass, final TimerInfo info, Job job) throws ParseException {
 		final JobDetail jobDetail = TimerUtility.buildJobDetail(jobClass, info, job);
 		final Trigger trigger = TimerUtility.buildTrigger(jobClass, info, job);
 		try {

@@ -2,6 +2,7 @@ package com.tn.uib.uibechanges.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,29 +26,32 @@ public class ServerController {
 	ServerService serverService;
 	
 	@PostMapping
-	//@PreAuthorize("hasAuthority('serveur:ecrire')")
+	@PreAuthorize("hasAuthority('server:write')")
 	public ResponseEntity<?> addServeur(@RequestBody Server server) {
 		return serverService.addServer(server);
 	};
 	
 	@GetMapping
 	//@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_NWADMIN')")
+	@PreAuthorize("hasAuthority('server:read')")
 	public ResponseEntity<?> getServeurs() {
 		return serverService.getServers();
 	};
 	
 	@GetMapping(path = "{id}")
+	@PreAuthorize("hasAuthority('server:read')")
 	public ResponseEntity<?> getServeur(@PathVariable int id) {
 		return serverService.getServer(id);
 	};
 	
 	@PutMapping
+	@PreAuthorize("hasAuthority('server:write')")
 	public ResponseEntity<?> updateServeur(@RequestBody Server server) {
 		return serverService.updateServer(server);
 	};
 	
 	@DeleteMapping(path="{id}")
-	//@PreAuthorize("hasAuthority('job:write')")
+	@PreAuthorize("hasAuthority('server:write')")
 	public ResponseEntity<?> deleteServeur(@PathVariable int id) {
 		return serverService.deleteServer(id);
 	};

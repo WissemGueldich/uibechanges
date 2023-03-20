@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,42 +29,50 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('user:write')")
 	private ResponseEntity<?> addUser (@RequestBody User user){
 		return userService.addUser(user);
 	}
 	
 	@GetMapping
+	@PreAuthorize("hasAuthority('user:read')")
 	private ResponseEntity<?> getUsers (){
 		return userService.getUsers();
 	}
 	
 	@GetMapping(path = "{id}")
+	@PreAuthorize("hasAuthority('user:read')")
 	private ResponseEntity<?> getUser (@PathVariable int id ){
 		return userService.getUser(id);
 	}
 	
 	@GetMapping(path = "/m/{matricule}")
+	@PreAuthorize("hasAuthority('user:read')")
 	private ResponseEntity<?> getUser (@PathVariable String matricule ){
 		return userService.getUser(matricule);
 	}
 	
 	@PutMapping
+	@PreAuthorize("hasAuthority('user:write')")
 	private ResponseEntity<?> updateUser (@RequestBody User user ){
 		return userService.updateUser(user);
 	}
 	
 	@DeleteMapping(path="{id}")
+	@PreAuthorize("hasAuthority('user:write')")
 	private ResponseEntity<?> deleteUser (@PathVariable int id){
 		return userService.deleteUser(id);
 	}
 	
 	@PostMapping(path="/add/{userId}")
+	@PreAuthorize("hasAuthority('user:write')")
 	private ResponseEntity<?> addRoleToUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
 
 		return userService.addRolesToUser(userId, roles);
 	}
 	
 	@PostMapping(path="/remove/{userId}")
+	@PreAuthorize("hasAuthority('user:write')")
 	private ResponseEntity<?> removeRoleFromUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
 
 		return userService.removeRolesFromUser(userId, roles);

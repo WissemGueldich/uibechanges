@@ -1,11 +1,12 @@
 package com.tn.uib.uibechanges.controller;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.web.servlet.oauth2.resourceserver.OAuth2ResourceServerSecurityMarker;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,24 +35,15 @@ public class TransferController {
 	@Autowired
 	private EmailService emailService;
 	
-	///////////////////////////////////////////
-	@PostMapping("/email")
-	private ResponseEntity<?> mail (@RequestBody Email email) {
-		return new ResponseEntity<>(emailService.sendSimpleMail(email),HttpStatus.OK);
-	}
-	///////////////////////////////////////////
-	
 	@PostMapping
+	@PreAuthorize("hasAuthority('transfer:execute')")
 	private ResponseEntity<?> transfer (@RequestBody Configuration config) {
 		
 		FileTransferUtility fileTransferUtility = new FileTransferUtility();
 		fileTransferUtility.setConfig(config);
-		System.out.println("hello controller");
-
 		try {
 			try {
 				if (fileTransferUtility.transfer().isResult()) {
-					System.out.println("hello is result");
 					return new ResponseEntity<>(transferService.addTransfer(fileTransferUtility.getTransfer()),HttpStatus.OK);
 				}
 			} catch (InterruptedException e) {
@@ -70,29 +62,33 @@ public class TransferController {
 		}
 		transferService.addTransfer(fileTransferUtility.getTransfer());
 		Email email = new Email();
-		email.setSubject("Échec de transfert");
+		email.setSubject("Transfert échoué");
 		email.setRecipient("wisseminfo0@gmail.com");
-		email.setMsgBody("Ceci est un email automatique pour vous informer q'un transfert a échoué :\n"+fileTransferUtility.getTransfer().getError()+"\n ");
+		email.setMsgBody("Ceci est un email automatique pour vous informer que le transfert '" + fileTransferUtility.getTransfer().getConfiguration().getLibelle() + "' a échoué : \n"+fileTransferUtility.getTransfer().getError()+".\n(" + new Date().toString() + ").");
 		emailService.sendSimpleMail(email);
-		return  new ResponseEntity<>(fileTransferUtility.getTransfer().getError(),HttpStatus.ACCEPTED);
+		return new ResponseEntity<String>(fileTransferUtility.getTransfer().getError(),HttpStatus.OK);
 	}
 	
 	@GetMapping
+	@PreAuthorize("hasAuthority('transfer:read')")
 	private ResponseEntity<?> getTransfers() {
 		return transferService.getTransfers();
 	}
 	
 	@GetMapping(path = "{id}")
+	@PreAuthorize("hasAuthority('transfer:read')")
 	public ResponseEntity<?> getTransfer(@PathVariable int id) {
 		return transferService.getTransfer(id);
 	};
 	
 	@PutMapping
+	@PreAuthorize("hasAuthority('transfer:write')")
 	public ResponseEntity<?> updateTransfer(@RequestBody Transfer transfer) {
 		return transferService.updateTransfer(transfer);
 	};
 	
 	@DeleteMapping(path="{id}")
+	@PreAuthorize("hasAuthority('transfer:write')")
 	public ResponseEntity<?> deleteTransfer(@PathVariable int id) {
 		return transferService.deleteTransfer(id);
 	};

@@ -89,6 +89,7 @@ public class FileTransferUtility {
 		} catch (JSchException e2) {
 			this.transfer.setError("échec de connexion au serveur / "+e2);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return false;
 		}
 		System.out.println("Opening upload channel...");
@@ -98,6 +99,7 @@ public class FileTransferUtility {
 		} catch (JSchException e1) {
 			this.transfer.setError("échec de création de canal sftp avec le serveur destination / "+e1);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return false;
 		}
 		try {
@@ -105,6 +107,7 @@ public class FileTransferUtility {
 		} catch (JSchException e) {
 			this.transfer.setError("échec de connexion au canal sftp avec le serveur destination / "+e);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return false;
 		}
 		System.out.println("Starting Upload...");
@@ -116,6 +119,7 @@ public class FileTransferUtility {
 		} catch (SftpException e) {
 			this.transfer.setError("échec de téléchargement vers le serveur destination / "+e);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return false;
 		}
 		System.out.println("Uploaded successfully.");
@@ -127,6 +131,7 @@ public class FileTransferUtility {
 		} catch (IOException e) {
 			this.transfer.setError("échec de la suppression du fichiers temporaire / "+e);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return false;
 		}
 		System.out.println("Temporary files deleted.");
@@ -145,6 +150,7 @@ public class FileTransferUtility {
 		} catch (JSchException e2) {
 			this.transfer.setError("échec de connexion au serveur source / "+e2);
 			this.transfer.setResult(false);
+			System.out.println("Failed");
 			return false;
 		}
 		System.out.println("Opening download channel...");
@@ -154,6 +160,7 @@ public class FileTransferUtility {
 		} catch (JSchException e1) {
 			this.transfer.setError("échec de création du canal sftp avec le serveur source / "+e1);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return false;
 		}
 		try {
@@ -161,6 +168,7 @@ public class FileTransferUtility {
 		} catch (JSchException e) {
 			this.transfer.setError("échec de connexion au canal sftp avec le serveur source / "+e);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return false;
 		}
 		System.out.println("Starting download...");
@@ -169,6 +177,7 @@ public class FileTransferUtility {
 		} catch (SftpException e) {
 			this.transfer.setError("échec de téléchargement à partir du serveur source / "+e);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return false;
 		}
 		System.out.println("Downloaded successfully.");
@@ -185,13 +194,18 @@ public class FileTransferUtility {
 
 		System.out.println("initiating transfer...");
 		boolean download = this.download();
-		boolean upload = this.upload();
-		System.out.println("File transfer completed.");
-		if (upload && download) {
-			this.transfer.setError("");
-			this.transfer.setResult(true);
+		if (!download) {
+			System.out.println("File transfer failed.");
 			return this.transfer;
 		}
+		boolean upload = this.upload();
+		if (!upload) {
+			System.out.println("File transfer failed.");
+			return this.transfer;
+		}
+		this.transfer.setError("");
+		this.transfer.setResult(true);
+		System.out.println("File transfer completed.");
 		return this.transfer;
 	}
 
@@ -209,6 +223,7 @@ public class FileTransferUtility {
 		} catch (JSchException e) {
 			this.transfer.setError("échec de création du canal ssh / "+e);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return;
 		}
 		System.out.println("Executing command: " + command);
@@ -221,6 +236,7 @@ public class FileTransferUtility {
 		} catch (JSchException e) {
 			this.transfer.setError("échec de connexion au canal ssh / "+e);
 			this.transfer.setResult(false);
+			System.out.println("Failed.");
 			return;
 		}
 		byte[] tmp = new byte[1024];
@@ -256,6 +272,7 @@ public class FileTransferUtility {
 	}
 
 	public void setConfig(Configuration config) {
+		this.transfer.setConfiguration(config);
 		this.config = config;
 	}
 
