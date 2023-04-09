@@ -1,6 +1,7 @@
 package com.tn.uib.uibechanges.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class TransferController {
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('transfer:execute')")
-	private ResponseEntity<?> transfer (@RequestBody Configuration config) {
+	public ResponseEntity<?> transfer (@RequestBody Configuration config) {
 		
 		FileTransferUtility fileTransferUtility = new FileTransferUtility();
 		fileTransferUtility.setConfig(config);
@@ -71,7 +72,7 @@ public class TransferController {
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('transfer:read')")
-	private ResponseEntity<?> getTransfers() {
+	public ResponseEntity<?> getTransfers() {
 		return transferService.getTransfers();
 	}
 	
@@ -93,4 +94,13 @@ public class TransferController {
 		return transferService.deleteTransfer(id);
 	};
 	
+	@DeleteMapping
+	@PreAuthorize("hasAuthority('transfer:write')")
+	public ResponseEntity<?> deleteTransfersBetween(@RequestBody DateBetween dateBetween) throws ParseException {
+		return transferService.deleteByDateBetween(dateBetween.getStartDate(), dateBetween.getEndDate());
+	};
+	
+	
+	
 }
+

@@ -30,50 +30,50 @@ public class UserController {
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('user:write')")
-	private ResponseEntity<?> addUser (@RequestBody User user){
+	public ResponseEntity<?> addUser (@RequestBody User user){
 		return userService.addUser(user);
 	}
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('user:read')")
-	private ResponseEntity<?> getUsers (){
+	public ResponseEntity<?> getUsers (){
 		return userService.getUsers();
 	}
 	
 	@GetMapping(path = "{id}")
 	@PreAuthorize("hasAuthority('user:read')")
-	private ResponseEntity<?> getUser (@PathVariable int id ){
+	public ResponseEntity<?> getUser (@PathVariable int id ){
 		return userService.getUser(id);
 	}
 	
 	@GetMapping(path = "/m/{matricule}")
-	@PreAuthorize("hasAuthority('user:read')")
-	private ResponseEntity<?> getUser (@PathVariable String matricule ){
+	@PreAuthorize("hasAuthority('transfer:read')")
+	public ResponseEntity<?> getUser (@PathVariable String matricule ){
 		return userService.getUser(matricule);
 	}
 	
 	@PutMapping
 	@PreAuthorize("hasAuthority('user:write')")
-	private ResponseEntity<?> updateUser (@RequestBody User user ){
+	public ResponseEntity<?> updateUser (@RequestBody User user ){
 		return userService.updateUser(user);
 	}
 	
 	@DeleteMapping(path="{id}")
 	@PreAuthorize("hasAuthority('user:write')")
-	private ResponseEntity<?> deleteUser (@PathVariable int id){
+	public ResponseEntity<?> deleteUser (@PathVariable int id){
 		return userService.deleteUser(id);
 	}
 	
 	@PostMapping(path="/add/{userId}")
 	@PreAuthorize("hasAuthority('user:write')")
-	private ResponseEntity<?> addRoleToUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
+	public ResponseEntity<?> addRoleToUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
 
 		return userService.addRolesToUser(userId, roles);
 	}
 	
 	@PostMapping(path="/remove/{userId}")
 	@PreAuthorize("hasAuthority('user:write')")
-	private ResponseEntity<?> removeRoleFromUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
+	public ResponseEntity<?> removeRoleFromUser(@PathVariable int userId, @RequestBody Set<UserRole> roles){
 
 		return userService.removeRolesFromUser(userId, roles);
 	}

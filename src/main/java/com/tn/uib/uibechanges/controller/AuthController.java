@@ -6,13 +6,14 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,13 +33,13 @@ public class AuthController {
 	AuthenticationManager authenticationManager;
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
+
+//	@Autowired
+//	PasswordEncoder encoder;
 
 	@Autowired
-	PasswordEncoder encoder;
-
-	@Autowired
-	JwtUtils jwtUtils;
+	private JwtUtils jwtUtils;
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -60,7 +61,13 @@ public class AuthController {
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody com.tn.uib.uibechanges.model.User user) {
-		
 		return userService.addUser(user);
 	}
+	
+	@GetMapping
+	public ResponseEntity<?> verifyToken(){
+		return new ResponseEntity<>("Token is valid",HttpStatus.OK);
+	}
+	
+	
 }

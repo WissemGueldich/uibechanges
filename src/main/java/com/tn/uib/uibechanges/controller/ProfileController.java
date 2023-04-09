@@ -25,19 +25,19 @@ public class ProfileController {
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('profile:write')")
-	private ResponseEntity<?> addProfile (@RequestBody Profile profile){
+	public ResponseEntity<?> addProfile (@RequestBody Profile profile){
 		return profileService.addProfile(profile);
 	}
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('profile:read')")
-	private ResponseEntity<?> getProfiles (){
+	public ResponseEntity<?> getProfiles (){
 		return profileService.getProfiles();
 	}
 	
 	@GetMapping(path = "{id}")
 	@PreAuthorize("hasAuthority('profile:read')")
-	private ResponseEntity<?> getProfile (@PathVariable int id ){
+	public ResponseEntity<?> getProfile (@PathVariable int id ){
 		return profileService.getProfile(id);
 	}
 	
@@ -55,13 +55,13 @@ public class ProfileController {
 	
 	@PutMapping
 	@PreAuthorize("hasAuthority('profile:write')")
-	private ResponseEntity<?> updateProfile (@RequestBody Profile profile ){
+	public ResponseEntity<?> updateProfile (@RequestBody Profile profile ){
 		return profileService.updateProfile(profile);
 	}
 	
 	@DeleteMapping(path="{id}")
 	@PreAuthorize("hasAuthority('profile:write')")
-	private ResponseEntity<?> deleteProfile (@PathVariable int id){
+	public ResponseEntity<?> deleteProfile (@PathVariable int id){
 		return profileService.deleteProfile(id);
 
 	}

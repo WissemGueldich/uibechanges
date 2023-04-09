@@ -28,7 +28,6 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@NotBlank
 	@Size(max = 120)
 	private String password;
 
@@ -75,7 +74,7 @@ public class User {
 
 	}
 
-	public User(@NotBlank @Size(max = 120) String matricule, @NotBlank @Size(max = 120) String password,
+	public User(@NotBlank @Size(max = 120) String matricule, @Size(max = 120) String password,
 			@NotBlank @Size(max = 50) @Email String email, @NotBlank @Size(min = 4, max = 40) String firstName, 
 			@NotBlank @Size(min = 4, max = 40) String lastName, boolean isEnabled, Set<UserRole> roles, Set<Profile> profiles) {
 		this.password = password;

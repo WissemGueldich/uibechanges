@@ -30,44 +30,44 @@ public class ConfigurationController {
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('config:write')")
-	private ResponseEntity<?> addConfiguration (@RequestBody Configuration configuration){
+	public ResponseEntity<?> addConfiguration (@RequestBody Configuration configuration){
 		return configurationService.addConfiguration(configuration);
 	}
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('config:read')")
-	private ResponseEntity<?> getConfigurations (){
+	public ResponseEntity<?> getConfigurations (){
 		return configurationService.getConfigurations();
 	}
 	
 	@GetMapping(path = "{id}")
 	@PreAuthorize("hasAuthority('config:read')")
-	private ResponseEntity<?> getConfiguration (@PathVariable int id ){
+	public ResponseEntity<?> getConfiguration (@PathVariable int id ){
 		return configurationService.getConfiguration(id);
 
 	}
 	
 	@PutMapping
 	@PreAuthorize("hasAuthority('config:write')")
-	private ResponseEntity<?> updateConfiguration (@RequestBody Configuration configuration ){
+	public ResponseEntity<?> updateConfiguration (@RequestBody Configuration configuration ){
 		return configurationService.updateConfiguration(configuration);
 	}
 	
 	@DeleteMapping(path="{id}")
 	@PreAuthorize("hasAuthority('config:write')")
-	private ResponseEntity<?> deleteConfiguration (@PathVariable int id){
+	public ResponseEntity<?> deleteConfiguration (@PathVariable int id){
 		return configurationService.deleteConfiguration(id);
 	}
 	
 	@GetMapping("/user")
 	@PreAuthorize("hasAuthority('config:read')")
-	private ResponseEntity<?> getUserConfigurationsBy(@RequestBody SearchRequest searchRequest){
+	public ResponseEntity<?> getUserConfigurationsBy(@RequestBody SearchRequest searchRequest){
 		return configurationService.getUserConfigurations(searchRequest.getAutomatic(),searchRequest.getMatricule());
 	}
 	
 	@GetMapping("/server")
 	@PreAuthorize("hasAuthority('config:read')")
-	private ResponseEntity<?> getServersConfigurations(@RequestBody Map<String, Server> json){
+	public ResponseEntity<?> getServersConfigurations(@RequestBody Map<String, Server> json){
 		return configurationService.getConfigurationsByServers(json.get("source"), json.get("destination"));
 	}
 	

@@ -26,43 +26,43 @@ public class SystemUserController {
 	private SystemUserService systemUserService;
 	
 	@PostMapping
-	@PreAuthorize("hasAuthority('sys_user:write')")
+	@PreAuthorize("hasAuthority('systemuser:write')")
 	public ResponseEntity<?> addSystemUser(@RequestBody SystemUser systemUser) {
 		return systemUserService.addSystemUser(systemUser);
 	};
 	
 	@GetMapping
-	@PreAuthorize("hasAuthority('sys_user:read')")
+	@PreAuthorize("hasAuthority('systemuser:read')")
 	public ResponseEntity<?> getSystemUsers() {
 		return systemUserService.getSystemUsers();
 	};
 	
 	@GetMapping("/server")
-	@PreAuthorize("hasAuthority('sys_user:read')")
+	@PreAuthorize("hasAuthority('systemuser:read')")
 	public ResponseEntity<?> getSystemUsersBySourceServer(@RequestBody Server server) {
 		return systemUserService.getSystemUsersByServer(server);
 	};
 	
 	@GetMapping("/server/{id}")
-	@PreAuthorize("hasAuthority('sys_user:read')")
+	@PreAuthorize("hasAuthority('systemuser:read')")
 	public ResponseEntity<?> getSystemUsersBySourceServer(@PathVariable int id) {
 		return systemUserService.getSystemUsersByServerId(id);
 	};
 	
 	@GetMapping(path = "{id}")
-	@PreAuthorize("hasAuthority('sys_user:read')")
+	@PreAuthorize("hasAuthority('systemuser:read')")
 	public ResponseEntity<?> getSystemUser(@PathVariable int id) {
 		return systemUserService.getSystemUser(id);
 	};
 	
 	@PutMapping
-	@PreAuthorize("hasAuthority('sys_user:write')")
+	@PreAuthorize("hasAuthority('systemuser:write')")
 	public ResponseEntity<?> updateSystemUser(@RequestBody SystemUser systemUser) {
 		return systemUserService.updateSystemUser(systemUser);
 	};
 	
 	@DeleteMapping(path="{id}")
-	@PreAuthorize("hasAuthority('sys_user:write')")
+	@PreAuthorize("hasAuthority('systemuser:write')")
 	public ResponseEntity<?> deleteSystemUser(@PathVariable int id) {
 		return systemUserService.deleteSystemUsers(id);
 	};

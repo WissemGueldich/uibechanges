@@ -25,9 +25,10 @@ import com.tn.uib.uibechanges.service.UserService;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-		// securedEnabled = true,
-		// jsr250Enabled = true,
-		prePostEnabled = true)
+		 securedEnabled = true,
+		 jsr250Enabled = true,
+		prePostEnabled = true
+		)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	UserService userDetailsService;
@@ -63,7 +64,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.authorizeRequests().antMatchers("/api/auth/**").permitAll()
-			.antMatchers("/api/test/**").permitAll()
 			.anyRequest().authenticated();
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

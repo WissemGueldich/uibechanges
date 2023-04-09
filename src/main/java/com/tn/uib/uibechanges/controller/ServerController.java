@@ -23,7 +23,7 @@ import com.tn.uib.uibechanges.service.ServerService;
 public class ServerController {
 	
 	@Autowired
-	ServerService serverService;
+	private ServerService serverService;
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('server:write')")
@@ -32,7 +32,6 @@ public class ServerController {
 	};
 	
 	@GetMapping
-	//@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_NWADMIN')")
 	@PreAuthorize("hasAuthority('server:read')")
 	public ResponseEntity<?> getServeurs() {
 		return serverService.getServers();

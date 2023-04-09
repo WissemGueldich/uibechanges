@@ -29,7 +29,7 @@ public class JobController {
 	
 	@PostMapping("/schedule/{jobId}")
 	@PreAuthorize("hasAuthority('job:execute')")
-	private ResponseEntity<?> scheduleJob (@PathVariable Integer jobId){
+	public ResponseEntity<?> scheduleJob (@PathVariable Integer jobId){
 		try {
 			jobService.scheduleJob(jobId);
 		} catch (ParseException e) {
@@ -40,31 +40,31 @@ public class JobController {
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('job:read')")
-	private ResponseEntity<?> getJobs (){
+	public ResponseEntity<?> getJobs (){
 		return jobService.getJobs();
 	}
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('job:write')")
-	private ResponseEntity<?> addJob (@RequestBody Job Job){
+	public ResponseEntity<?> addJob (@RequestBody Job Job){
 		return jobService.addJob(Job);
 	}
 
 	@GetMapping(path = "{id}")
 	@PreAuthorize("hasAuthority('job:read')")
-	private ResponseEntity<?> getJob (@PathVariable int id ){
+	public ResponseEntity<?> getJob (@PathVariable int id ){
 		return jobService.getJob(id);
 	}
 	
 	@PutMapping
 	@PreAuthorize("hasAuthority('job:write')")
-	private ResponseEntity<?> updateJob (@RequestBody Job Job ){
+	public ResponseEntity<?> updateJob (@RequestBody Job Job ){
 		return jobService.updateJob(Job);
 	}
 	
 	@DeleteMapping(path="{id}")
 	@PreAuthorize("hasAuthority('job:write')")
-	private ResponseEntity<?> deleteJob (@PathVariable int id){
+	public ResponseEntity<?> deleteJob (@PathVariable int id){
 		return jobService.deleteJob(id);
 	}
 

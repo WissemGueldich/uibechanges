@@ -76,8 +76,8 @@ public class UibechangesApplication {
 			UserPermission pje = new UserPermission("job:execute");
 			UserPermission ppr = new UserPermission("profile:read");
 			UserPermission ppw = new UserPermission("profile:write");
-			UserPermission psur = new UserPermission("sys_user:read");
-			UserPermission psuw = new UserPermission("sys_user:write");
+			UserPermission psur = new UserPermission("systemuser:read");
+			UserPermission psuw = new UserPermission("systemuser:write");
 			UserPermission ptr = new UserPermission("transfer:read");
 			UserPermission ptw = new UserPermission("transfer:write");
 			UserPermission pte = new UserPermission("transfer:execute");
@@ -90,20 +90,23 @@ public class UibechangesApplication {
 			userRoleService.addPermission(pcw);
 			userRoleService.addPermission(pjr);
 			userRoleService.addPermission(pjw);
+			userRoleService.addPermission(pje);
 			userRoleService.addPermission(ppr);
 			userRoleService.addPermission(ppw);
 			userRoleService.addPermission(psur);
 			userRoleService.addPermission(psuw);
 			userRoleService.addPermission(ptr);
 			userRoleService.addPermission(ptw);
+			userRoleService.addPermission(pte);
+
 
 			UserRole roleAdmin = new UserRole("admin", Set.of(psr,psw,pur,puw,pcr,pcw,pjr,pjw,ppr,ppw,psur,psuw,ptr,ptw,pje,pte));
 			UserRole rolehGDHB = new UserRole("gdhb", Set.of(pur,puw));
-			UserRole roleSupervisor = new UserRole("supervision", Set.of(ptr));
-			UserRole roleTransfer = new UserRole("transfert", Set.of(pte,ptr));
+			UserRole rolesupervision = new UserRole("supervision", Set.of(ptr));
+			UserRole roleTransfer = new UserRole("transfer", Set.of(pte,ptr));
 			userRoleService.addRole(roleAdmin);
 			userRoleService.addRole(rolehGDHB);
-			userRoleService.addRole(roleSupervisor);
+			userRoleService.addRole(rolesupervision);
 			userRoleService.addRole(roleTransfer);
 			
 			Server server = new Server("192.168.75.129", 22, "the server");
@@ -123,14 +126,33 @@ public class UibechangesApplication {
 			configurationService.addConfiguration(config);
 			configurationService.addConfiguration(config2);
 			
-			Profile profile = new Profile();
-			profile.setLibelle("profile");
-			profile.setConfigurations(Set.of(config,config2));
-			profileService.addProfile(profile);
+			Profile profile1 = new Profile();
+			profile1.setLibelle("profile1");
+			profile1.setConfigurations(Set.of(config));
+			profileService.addProfile(profile1);
 			
-			User admin = new User("admin", "password", "admin@admin.com", "admin fname", "admin lname", true, Set.of(roleAdmin), Set.of(profile));
-			userService.addUser(admin);
+			Profile profile2 = new Profile();
+			profile2.setLibelle("profile2");
+			profile2.setConfigurations(Set.of(config2));
+			profileService.addProfile(profile2);
+			
+			Profile profile3 = new Profile();
+			profile3.setLibelle("profile3");
+			profile3.setConfigurations(Set.of(config,config2));
+			profileService.addProfile(profile3);
+			
+			User admin = new User("admin", "adminpass", "admin@admin.com", "admin fname", "admin lname", true, Set.of(roleAdmin), Set.of(profile1,profile2,profile3));
+			User gdhbUser = new User("gdhb", "gdhbpass", "gdhb@gdhb.com", "gdhb fname", "ghbh lname", true, Set.of(rolehGDHB), Set.of(profile1,profile2));
+			User supervision = new User("supervision", "supervisionpass", "supervision@supervision.com", "supervision fname", "supervision lname", true, Set.of(rolesupervision), Set.of(profile2));
+			User transfer = new User("transfer", "transferpass", "transfer@transfer.com", "transfer fname", "transfer lname", true, Set.of(roleTransfer), Set.of(profile1,profile2,profile3));
 
+			userService.addUser(admin);
+			userService.addUser(gdhbUser);
+			userService.addUser(supervision);
+			userService.addUser(transfer);
+
+			
+			
 			Day day1 = new Day("MON");
 			dayService.addDay(day1);
 			Day day2 = new Day("TUE");
