@@ -40,7 +40,7 @@ public class TransferController {
 	@PreAuthorize("hasAuthority('transfer:execute')")
 	public ResponseEntity<?> transfer (@RequestBody Configuration config) {
 		
-		FileTransferUtility fileTransferUtility = new FileTransferUtility();
+		FileTransferUtility fileTransferUtility = new FileTransferUtility(0);
 		fileTransferUtility.setConfig(config);
 		try {
 			try {

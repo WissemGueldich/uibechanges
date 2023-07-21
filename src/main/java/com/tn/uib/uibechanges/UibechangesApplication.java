@@ -11,6 +11,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import com.tn.uib.uibechanges.controller.JobConfigs;
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.Day;
 import com.tn.uib.uibechanges.model.Job;
@@ -152,7 +153,8 @@ public class UibechangesApplication {
 			userService.addUser(transfer);
 
 			
-			
+			Day day7 = new Day("SUN");
+			dayService.addDay(day7);
 			Day day1 = new Day("MON");
 			dayService.addDay(day1);
 			Day day2 = new Day("TUE");
@@ -165,24 +167,20 @@ public class UibechangesApplication {
 			dayService.addDay(day5);
 			Day day6 = new Day("SAT");
 			dayService.addDay(day6);
-			Day day7 = new Day("SUN");
-			dayService.addDay(day7);
+
 			
-			
-			Job job1 = new Job("job1", "20:57", "21:00", 5, true, Set.of(day1,day2,day3,day4,day5,day6,day7));
-			jobService.addJob(job1);
-			Job job2 = new Job("job2", "8:00", "9:30", 5, false, Set.of(day3,day4));
+			Job job2 = new Job("job2", "20:55", "20:56", 1, false, Set.of(day7,day1));
 			jobService.addJob(job2);
+			Job job1 = new Job("job1", "15:07", "21:00", 5, true, Set.of(day1,day2,day3,day4,day5,day6,day7));
+			jobService.addJob(job1);
 			Job job3 = new Job("job3", "17:00", "17:30", 9, false, Set.of(day6,day1,day3));
 			jobService.addJob(job3);
 			Job job4 = new Job("job4", "18:00", "21:30", 7, true, Set.of(day5));
 			jobService.addJob(job4);
 			
-			
-			
-//			FileTransferUtility fileTransferUtility = new FileTransferUtility();
-//			fileTransferUtility.setConfig(config);
-//			fileTransferUtility.transfer();
+			JobConfigs jConfigs = new JobConfigs(job1, Set.of(1,2));
+			jobService.updateJob(jConfigs);
+
 			
 		};
 	}

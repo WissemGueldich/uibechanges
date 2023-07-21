@@ -39,17 +39,17 @@ public class FileTransferUtility {
 		this.transfer = transfer;
 	}
 
-	public FileTransferUtility() {
+	public FileTransferUtility(int type) {
 		this.transfer  = new Transfer();
 		this.transfer.setDate(new Date());
-		this.transfer.setType(0);
+		this.transfer.setType(type);
 	}
 	
-	public FileTransferUtility(Configuration config, Transfer transfer) {
+	public FileTransferUtility(Configuration config, Transfer transfer, int type) {
 		this.config = config;
 		this.transfer = transfer;
 		this.transfer.setDate(new Date());
-		this.transfer.setType(0);
+		this.transfer.setType(type);
 	}
 
 	private void getSession(String host, int port, String sftpUser, String sftpPassword) throws JSchException {
@@ -123,7 +123,24 @@ public class FileTransferUtility {
 			return false;
 		}
 		System.out.println("Uploaded successfully.");
+		if (config.getArchive()) {
+			execute("cp " + config.getDestinationPath() + config.getFilter() + " "
+					+ config.getDestinationArchivingPath() + config.getFilter().replace(".", "_archive."));
+		}
 		channel.disconnect();
+		killSession();
+		if (config.getMove()) {
+			try {
+				getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
+						config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
+				execute("rm -f " + config.getSourcePath() + config.getFilter());
+			} catch (JSchException e2) {
+				this.transfer.setError("échec de connexion au serveur source pour supprimer le fichier source/ "+e2);
+				this.transfer.setResult(false);
+				System.out.println("Failed");
+			}
+		}
+		killSession();
 		Path temp = Paths.get("src/main/resources/tmp/" + config.getFilter());
 		System.out.println("Deleting temporary files...");
 		try {
@@ -132,14 +149,9 @@ public class FileTransferUtility {
 			this.transfer.setError("échec de la suppression du fichiers temporaire / "+e);
 			this.transfer.setResult(false);
 			System.out.println("Failed.");
-			return false;
 		}
 		System.out.println("Temporary files deleted.");
-		if (config.getArchive()) {
-			execute("cp " + config.getDestinationPath() + config.getFilter() + " "
-					+ config.getDestinationArchivingPath() + config.getFilter().replace(".", "_archive."));
-		}
-		killSession();
+
 		return true;
 	}
 
@@ -182,10 +194,6 @@ public class FileTransferUtility {
 		}
 		System.out.println("Downloaded successfully.");
 		channel.disconnect();
-		//TODO: condition to not remove file unless uploaded
-		if (config.getMove()) {
-			execute("rm -f " + config.getSourcePath() + config.getFilter());
-		}
 		killSession();
 		return true;
 	}

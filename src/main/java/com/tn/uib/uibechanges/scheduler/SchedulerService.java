@@ -1,6 +1,7 @@
 package com.tn.uib.uibechanges.scheduler;
 
 import java.text.ParseException;
+import java.util.Date;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -47,14 +48,22 @@ public class SchedulerService {
 	}
 	
 	public void schedule( final Class jobClass, final TimerInfo info, Job job) throws ParseException {
-		final JobDetail jobDetail = TimerUtility.buildJobDetail(jobClass, info, job);
-		final Trigger trigger = TimerUtility.buildTrigger(jobClass, info, job);
-		try {
-			scheduler.scheduleJob(jobDetail, trigger);
-		} catch (SchedulerException e) {
-			System.out.println("error scheduling job");
-			System.out.println(e);
-		}
+		info.getDays().forEach(day->{
+			try {
+			final JobDetail jobDetail = TimerUtility.buildJobDetail(jobClass, info, job, day.getId());
+			final Trigger trigger = TimerUtility.buildTrigger(jobClass, info, job, day.getId());
+				scheduler.unscheduleJob(trigger.getKey());
+				scheduler.scheduleJob(jobDetail, trigger);
+				System.out.println("Job Triggered at :"+new Date());
+				System.out.println("job id : "+job.getId());
+				System.out.println("job scheduled to start at :"+job.getStartHour());
+				System.out.println("Job scheduled to end at:"+ job.getEndHour());
+			} catch (SchedulerException | ParseException e) {
+				System.out.println("error scheduling job");
+				System.out.println(e);
+			}
+		});
+
 	}
 	
 	

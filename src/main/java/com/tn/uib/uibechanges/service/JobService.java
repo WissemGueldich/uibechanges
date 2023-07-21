@@ -1,7 +1,9 @@
 package com.tn.uib.uibechanges.service;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.transaction.Transactional;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.tn.uib.uibechanges.controller.JobConfigs;
 import com.tn.uib.uibechanges.job.TransferJob;
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.ConfigurationJob;
@@ -19,6 +22,7 @@ import com.tn.uib.uibechanges.model.Day;
 import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.model.JobExecution;
 import com.tn.uib.uibechanges.repository.ConfigurationJobRepository;
+import com.tn.uib.uibechanges.repository.ConfigurationRepository;
 import com.tn.uib.uibechanges.repository.DayRepository;
 import com.tn.uib.uibechanges.repository.JobExecutionRepository;
 import com.tn.uib.uibechanges.repository.JobRepository;
@@ -42,10 +46,21 @@ public class JobService {
 	private DayRepository dayRepository;
 	
 	@Autowired
+	private ConfigurationRepository configurationRepository;
+	
+	@Autowired
 	private SchedulerService schedulerService;
 	
 
-    public ResponseEntity<?> addJob(Job job, Set<Configuration> configurations) {
+    public ResponseEntity<?> addJob(JobConfigs jobConfigs) {
+    	
+    	Set<Configuration> configurations = new HashSet<>();
+    	
+    	jobConfigs.getConfigurations().forEach(id->{
+    		configurations.add(configurationRepository.findById(id).get());
+    	});
+    	
+    	Job job = jobConfigs.getJob();
 
     	if (job.getConfigurations() == null) {
             job.setConfigurations(new HashSet<ConfigurationJob>());
@@ -55,7 +70,7 @@ public class JobService {
 			job.getDays().forEach(day -> {days.add(dayRepository.findById(day.getId()).get());});
 		}
 		job.setDays(days);
-
+		job = jobRepository.save(job);
         int i = 1;
         for (Configuration conf : configurations) {
             ConfigurationJob confJob = new ConfigurationJob();
@@ -84,12 +99,32 @@ public class JobService {
     }
  
     public ResponseEntity<?> getJob(Integer id) {
-        return new ResponseEntity<>(jobRepository.findById(id).get(),HttpStatus.OK);
+    	JobConfigs jobConfigs = new JobConfigs();
+    	Job job = jobRepository.findById(id).get();
+    	if (job!=null) {
+        	jobConfigs.setJob(job);
+        	Map<String, String> configurationsMap = new HashMap<>();
+        	if (job.getConfigurations()!=null && job.getConfigurations().size()>0) {
+        		job.getConfigurations().forEach(confJob->{
+            		configurationsMap.put(confJob.getConfiguration().getId().toString(), confJob.getConfiguration().getLibelle());
+            	});
+    		}
+        	jobConfigs.setConfigurationsMap(configurationsMap);
+    	}
+    	    	
+        return new ResponseEntity<>(jobConfigs,HttpStatus.OK);
     }
 
-    
-    public ResponseEntity<?> updateJob(Job job, Set<Configuration> configurations) {
+    public ResponseEntity<?> updateJob(JobConfigs jobConfigs) {
 
+    	Set<Configuration> configurations = new HashSet<>();
+    	
+    	jobConfigs.getConfigurations().forEach(id->{
+    		configurations.add(configurationRepository.findById(id).get());
+    	});
+    	
+    	Job job = jobConfigs.getJob();
+    	
         Job oldJob = jobRepository.findById(job.getId()).get();
         oldJob.setEndHour(job.getEndHour());
         oldJob.setFrequency(job.getFrequency());
@@ -97,12 +132,14 @@ public class JobService {
         oldJob.setStartHour(job.getStartHour());
         oldJob.setState(job.getState());
         for (ConfigurationJob confJob : oldJob.getConfigurations()) {
+        	confJob.getConfiguration().getJobs().remove(confJob);
+        	configurationRepository.save(confJob.getConfiguration());
             configurationJobRepository.delete(confJob);
         }
         oldJob.getConfigurations().clear();
 
         Set<ConfigurationJob> configurationsJob = new HashSet<>();
-        int i = 1;
+        int i = 0;
         for (Configuration conf : configurations) {
             ConfigurationJob confJob = new ConfigurationJob();
             confJob.setConfiguration(conf);
@@ -126,7 +163,6 @@ public class JobService {
         return new ResponseEntity<>(jobRepository.save(oldJob),HttpStatus.OK);
     }
 
-    
     public ResponseEntity<?> updateJob(Job job) {
         Job oldJob = jobRepository.findById(job.getId()).get();
     	oldJob.setEndHour(job.getEndHour());

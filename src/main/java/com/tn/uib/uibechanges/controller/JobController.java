@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.service.JobService;
 
 @RestController
@@ -46,9 +45,10 @@ public class JobController {
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('job:write')")
-	public ResponseEntity<?> addJob (@RequestBody Job Job){
-		return jobService.addJob(Job);
+	public ResponseEntity<?> addJob (@RequestBody JobConfigs jobConfigs){
+		return jobService.addJob(jobConfigs);
 	}
+
 
 	@GetMapping(path = "{id}")
 	@PreAuthorize("hasAuthority('job:read')")
@@ -58,8 +58,8 @@ public class JobController {
 	
 	@PutMapping
 	@PreAuthorize("hasAuthority('job:write')")
-	public ResponseEntity<?> updateJob (@RequestBody Job Job ){
-		return jobService.updateJob(Job);
+	public ResponseEntity<?> updateJob (@RequestBody JobConfigs jobConfigs ){
+		return jobService.updateJob(jobConfigs);
 	}
 	
 	@DeleteMapping(path="{id}")

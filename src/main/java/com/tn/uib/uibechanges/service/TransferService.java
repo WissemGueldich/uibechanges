@@ -2,7 +2,6 @@ package com.tn.uib.uibechanges.service;
 
 import java.sql.Date;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +51,7 @@ public class TransferService {
 	public ResponseEntity<?> deleteByDateBetween(Date startDate, Date endDate) throws ParseException {
 
 		Set<Transfer> tranfersToDelete = transferRepository.findAllByDateBetween(startDate,endDate);
-		System.out.println(tranfersToDelete.size() + "tranfers to delete");
 		tranfersToDelete.forEach(transfer->{
-			System.out.println("tranfer");
-			System.out.println(transfer);
 			transfer.getConfiguration().getTransfers().remove(transfer);
 			transfer.setConfiguration(null);
 			transferRepository.deleteById(transfer.getId());

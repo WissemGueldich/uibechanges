@@ -40,6 +40,9 @@ public class Job {
     @Column(name = "state")
     private boolean state;
     
+    @Column(name="active")
+    private boolean active;
+    
     @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "job_days", 
     		joinColumns = @JoinColumn(name = "job_id"), 

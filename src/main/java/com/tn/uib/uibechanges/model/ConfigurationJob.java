@@ -33,10 +33,6 @@ public class ConfigurationJob implements Comparable<ConfigurationJob>{
         this.configurationJobPK = configurationJobPK;
     }
 
-    public ConfigurationJob(int job, int configuration) {
-        this.configurationJobPK = new ConfigurationJobPK(job, configuration);
-    }
-
     public ConfigurationJob(ConfigurationJobPK configurationJobPK, Configuration conf, Job job) {
         this.configurationJobPK = configurationJobPK;
         this.configuration = conf;
