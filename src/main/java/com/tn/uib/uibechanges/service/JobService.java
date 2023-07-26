@@ -179,6 +179,13 @@ public class JobService {
     }
 
     public ResponseEntity<?> deleteJob(int id) {
+    	Job job = jobRepository.findById(id);
+    	job.getConfigurations().forEach(confJob->{
+    		confJob.getConfiguration().getJobs().remove(confJob);
+    		confJob.setConfiguration(null);
+    		confJob.setJob(null);
+    		configurationJobRepository.deleteById(confJob.getConfigurationJobPK());
+    	});
     	jobRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

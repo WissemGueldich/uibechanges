@@ -27,16 +27,10 @@ public class ServerService {
 	@Autowired
 	private SystemUserRepository systemUserRepository;
 	
-	@Autowired
-	private SystemUserService systemUserService;
-	
-	//TODO link server to configuration
-
 	public ResponseEntity<?> addServer(Server server) {
 		if (serverRepository.existsByAddress(server.getAddress())) {
 			return new ResponseEntity<>("address already taken !", HttpStatus.FOUND);
 		} 
-		//TODO update relational attributes before saving
 		if(server.getDestionationConfigurations()==null) {
 			server.setDestionationConfigurations(new HashSet<>());
 		}
@@ -90,12 +84,7 @@ public class ServerService {
 		});
 		server.getDestionationConfigurations().forEach(config->{config.setDestinationServer(null);});
 		server.getSystemUsers().forEach(user->{
-			if (user.getServers().size()>1) {
-				user.getServers().remove(server);
-			}else {
-				user.getServers().remove(server);
-				systemUserService.deleteSystemUsers(user.getId());
-			}
+			user.getServers().remove(server);
 		});
 		server.getSystemUsers().clear();
 		serverRepository.deleteById(id);

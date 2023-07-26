@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.Server;
 import com.tn.uib.uibechanges.model.User;
+import com.tn.uib.uibechanges.repository.ConfigurationJobRepository;
 import com.tn.uib.uibechanges.repository.ConfigurationRepository;
 import com.tn.uib.uibechanges.repository.ServerRepository;
 import com.tn.uib.uibechanges.repository.SystemUserRepository;
@@ -31,6 +32,9 @@ public class ConfigurationService {
 	
 	@Autowired
 	private SystemUserRepository systemUserRepository;
+	
+	@Autowired
+	private ConfigurationJobRepository configurationJobRepository;
 	
 	public ResponseEntity<?> addConfiguration(Configuration configuration) {
 		configuration.setSourceServer(serverRepository.findById(configuration.getSourceServer().getId()));
@@ -83,8 +87,24 @@ public class ConfigurationService {
 
 	public ResponseEntity<?> deleteConfiguration(int id) {
 		Configuration configuration = configurationRepository.findById(id);
-		configuration.getProfiles().forEach(prof->{prof.getConfigurations().remove(configuration);});
-		configuration.getProfiles().clear();
+		if (configuration.getProfiles()!=null && configuration.getProfiles().size()>0) {
+			configuration.getProfiles().forEach(prof->{prof.getConfigurations().remove(configuration);});
+			configuration.getProfiles().clear();
+		}
+		if (configuration.getDestinationUser()!=null && configuration.getSourceUser()!=null) {
+			configuration.getDestinationUser().getConfigurationsAsDestination().remove(configuration);
+			configuration.getSourceUser().getConfigurationsAsSource().remove(configuration);
+		}
+		if (configuration.getDestinationServer()!=null && configuration.getSourceServer()!=null) {
+			configuration.getDestinationServer().getDestionationConfigurations().remove(configuration);
+			configuration.getSourceServer().getSourceConfigurations().remove(configuration);
+		}
+		configuration.getJobs().forEach(confJob->{
+			confJob.getJob().getConfigurations().remove(confJob);
+			confJob.setConfiguration(null);
+    		confJob.setJob(null);
+    		configurationJobRepository.deleteById(confJob.getConfigurationJobPK());
+		});
 		configurationRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -94,7 +114,8 @@ public class ConfigurationService {
     	Set<Configuration> configs = new HashSet<>();
     	user.getProfiles().forEach(profile -> { profile.getConfigurations().forEach(config -> {
     		if(config.getAutomatic()==automatic) {configs.add(config);}
-    	}); });
+    		}); 
+    	});
 		return new ResponseEntity<>(configs,HttpStatus.OK);
     }
 }

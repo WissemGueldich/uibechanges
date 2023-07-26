@@ -71,15 +71,14 @@ public class SystemUserService {
 	}
 	
 	public ResponseEntity<?> deleteSystemUsers(int id) {
-		System.out.println("this is delete system user service");
 		SystemUser oldUser = systemUserRepository.findById(id).get();
 		oldUser.getConfigurationsAsDestination().forEach(config->{
-			config.setDestinationServer(null);
-			
+			config.setDestinationUser(null);
+			configurationRepository.save(config);
 		});
 		oldUser.getConfigurationsAsDestination().clear();
 		oldUser.getConfigurationsAsSource().forEach(config->{
-			config.setSourceServer(null);
+			config.setSourceUser(null);
 			configurationRepository.save(config);
 		});
 		oldUser.getConfigurationsAsSource().clear();
