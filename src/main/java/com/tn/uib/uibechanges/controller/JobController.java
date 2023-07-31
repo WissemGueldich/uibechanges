@@ -31,6 +31,19 @@ public class JobController {
 	public ResponseEntity<?> scheduleJob (@PathVariable Integer jobId){
 		try {
 			jobService.scheduleJob(jobId);
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@PostMapping("/unschedule/{jobId}")
+	@PreAuthorize("hasAuthority('job:execute')")
+	public ResponseEntity<?> unscheduleJob (@PathVariable Integer jobId){
+		try {
+			jobService.unscheduleJob(jobId);
+			
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

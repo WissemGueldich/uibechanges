@@ -40,7 +40,7 @@ public class TransferJob implements org.quartz.Job{
 		Set<ConfigurationJob> configurationJobs = job.getConfigurations();
 		List<Configuration> configurations = new ArrayList<>();
 		
-		if (configurationJobs==null || configurationJobs.size()<1) {
+		if (configurationJobs==null || configurationJobs.isEmpty()) {
 			System.out.println("Scheduled job with id : "+job.getId()+" with label "+job.getLibelle()+" has no configurations linked");
 			System.out.println("Scheduling aborted.");
 			return;
@@ -55,6 +55,7 @@ public class TransferJob implements org.quartz.Job{
 		
 		configurations.forEach(conf->{
 			FileTransferUtility fileTransferUtility = new FileTransferUtility(1);
+			fileTransferUtility.getTransfer().setUser(job.getLibelle());
 			fileTransferUtility.setConfig(conf);
 			try {
 				try {
@@ -66,17 +67,11 @@ public class TransferJob implements org.quartz.Job{
 					transferService.addTransfer(fileTransferUtility.getTransfer());
 					System.out.println("SSH command execution failed, cause: "+fileTransferUtility.getTransfer().getError());
 				}
-			} catch (JSchException e) {
-				transferService.addTransfer(fileTransferUtility.getTransfer());
-				System.out.println(fileTransferUtility.getTransfer().getError());
-			} catch (IOException e) {
-				transferService.addTransfer(fileTransferUtility.getTransfer());
-				System.out.println(fileTransferUtility.getTransfer().getError());
-			} catch (SftpException e) {
+			} catch (JSchException | IOException | SftpException e) {
 				transferService.addTransfer(fileTransferUtility.getTransfer());
 				System.out.println(fileTransferUtility.getTransfer().getError());
 			}
-			transferService.addTransfer(fileTransferUtility.getTransfer());
+            transferService.addTransfer(fileTransferUtility.getTransfer());
 			System.out.println(fileTransferUtility.getTransfer().getError());                                                                                                 
 		});
 		if (job.getState()) {

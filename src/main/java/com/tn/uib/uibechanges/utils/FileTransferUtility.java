@@ -16,6 +16,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.Transfer;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class FileTransferUtility {
 	

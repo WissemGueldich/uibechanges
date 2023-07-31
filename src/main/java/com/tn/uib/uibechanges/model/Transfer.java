@@ -37,6 +37,8 @@ public class Transfer {
 	@JsonFormat(pattern = "yyyy/MM/dd")
 	private Date date;
 
+    private String user;
+    
 	public Transfer() {
 	}
 
@@ -94,6 +96,13 @@ public class Transfer {
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
 	}
-    
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
     
 }

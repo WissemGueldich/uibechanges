@@ -1,6 +1,7 @@
 package com.tn.uib.uibechanges;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
@@ -102,7 +103,7 @@ public class UibechangesApplication {
 
 
 			UserRole roleAdmin = new UserRole("admin", Set.of(psr,psw,pur,puw,pcr,pcw,pjr,pjw,ppr,ppw,psur,psuw,ptr,ptw,pje,pte));
-			UserRole rolehGDHB = new UserRole("gdhb", Set.of(pur,puw));
+			UserRole rolehGDHB = new UserRole("gdhb", Set.of(pur,puw,ppr,ppw));
 			UserRole rolesupervision = new UserRole("supervision", Set.of(ptr));
 			UserRole roleTransfer = new UserRole("transfer", Set.of(pte,ptr));
 			userRoleService.addRole(roleAdmin);
@@ -126,6 +127,12 @@ public class UibechangesApplication {
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server, systemUser, server1, systemUser1);
 			configurationService.addConfiguration(config);
 			configurationService.addConfiguration(config2);
+			
+			for (int i = 0; i < 100; i++) {
+				Configuration conf = new Configuration("the_file_"+i+".txt", "config libelle"+i, false, false, false, true, "/home/sftpuser/"+i, 
+						"/home/sftpuser/archive/"+i, "/home/sftpuser/"+i, "/home/sftpuser/archive/"+i, server1, systemUser1, server, systemUser);
+				configurationService.addConfiguration(conf);
+			}
 			
 			Profile profile1 = new Profile();
 			profile1.setLibelle("profile1");

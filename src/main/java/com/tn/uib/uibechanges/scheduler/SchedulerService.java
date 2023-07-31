@@ -56,10 +56,23 @@ public class SchedulerService {
 				scheduler.scheduleJob(jobDetail, trigger);
 				System.out.println("Job Triggered at :"+new Date());
 				System.out.println("job id : "+job.getId());
-				System.out.println("job scheduled to start at :"+job.getStartHour());
-				System.out.println("Job scheduled to end at:"+ job.getEndHour());
+				System.out.println("job scheduled to start next at: "+trigger.getStartTime());
+				System.out.println("Job scheduled to end next at: "+ trigger.getEndTime());
 			} catch (SchedulerException | ParseException e) {
 				System.out.println("error scheduling job");
+				System.out.println(e);
+			}
+		});
+
+	}
+	
+	public void unschedule( final Class jobClass, final TimerInfo info, Job job) throws ParseException {
+		info.getDays().forEach(day->{
+			try {
+			final Trigger trigger = TimerUtility.buildTrigger(jobClass, info, job, day.getId());
+				scheduler.unscheduleJob(trigger.getKey());
+			} catch (SchedulerException | ParseException e) {
+				System.out.println("error unscheduling job");
 				System.out.println(e);
 			}
 		});

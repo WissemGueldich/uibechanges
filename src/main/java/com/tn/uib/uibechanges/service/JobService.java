@@ -223,8 +223,18 @@ public class JobService {
 		info.setEndDate(job.getEndHour());
 		info.setRepeatInterval(job.getFrequency());
 		info.setDays(job.getDays());
-		
 		schedulerService.schedule(TransferJob.class, info, job);
+	}
+    
+    public void unscheduleJob(Integer jobId) throws ParseException {
+        Job job = jobRepository.findById(jobId).get();
+		final TimerInfo info = new TimerInfo();
+		info.setRunForever(true);
+		info.setStartDate(job.getStartHour());
+		info.setEndDate(job.getEndHour());
+		info.setRepeatInterval(job.getFrequency());
+		info.setDays(job.getDays());
+		schedulerService.unschedule(TransferJob.class, info, job);
 	}
 
 }
