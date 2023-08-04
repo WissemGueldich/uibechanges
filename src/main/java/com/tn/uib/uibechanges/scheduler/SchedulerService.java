@@ -50,7 +50,7 @@ public class SchedulerService {
 		}
 	}
 	
-	public void schedule( final Class jobClass, final TimerInfo info, Job job) throws ParseException {
+	public void schedule( final Class jobClass, final TimerInfo info, Job job)  {
 		info.getDays().forEach(day->{
 			try {
 			final JobDetail jobDetail = TimerUtility.buildJobDetail(jobClass, info, job, day.getId());
@@ -69,7 +69,7 @@ public class SchedulerService {
 
 	}
 	
-	public void unschedule( final Class jobClass, final TimerInfo info, Job job) throws ParseException {
+	public void unschedule( final Class jobClass, final TimerInfo info, Job job) {
 		info.getDays().forEach(day->{
 			try {
 			final Trigger trigger = TimerUtility.buildTrigger(jobClass, info, job, day.getId());

@@ -223,37 +223,46 @@ public class JobService {
         return new ResponseEntity<>(jobExecutionRepository.save(oldJobExecution),HttpStatus.OK);
     }
     
-    public void scheduleJob(Integer jobId) throws ParseException {
-        Job job = jobRepository.findById(jobId).get();
-		final TimerInfo info = new TimerInfo();
-		info.setRunForever(true);
-		info.setStartDate(job.getStartHour());
-		info.setEndDate(job.getEndHour());
-		info.setRepeatInterval(job.getFrequency());
-		info.setDays(job.getDays());
-		schedulerService.schedule(TransferJob.class, info, job);
+    public void scheduleJob(Integer jobId)  {
+        if(jobRepository.findById(jobId).isPresent()) {
+            Job job = jobRepository.findById(jobId).get();
+            final TimerInfo info = new TimerInfo();
+            info.setRunForever(true);
+            info.setStartDate(job.getStartHour());
+            info.setEndDate(job.getEndHour());
+            info.setRepeatInterval(job.getFrequency());
+            info.setDays(job.getDays());
+            schedulerService.schedule(TransferJob.class, info, job);
+        }
 	}
-    
-    public void unscheduleJob(Integer jobId) throws ParseException {
-        Job job = jobRepository.findById(jobId).get();
-		final TimerInfo info = new TimerInfo();
-		info.setRunForever(true);
-		info.setStartDate(job.getStartHour());
-		info.setEndDate(job.getEndHour());
-		info.setRepeatInterval(job.getFrequency());
-		info.setDays(job.getDays());
-		schedulerService.unschedule(TransferJob.class, info, job);
+
+    public void unscheduleJob(Integer jobId) {
+
+        if(jobRepository.findById(jobId).isPresent()){
+            Job job = jobRepository.findById(jobId).get();
+            final TimerInfo info = new TimerInfo();
+            info.setRunForever(true);
+            info.setStartDate(job.getStartHour());
+            info.setEndDate(job.getEndHour());
+            info.setRepeatInterval(job.getFrequency());
+            info.setDays(job.getDays());
+            schedulerService.unschedule(TransferJob.class, info, job);
+        }
+
 	}
 
     public JobStatus isRunning(Integer jobId)  {
-        Job job = jobRepository.findById(jobId).get();
-		final TimerInfo info = new TimerInfo();
-		info.setRunForever(true);
-		info.setStartDate(job.getStartHour());
-		info.setEndDate(job.getEndHour());
-		info.setRepeatInterval(job.getFrequency());
-		info.setDays(job.getDays());
-		return schedulerService.isJobRunning(TransferJob.class, info, job);
+        if(jobRepository.findById(jobId).isPresent()){
+            Job job = jobRepository.findById(jobId).get();
+            final TimerInfo info = new TimerInfo();
+            info.setRunForever(true);
+            info.setStartDate(job.getStartHour());
+            info.setEndDate(job.getEndHour());
+            info.setRepeatInterval(job.getFrequency());
+            info.setDays(job.getDays());
+            return schedulerService.isJobRunning(TransferJob.class, info, job);
+        }
+        return new JobStatus(0,false,true);
 	}
 
 }

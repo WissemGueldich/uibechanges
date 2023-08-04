@@ -30,24 +30,14 @@ public class JobController {
 	@PostMapping("/schedule/{jobId}")
 	@PreAuthorize("hasAuthority('job:execute')")
 	public ResponseEntity<?> scheduleJob (@PathVariable Integer jobId){
-		try {
-			jobService.scheduleJob(jobId);
-			
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		jobService.scheduleJob(jobId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@PostMapping("/unschedule/{jobId}")
 	@PreAuthorize("hasAuthority('job:execute')")
 	public ResponseEntity<?> unscheduleJob (@PathVariable Integer jobId){
-		try {
-			jobService.unscheduleJob(jobId);
-			
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		jobService.unscheduleJob(jobId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
@@ -55,8 +45,10 @@ public class JobController {
 	@PreAuthorize("hasAuthority('job:execute')")
 	public ResponseEntity<?> isJobRunning (@PathVariable Integer jobId){
 		JobStatus running = jobService.isRunning(jobId);
-		return new ResponseEntity<JobStatus>(running,HttpStatus.OK);
-
+		if (running.isRunning()!=running.isScheduled()){
+			return new ResponseEntity<>("Job introuvable",HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(running,HttpStatus.OK);
 	}
 	
 	@GetMapping
