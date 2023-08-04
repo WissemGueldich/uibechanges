@@ -1,9 +1,11 @@
 package com.tn.uib.uibechanges.job;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -38,7 +40,7 @@ public class TransferJob implements org.quartz.Job{
 		}
 		
 		Set<ConfigurationJob> configurationJobs = job.getConfigurations();
-		List<Configuration> configurations = new ArrayList<>();
+		Map<Integer, Configuration> configurations = new HashMap();
 		
 		if (configurationJobs==null || configurationJobs.isEmpty()) {
 			System.out.println("Scheduled job with id : "+job.getId()+" with label "+job.getLibelle()+" has no configurations linked");
@@ -46,23 +48,28 @@ public class TransferJob implements org.quartz.Job{
 			return;
 		}
 		
+		
+		
 		configurationJobs.forEach(configurationJob->{
+			
 			if (configurationJob != null && configurationJob.getConfiguration()!=null ) {
 				//error here (maybe when job has no configs)
 				//or index is not found because bigger than size
-				configurations.add(configurationJob.getRank(),configurationJob.getConfiguration());
+				//potential order bug
+				
+				configurations.put(configurationJob.getRank(),configurationJob.getConfiguration());
 			}
 		});
-		
-		configurations.forEach(conf->{
+		SortedSet<Integer> ranks = new TreeSet<>(configurations.keySet());
+		for (Integer key : ranks) {
 			FileTransferUtility fileTransferUtility = new FileTransferUtility(1);
 			fileTransferUtility.getTransfer().setUser(job.getLibelle());
-			fileTransferUtility.setConfig(conf);
+			fileTransferUtility.setConfig(configurations.get(key));
 			try {
 				try {
 					if (fileTransferUtility.transfer().isResult()) {
 						transferService.addTransfer(fileTransferUtility.getTransfer());
-						System.out.println("transfer performed successfully for configuration " + conf.getLibelle() + " for job with id "+job.getId());
+						System.out.println("transfer performed successfully for configuration " + configurations.get(key).getLibelle() + " for job with id "+job.getId());
 					}
 				} catch (InterruptedException e) {
 					transferService.addTransfer(fileTransferUtility.getTransfer());
@@ -73,8 +80,9 @@ public class TransferJob implements org.quartz.Job{
 				System.out.println(fileTransferUtility.getTransfer().getError());
 			}
             transferService.addTransfer(fileTransferUtility.getTransfer());
-			System.out.println(fileTransferUtility.getTransfer().getError());                                                                                                 
-		});
+			System.out.println(fileTransferUtility.getTransfer().getError());   
+		}
+
         try {
             Trigger trigger = context.getTrigger();
             Scheduler scheduler = context.getScheduler();

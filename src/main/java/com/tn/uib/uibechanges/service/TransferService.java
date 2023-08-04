@@ -45,7 +45,8 @@ public class TransferService {
 	
 	public ResponseEntity<?> deleteTransfer(int id) {
 		Transfer transfer = transferRepository.findById(id);
-		if (calculateDifferenceInDays(new java.sql.Date(transfer.getDate().getTime()),new java.sql.Date(new java.util.Date().getTime()))<60){
+		
+		if (transfer==null || calculateDifferenceInDays(new java.sql.Date(transfer.getDate().getTime()),new java.sql.Date(new java.util.Date().getTime()))<30){
 			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 		}
 		transfer.getConfiguration().getTransfers().remove(transfer);
@@ -62,7 +63,7 @@ public class TransferService {
 	}
 	
 	public ResponseEntity<?> deleteByDateBetween(Date startDate, Date endDate) throws ParseException {
-		if (startDate.before(endDate) || calculateDifferenceInDays(startDate,endDate)<30){
+		if (endDate.before(startDate) || calculateDifferenceInDays(startDate,endDate)<=30){
 			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 		}
 		Set<Transfer> tranfersToDelete = transferRepository.findAllByDateBetween(startDate,endDate);
@@ -75,9 +76,8 @@ public class TransferService {
 	}
 
 	private static long calculateDifferenceInDays(Date date1, Date date2) {
-		LocalDate localDate1 = date1.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
-		LocalDate localDate2 = date2.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
-
+		LocalDate localDate1 = date1.toLocalDate();
+		LocalDate localDate2 = date2.toLocalDate();
 		return ChronoUnit.DAYS.between(localDate1, localDate2);
 	}
 }
