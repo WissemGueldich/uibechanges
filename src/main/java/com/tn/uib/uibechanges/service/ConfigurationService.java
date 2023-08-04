@@ -23,41 +23,42 @@ import com.tn.uib.uibechanges.repository.UserRepository;
 public class ConfigurationService {
 	@Autowired
 	private ConfigurationRepository configurationRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private ServerRepository serverRepository;
-	
+
 	@Autowired
 	private SystemUserRepository systemUserRepository;
-	
+
 	@Autowired
 	private ConfigurationJobRepository configurationJobRepository;
-	
+
 	public ResponseEntity<?> addConfiguration(Configuration configuration) {
 		configuration.setSourceServer(serverRepository.findById(configuration.getSourceServer().getId()));
 		configuration.setDestinationServer(serverRepository.findById(configuration.getDestinationServer().getId()));
 		configuration.setSourceUser(systemUserRepository.findById(configuration.getSourceUser().getId()).get());
-		configuration.setDestinationUser(systemUserRepository.findById(configuration.getDestinationUser().getId()).get());
-		return new ResponseEntity<> (configurationRepository.save(configuration),HttpStatus.CREATED);
+		configuration
+				.setDestinationUser(systemUserRepository.findById(configuration.getDestinationUser().getId()).get());
+		return new ResponseEntity<>(configurationRepository.save(configuration), HttpStatus.CREATED);
 	}
 
 	public ResponseEntity<?> getConfigurations() {
 		return new ResponseEntity<>(configurationRepository.findAll(), HttpStatus.OK);
 	}
-	
 
 	public ResponseEntity<?> getConfiguration(int id) {
 		return new ResponseEntity<>(configurationRepository.findById(id), HttpStatus.OK);
 	}
-	
+
 	public ResponseEntity<?> getConfigurationsByServers(Server sourceServer, Server destinationServer) {
 		Set<Configuration> configs = new HashSet<>();
 		Set<Configuration> sConfigs = configurationRepository.findBySourceServer(sourceServer);
-		sConfigs.forEach(config ->{
-			if (config.getDestinationServer()!=null && config.getDestinationServer().getId() == destinationServer.getId()) {
+		sConfigs.forEach(config -> {
+			if (config.getDestinationServer() != null
+					&& config.getDestinationServer().getId() == destinationServer.getId()) {
 				configs.add(config);
 			}
 		});
@@ -65,7 +66,7 @@ public class ConfigurationService {
 	}
 
 	public ResponseEntity<?> updateConfiguration(Configuration configuration) {
-		
+
 		Configuration oldConfiguration = configurationRepository.findById(configuration.getId()).get();
 		oldConfiguration.setLibelle(configuration.getLibelle());
 		oldConfiguration.setSourceServer(configuration.getSourceServer());
@@ -79,43 +80,45 @@ public class ConfigurationService {
 		oldConfiguration.setOverwrite(configuration.getOverwrite());
 		oldConfiguration.setMove(configuration.getMove());
 		oldConfiguration.setArchive(configuration.getArchive());
-		oldConfiguration.setAutomatic(configuration.getAutomatic());
 		oldConfiguration.setFilter(configuration.getFilter());
-		
+
 		return new ResponseEntity<>(configurationRepository.save(oldConfiguration), HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> deleteConfiguration(int id) {
 		Configuration configuration = configurationRepository.findById(id);
-		if (configuration.getProfiles()!=null && configuration.getProfiles().size()>0) {
-			configuration.getProfiles().forEach(prof->{prof.getConfigurations().remove(configuration);});
+		if (configuration.getProfiles() != null && configuration.getProfiles().size() > 0) {
+			configuration.getProfiles().forEach(prof -> {
+				prof.getConfigurations().remove(configuration);
+			});
 			configuration.getProfiles().clear();
 		}
-		if (configuration.getDestinationUser()!=null && configuration.getSourceUser()!=null) {
+		if (configuration.getDestinationUser() != null && configuration.getSourceUser() != null) {
 			configuration.getDestinationUser().getConfigurationsAsDestination().remove(configuration);
 			configuration.getSourceUser().getConfigurationsAsSource().remove(configuration);
 		}
-		if (configuration.getDestinationServer()!=null && configuration.getSourceServer()!=null) {
+		if (configuration.getDestinationServer() != null && configuration.getSourceServer() != null) {
 			configuration.getDestinationServer().getDestionationConfigurations().remove(configuration);
 			configuration.getSourceServer().getSourceConfigurations().remove(configuration);
 		}
-		configuration.getJobs().forEach(confJob->{
+		configuration.getJobs().forEach(confJob -> {
 			confJob.getJob().getConfigurations().remove(confJob);
 			confJob.setConfiguration(null);
-    		confJob.setJob(null);
-    		configurationJobRepository.deleteById(confJob.getConfigurationJobPK());
+			confJob.setJob(null);
+			configurationJobRepository.deleteById(confJob.getConfigurationJobPK());
 		});
 		configurationRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
-    public ResponseEntity<?> getUserConfigurations( boolean automatic, String matricule) {
-    	User user = userRepository.findByMatricule(matricule);
-    	Set<Configuration> configs = new HashSet<>();
-    	user.getProfiles().forEach(profile -> { profile.getConfigurations().forEach(config -> {
-    		if(config.getAutomatic()==automatic) {configs.add(config);}
-    		}); 
-    	});
-		return new ResponseEntity<>(configs,HttpStatus.OK);
-    }
+
+	public ResponseEntity<?> getUserConfigurations(String matricule) {
+		User user = userRepository.findByMatricule(matricule);
+		Set<Configuration> configs = new HashSet<>();
+		user.getProfiles().forEach(profile -> {
+			profile.getConfigurations().forEach(config -> {
+				configs.add(config);
+			});
+		});
+		return new ResponseEntity<>(configs, HttpStatus.OK);
+	}
 }

@@ -1,7 +1,6 @@
 package com.tn.uib.uibechanges;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
@@ -121,15 +120,15 @@ public class UibechangesApplication {
 			systemUserService.addSystemUser(systemUser);
 			systemUserService.addSystemUser(systemUser1);
 			
-			Configuration config = new Configuration("the_file.txt", "config libelle", false, false, false, true, "/home/sftpuser/", 
+			Configuration config = new Configuration("the_file.txt", "config libelle", false, false, true, "/home/sftpuser/", 
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server1, systemUser1, server, systemUser);
-			Configuration config2 = new Configuration("the_file2.txt", "config libelle2", true, true, false, false, "/home/sftpuser/", 
+			Configuration config2 = new Configuration("the_file2.txt", "config libelle2", true, false, false, "/home/sftpuser/", 
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server, systemUser, server1, systemUser1);
 			configurationService.addConfiguration(config);
 			configurationService.addConfiguration(config2);
 			
 			for (int i = 0; i < 100; i++) {
-				Configuration conf = new Configuration("the_file_"+i+".txt", "config libelle"+i, false, false, false, true, "/home/sftpuser/"+i, 
+				Configuration conf = new Configuration("the_file_"+i+".txt", "config libelle"+i, false, false, true, "/home/sftpuser/"+i, 
 						"/home/sftpuser/archive/"+i, "/home/sftpuser/"+i, "/home/sftpuser/archive/"+i, server1, systemUser1, server, systemUser);
 				configurationService.addConfiguration(conf);
 			}

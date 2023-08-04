@@ -2,6 +2,7 @@ package com.tn.uib.uibechanges.scheduler;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Iterator;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -13,7 +14,9 @@ import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tn.uib.uibechanges.model.Day;
 import com.tn.uib.uibechanges.model.Job;
+import com.tn.uib.uibechanges.model.JobStatus;
 import com.tn.uib.uibechanges.utils.TimerUtility;
 
 @Service
@@ -79,6 +82,23 @@ public class SchedulerService {
 
 	}
 	
-	
+    public JobStatus isJobRunning(final Class jobClass, final TimerInfo info, Job job)  { 
+    	JobStatus status = new JobStatus(job.getId(),false,false);
+    	for (Iterator<Day> it = info.getDays().iterator(); it.hasNext(); ) {
+            Day d = it.next();
+			try {
+				final Trigger trigger = TimerUtility.buildTrigger(jobClass, info, job, d.getId());
+				Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
+				status.setScheduled(scheduler.checkExists(trigger.getKey()));
+				if (triggerState == Trigger.TriggerState.NORMAL) {
+					status.setRunning(true);
+				}
+			} catch (ParseException | SchedulerException e) {
+				System.out.println("error unscheduling job");
+				System.out.println(e);
+			}
+        }
+    	return status;
+    }
 
 }

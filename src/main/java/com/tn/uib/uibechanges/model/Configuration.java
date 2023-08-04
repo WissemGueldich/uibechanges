@@ -32,8 +32,6 @@ public class Configuration {
 
 	private boolean move;
 
-	private boolean automatic;
-
 	private boolean archive;
 
 	private String sourcePath;
@@ -77,7 +75,7 @@ public class Configuration {
 	public Configuration() {
 	}
 	
-	public Configuration(String filter, String libelle, boolean move, boolean automatic, boolean overwrite,
+	public Configuration(String filter, String libelle, boolean move, boolean overwrite,
 			boolean archive, String sourcePath, String sourceArchivingPath, String destinationPath,
 			String destinationArchivingPath, Server sourceServer, SystemUser sourceUser, Server destinationServer,
 			SystemUser destinationUser) {
@@ -85,7 +83,6 @@ public class Configuration {
 		this.overwrite = overwrite;
 		this.libelle = libelle;
 		this.move = move;
-		this.automatic = automatic;
 		this.archive = archive;
 		this.sourcePath = sourcePath;
 		this.sourceArchivingPath = sourceArchivingPath;
@@ -143,14 +140,6 @@ public class Configuration {
 
 	public void setMove(boolean move) {
 		this.move = move;
-	}
-
-	public boolean getAutomatic() {
-		return automatic;
-	}
-
-	public void setAutomatic(boolean automatic) {
-		this.automatic = automatic;
 	}
 
 	public boolean getArchive() {

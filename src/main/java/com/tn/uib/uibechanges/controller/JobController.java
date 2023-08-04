@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tn.uib.uibechanges.model.JobStatus;
 import com.tn.uib.uibechanges.service.JobService;
 
 @RestController
@@ -48,6 +49,14 @@ public class JobController {
 			e.printStackTrace();
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@GetMapping("/status/{jobId}")
+	@PreAuthorize("hasAuthority('job:execute')")
+	public ResponseEntity<?> isJobRunning (@PathVariable Integer jobId){
+		JobStatus running = jobService.isRunning(jobId);
+		return new ResponseEntity<JobStatus>(running,HttpStatus.OK);
+
 	}
 	
 	@GetMapping

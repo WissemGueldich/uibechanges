@@ -62,7 +62,7 @@ public class ConfigurationController {
 	@GetMapping("/user")
 	@PreAuthorize("hasAuthority('config:read')")
 	public ResponseEntity<?> getUserConfigurationsBy(@RequestBody SearchRequest searchRequest){
-		return configurationService.getUserConfigurations(searchRequest.getAutomatic(),searchRequest.getMatricule());
+		return configurationService.getUserConfigurations(searchRequest.getMatricule());
 	}
 	
 	@GetMapping("/server")

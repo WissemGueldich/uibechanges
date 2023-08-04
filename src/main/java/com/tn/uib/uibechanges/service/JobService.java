@@ -3,6 +3,7 @@ package com.tn.uib.uibechanges.service;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import com.tn.uib.uibechanges.model.ConfigurationJobPK;
 import com.tn.uib.uibechanges.model.Day;
 import com.tn.uib.uibechanges.model.Job;
 import com.tn.uib.uibechanges.model.JobExecution;
+import com.tn.uib.uibechanges.model.JobStatus;
 import com.tn.uib.uibechanges.repository.ConfigurationJobRepository;
 import com.tn.uib.uibechanges.repository.ConfigurationRepository;
 import com.tn.uib.uibechanges.repository.DayRepository;
@@ -102,6 +104,7 @@ public class JobService {
     	JobConfigs jobConfigs = new JobConfigs();
     	Job job = jobRepository.findById(id).get();
     	if (job!=null) {
+    		job.setState(this.isRunning(id).isScheduled());
         	jobConfigs.setJob(job);
         	Map<String, String> configurationsMap = new HashMap<>();
         	if (job.getConfigurations()!=null && job.getConfigurations().size()>0) {
@@ -175,7 +178,12 @@ public class JobService {
     }
 
     public ResponseEntity<?> getJobs() {
-        return new ResponseEntity<>(jobRepository.findAll(),HttpStatus.OK);
+    	
+    	List<Job> jobs = jobRepository.findAll();
+    	jobs.forEach(job->{
+    		job.setState(this.isRunning(job.getId()).isScheduled());
+    	});
+        return new ResponseEntity<>(jobs,HttpStatus.OK);
     }
 
     public ResponseEntity<?> deleteJob(int id) {
@@ -235,6 +243,17 @@ public class JobService {
 		info.setRepeatInterval(job.getFrequency());
 		info.setDays(job.getDays());
 		schedulerService.unschedule(TransferJob.class, info, job);
+	}
+
+    public JobStatus isRunning(Integer jobId)  {
+        Job job = jobRepository.findById(jobId).get();
+		final TimerInfo info = new TimerInfo();
+		info.setRunForever(true);
+		info.setStartDate(job.getStartHour());
+		info.setEndDate(job.getEndHour());
+		info.setRepeatInterval(job.getFrequency());
+		info.setDays(job.getDays());
+		return schedulerService.isJobRunning(TransferJob.class, info, job);
 	}
 
 }

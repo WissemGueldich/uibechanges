@@ -49,6 +49,7 @@ public class TransferJob implements org.quartz.Job{
 		configurationJobs.forEach(configurationJob->{
 			if (configurationJob != null && configurationJob.getConfiguration()!=null ) {
 				//error here (maybe when job has no configs)
+				//or index is not found because bigger than size
 				configurations.add(configurationJob.getRank(),configurationJob.getConfiguration());
 			}
 		});
@@ -74,15 +75,13 @@ public class TransferJob implements org.quartz.Job{
             transferService.addTransfer(fileTransferUtility.getTransfer());
 			System.out.println(fileTransferUtility.getTransfer().getError());                                                                                                 
 		});
-		if (job.getState()) {
-	        try {
-	            Trigger trigger = context.getTrigger();
-	            Scheduler scheduler = context.getScheduler();
-	            scheduler.rescheduleJob(trigger.getKey(), trigger);
-	        } catch (SchedulerException e) {
-	            e.printStackTrace();
-	        }
-		}
+        try {
+            Trigger trigger = context.getTrigger();
+            Scheduler scheduler = context.getScheduler();
+            scheduler.rescheduleJob(trigger.getKey(), trigger);
+        } catch (SchedulerException e) {
+            System.out.println(e);
+        }
 	}
 
 }
