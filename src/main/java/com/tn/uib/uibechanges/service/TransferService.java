@@ -46,7 +46,7 @@ public class TransferService {
 	public ResponseEntity<?> deleteTransfer(int id) {
 		Transfer transfer = transferRepository.findById(id);
 		
-		if (transfer==null || calculateDifferenceInDays(new java.sql.Date(transfer.getDate().getTime()),new java.sql.Date(new java.util.Date().getTime()))<30){
+		if (transfer==null || calculateDifferenceInDays(new java.sql.Date(transfer.getDate().getTime()),new java.sql.Date(new java.util.Date().getTime()))<=30){
 			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 		}
 		transfer.getConfiguration().getTransfers().remove(transfer);
