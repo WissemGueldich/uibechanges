@@ -25,7 +25,6 @@ public class Transfer {
     @Basic(optional = false)
     private int type;
     
-	@Basic(optional = false)
     @ManyToOne
     private Configuration configuration;
     

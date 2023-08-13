@@ -57,6 +57,12 @@ public class Job {
     @JsonIgnore
     private Set<JobExecution> jobExecutions;
 
+	@ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
+	@JoinTable(name = "job_mails",
+			joinColumns = @JoinColumn(name = "job_id"),
+			inverseJoinColumns = @JoinColumn(name = "user_id"))
+	private Set<User> mailRecipients;
+
     public Job() {
     }
 
@@ -93,6 +99,14 @@ public class Job {
 		this.days = days;
 		this.configurations = configurations;
 		this.jobExecutions = jobExecutions;
+	}
+
+	public Set<User> getMailRecipients() {
+		return mailRecipients;
+	}
+
+	public void setMailRecipients(Set<User> mailRecipients) {
+		this.mailRecipients = mailRecipients;
 	}
 
 	public String getLibelle() {

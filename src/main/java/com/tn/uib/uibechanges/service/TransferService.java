@@ -62,7 +62,7 @@ public class TransferService {
 		return new ResponseEntity<>(transferRepository.save(oldTransfer), HttpStatus.OK);
 	}
 	
-	public ResponseEntity<?> deleteByDateBetween(Date startDate, Date endDate) throws ParseException {
+	public ResponseEntity<?> deleteByDateBetween(Date startDate, Date endDate) {
 		if (endDate.before(startDate) || calculateDifferenceInDays(startDate,endDate)<=30){
 			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 		}

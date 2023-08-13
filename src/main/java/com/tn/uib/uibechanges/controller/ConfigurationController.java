@@ -44,7 +44,12 @@ public class ConfigurationController {
 	@PreAuthorize("hasAuthority('config:read')")
 	public ResponseEntity<?> getConfiguration (@PathVariable int id ){
 		return configurationService.getConfiguration(id);
+	}
 
+	@GetMapping(path = "/check/{id}")
+	@PreAuthorize("hasAuthority('config:read')")
+	public ResponseEntity<?> checkConfiguration (@PathVariable int id ){
+		return configurationService.checkConfig(id);
 	}
 	
 	@PutMapping

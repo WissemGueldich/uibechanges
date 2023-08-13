@@ -1,12 +1,10 @@
 package com.tn.uib.uibechanges.job;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
+import com.tn.uib.uibechanges.model.Email;
+import com.tn.uib.uibechanges.service.EmailService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
@@ -28,7 +26,10 @@ public class TransferJob implements org.quartz.Job{
 	
 	@Autowired
 	TransferService transferService;
-	
+
+	@Autowired
+	private EmailService emailService;
+
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		final Job job = (Job)context.getJobDetail().getJobDataMap().get(Job.class.getSimpleName());
@@ -47,19 +48,15 @@ public class TransferJob implements org.quartz.Job{
 			System.out.println("Scheduling aborted.");
 			return;
 		}
-		
-		
-		
+
 		configurationJobs.forEach(configurationJob->{
 			
 			if (configurationJob != null && configurationJob.getConfiguration()!=null ) {
-				//error here (maybe when job has no configs)
-				//or index is not found because bigger than size
 				//potential order bug
-				
 				configurations.put(configurationJob.getRank(),configurationJob.getConfiguration());
 			}
 		});
+
 		SortedSet<Integer> ranks = new TreeSet<>(configurations.keySet());
 		for (Integer key : ranks) {
 			FileTransferUtility fileTransferUtility = new FileTransferUtility(1);
@@ -80,6 +77,17 @@ public class TransferJob implements org.quartz.Job{
 				System.out.println(fileTransferUtility.getTransfer().getError());
 			}
             transferService.addTransfer(fileTransferUtility.getTransfer());
+			if (!fileTransferUtility.getTransfer().isResult()){
+				job.getMailRecipients().forEach(emailRecipient->{
+					Email email = new Email();
+					email.setSubject("Transfert échoué");
+					email.setRecipient(emailRecipient.getEmail());
+					email.setMsgBody("Ceci est un email automatique de UIB Echanges, pour vous informer que le job '"+ job.getLibelle() +"' a été interropu durant le transfert avec la configuration '" + fileTransferUtility.getTransfer().getConfiguration().getLibelle() + "'\n"+fileTransferUtility.getTransfer().getError()+".\n(" + new Date() + ").");
+					emailService.sendSimpleMail(email);
+				});
+
+			}
+
 			System.out.println(fileTransferUtility.getTransfer().getError());   
 		}
 

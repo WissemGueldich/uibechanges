@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
+import com.tn.uib.uibechanges.model.*;
+import com.tn.uib.uibechanges.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,18 +18,6 @@ import org.springframework.stereotype.Service;
 
 import com.tn.uib.uibechanges.controller.JobConfigs;
 import com.tn.uib.uibechanges.job.TransferJob;
-import com.tn.uib.uibechanges.model.Configuration;
-import com.tn.uib.uibechanges.model.ConfigurationJob;
-import com.tn.uib.uibechanges.model.ConfigurationJobPK;
-import com.tn.uib.uibechanges.model.Day;
-import com.tn.uib.uibechanges.model.Job;
-import com.tn.uib.uibechanges.model.JobExecution;
-import com.tn.uib.uibechanges.model.JobStatus;
-import com.tn.uib.uibechanges.repository.ConfigurationJobRepository;
-import com.tn.uib.uibechanges.repository.ConfigurationRepository;
-import com.tn.uib.uibechanges.repository.DayRepository;
-import com.tn.uib.uibechanges.repository.JobExecutionRepository;
-import com.tn.uib.uibechanges.repository.JobRepository;
 import com.tn.uib.uibechanges.scheduler.SchedulerService;
 import com.tn.uib.uibechanges.scheduler.TimerInfo;
 
@@ -52,7 +42,9 @@ public class JobService {
 	
 	@Autowired
 	private SchedulerService schedulerService;
-	
+
+    @Autowired
+    private UserRepository userRepository;
 
     public ResponseEntity<?> addJob(JobConfigs jobConfigs) {
     	
@@ -71,8 +63,13 @@ public class JobService {
 		if(job.getDays() != null) {
 			job.getDays().forEach(day -> {days.add(dayRepository.findById(day.getId()).get());});
 		}
-		job.setDays(days);
-		job = jobRepository.save(job);
+        job.setDays(days);
+        Set<User> mailRecipients = new HashSet<User>();
+        if(job.getMailRecipients() != null) {
+            job.getMailRecipients().forEach(recipient -> {mailRecipients.add(userRepository.findById(recipient.getId()));});
+        }
+        job.setMailRecipients(mailRecipients);
+        job = jobRepository.save(job);
         int i = 1;
         for (Configuration conf : configurations) {
             ConfigurationJob confJob = new ConfigurationJob();
@@ -163,6 +160,15 @@ public class JobService {
 		}
         oldJob.getDays().clear();
         oldJob.getDays().addAll(job.getDays());
+
+        if (oldJob.getMailRecipients() == null) {
+            oldJob.setMailRecipients(new HashSet<User>());
+        }
+        if (job.getMailRecipients()!=null) {
+            oldJob.getMailRecipients().clear();
+            job.getMailRecipients().forEach(user -> { oldJob.getMailRecipients().add( userRepository.findById(user.getId()));});
+        }
+
         return new ResponseEntity<>(jobRepository.save(oldJob),HttpStatus.OK);
     }
 

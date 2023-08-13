@@ -61,11 +61,11 @@ public class TransferController {
 			return new ResponseEntity<>(fileTransferUtility.getTransfer().getError(),HttpStatus.ACCEPTED);
 		}
         transferService.addTransfer(fileTransferUtility.getTransfer());
-		Email email = new Email();
+		/*Email email = new Email();
 		email.setSubject("Transfert échoué");
 		email.setRecipient("wisseminfo0@gmail.com");
 		email.setMsgBody("Ceci est un email automatique pour vous informer que le transfert '" + fileTransferUtility.getTransfer().getConfiguration().getLibelle() + "' a échoué : \n"+fileTransferUtility.getTransfer().getError()+".\n(" + new Date() + ").");
-		emailService.sendSimpleMail(email);
+		emailService.sendSimpleMail(email);*/
 		return new ResponseEntity<>(fileTransferUtility.getTransfer().getError(),HttpStatus.OK);
 	}
 	
