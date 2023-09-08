@@ -8,20 +8,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.*;
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.Transfer;
+import java.io.ByteArrayInputStream;
+
 
 public class FileTransferUtility {
 	
 	private Configuration config;
 	private Session session;
 	private Transfer transfer;
+
+	byte[] fileContent;
 	
 	public Session getSession() {
 		return session;
@@ -66,7 +65,7 @@ public class FileTransferUtility {
 		this.session.setPassword(sftpPassword);
 		System.out.println("Connecting to server...");
 		try {
-			this.session.connect(10000);
+			this.session.connect(5000);
 		} catch (JSchException e) {
 			this.transfer.setError("échec de connexion au serveur "+e);
 			this.transfer.setResult(false);
@@ -80,79 +79,6 @@ public class FileTransferUtility {
 		System.out.println("Disconnecting from server...");
 		this.session.disconnect();
 		System.out.println("Disconnected.");
-	}
-
-	public boolean upload() throws SftpException, IOException, InterruptedException, JSchException {
-		try {
-			getSession(config.getDestinationServer().getAddress(), config.getDestinationServer().getPort(),
-					config.getDestinationUser().getLogin(), config.getDestinationUser().getPassword());
-		} catch (JSchException e2) {
-			this.transfer.setError("échec de connexion au serveur / "+e2);
-			this.transfer.setResult(false);
-			System.out.println("Failed.");
-			return false;
-		}
-		System.out.println("Opening upload channel...");
-		ChannelSftp channel;
-		try {
-			channel = (ChannelSftp) this.session.openChannel("sftp");
-		} catch (JSchException e1) {
-			this.transfer.setError("échec de création de canal sftp avec le serveur destination / "+e1);
-			this.transfer.setResult(false);
-			System.out.println("Failed.");
-			return false;
-		}
-		try {
-			channel.connect(5000);
-		} catch (JSchException e) {
-			this.transfer.setError("échec de connexion au canal sftp avec le serveur destination / "+e);
-			this.transfer.setResult(false);
-			System.out.println("Failed.");
-			return false;
-		}
-		System.out.println("Starting Upload...");
-		System.out.println("Uploading from: " + "src/main/resources/tmp/" + config.getFilter() + " to: "
-				+ config.getDestinationPath() + config.getFilter());
-		try {
-			channel.put("src/main/resources/tmp/" + config.getFilter(),
-					config.getDestinationPath() + config.getFilter());
-		} catch (SftpException e) {
-			this.transfer.setError("échec de téléchargement vers le serveur destination / "+e);
-			this.transfer.setResult(false);
-			System.out.println("Failed.");
-			return false;
-		}
-		System.out.println("Uploaded successfully.");
-		if (config.getArchive()) {
-			execute("cp " + config.getDestinationPath() + config.getFilter() + " "
-					+ config.getDestinationArchivingPath() + config.getFilter().replace(".", "_archive."));
-		}
-		channel.disconnect();
-		killSession();
-		if (config.getMove()) {
-			try {
-				getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
-						config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
-				execute("rm -f " + config.getSourcePath() + config.getFilter());
-			} catch (JSchException e2) {
-				this.transfer.setError("échec de connexion au serveur source pour supprimer le fichier source/ "+e2);
-				this.transfer.setResult(false);
-				System.out.println("Failed");
-			}
-		}
-		killSession();
-		Path temp = Paths.get("src/main/resources/tmp/" + config.getFilter());
-		System.out.println("Deleting temporary files...");
-		try {
-			Files.delete(temp);
-		} catch (IOException e) {
-			this.transfer.setError("échec de la suppression du fichiers temporaire / "+e);
-			this.transfer.setResult(false);
-			System.out.println("Failed.");
-		}
-		System.out.println("Temporary files deleted.");
-
-		return true;
 	}
 
 	public boolean download() throws IOException, SftpException, InterruptedException, JSchException {
@@ -183,34 +109,128 @@ public class FileTransferUtility {
 			System.out.println("Failed.");
 			return false;
 		}
+		String sourceFilePath = formatPath(config.getSourcePath());
 		System.out.println("Starting download...");
 		try {
-			channel.get(config.getSourcePath() + config.getFilter(), "src/main/resources/tmp/" + config.getFilter());
+			InputStream inputStream = channel.get(sourceFilePath);
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			byte[] buffer = new byte[1024];
+			int bytesRead;
+			while ((bytesRead = inputStream.read(buffer)) != -1) {
+				byteArrayOutputStream.write(buffer, 0, bytesRead);
+			}
+			fileContent = byteArrayOutputStream.toByteArray();
+			byteArrayOutputStream.close();
+			inputStream.close();
 		} catch (SftpException e) {
 			this.transfer.setError("échec de téléchargement à partir du serveur source / "+e);
 			this.transfer.setResult(false);
 			System.out.println("Failed.");
 			return false;
 		}
-		System.out.println("Downloaded successfully.");
 		channel.disconnect();
+		System.out.println("Downloaded successfully.");
+		if (config.getArchive()) {
+			execute("powershell.exe copy " + sourceFilePath.substring(1) + " "
+					+ formatPath(config.getSourceArchivingPath()).replace(".", "_archive.").substring(1));
+		}
 		killSession();
 		return true;
 	}
 
-	public Transfer transfer() throws JSchException, IOException, SftpException, InterruptedException {
+	public boolean upload() throws SftpException, IOException, InterruptedException, JSchException {
+		try {
+			getSession(config.getDestinationServer().getAddress(), config.getDestinationServer().getPort(),
+					config.getDestinationUser().getLogin(), config.getDestinationUser().getPassword());
+		} catch (JSchException e2) {
+			this.transfer.setError("échec de connexion au serveur / "+e2);
+			this.transfer.setResult(false);
+			System.out.println("Failed.");
+			return false;
+		}
+		System.out.println("Opening upload channel...");
+		ChannelSftp channel;
+		try {
+			channel = (ChannelSftp) this.session.openChannel("sftp");
+		} catch (JSchException e1) {
+			this.transfer.setError("échec de création de canal sftp avec le serveur destination / "+e1);
+			this.transfer.setResult(false);
+			System.out.println("Failed.");
+			return false;
+		}
+		try {
+			channel.connect(5000);
+		} catch (JSchException e) {
+			this.transfer.setError("échec de connexion au canal sftp avec le serveur destination / "+e);
+			this.transfer.setResult(false);
+			System.out.println("Failed.");
+			return false;
+		}
+		String destFilePath = formatPath(config.getDestinationPath());
+		System.out.println("Starting Upload...");
+		try {
+			ByteArrayInputStream uploadInputStream = new ByteArrayInputStream(fileContent);
+			if(config.getOverwrite()){
+				channel.put(uploadInputStream, destFilePath,ChannelSftp.OVERWRITE);
+			}else{
+				SftpATTRS attrs = null;
+				try {
+					attrs = channel.stat(destFilePath);
+				} catch (SftpException e) {
+					System.out.println(e);
+				}
 
+				if (attrs != null) {
+					this.transfer.setError("Fichier déjà existant dans la répertoire destination.");
+					this.transfer.setResult(false);
+					System.out.println("Failed.");
+					return false;
+				} else {
+					channel.put(uploadInputStream, destFilePath,ChannelSftp.RESUME);
+				}
+			}
+			uploadInputStream.close();
+		} catch (SftpException e) {
+			this.transfer.setError("échec de téléchargement vers le serveur destination / "+e);
+			this.transfer.setResult(false);
+			System.out.println("Failed.");
+			return false;
+		}
+		channel.disconnect();
+		System.out.println("Uploaded successfully.");
+		if (config.getArchive()) {
+			execute("powershell.exe copy " + destFilePath.substring(1) + " "
+					+ formatPath(config.getDestinationArchivingPath()).replace(".", "_archive.").substring(1));
+		}
+		killSession();
+		if (config.getMove()) {
+			try {
+				getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
+						config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
+				execute("powershell.exe del " + formatPath(config.getSourcePath()).substring(1));
+			} catch (JSchException e2) {
+				this.transfer.setError("Transfer éffectué. échec de suppression du fichier source/ "+e2);
+				this.transfer.setResult(false);
+				System.out.println("Failed");
+			}
+		}
+		killSession();
+		return true;
+	}
+
+
+	public Transfer transfer() throws JSchException, IOException, SftpException, InterruptedException {
 		System.out.println("initiating transfer...");
-		boolean download = this.download();
-		if (!download) {
+		if (!this.download()) {
 			System.out.println("File transfer failed.");
 			return this.transfer;
 		}
-		boolean upload = this.upload();
-		if (!upload) {
+
+		if (!this.upload()) {
 			System.out.println("File transfer failed.");
 			return this.transfer;
 		}
+
 		this.transfer.setError("");
 		this.transfer.setResult(true);
 		System.out.println("File transfer completed.");
@@ -242,7 +262,7 @@ public class FileTransferUtility {
 		try {
 			channel.connect();
 		} catch (JSchException e) {
-			this.transfer.setError("échec de connexion au canal ssh / "+e);
+			this.transfer.setError("échec de connexion au canal ssh pour archiver / "+e);
 			this.transfer.setResult(false);
 			System.out.println("Failed.");
 			return;
@@ -284,4 +304,13 @@ public class FileTransferUtility {
 		this.config = config;
 	}
 
+	private String formatPath(String path){
+		if (!path.startsWith("/")){
+			path="/"+path;
+		}
+		if (!path.endsWith("/")){
+			path=path+"/";
+		}
+		return path+config.getFilter();
+	}
 }

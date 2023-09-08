@@ -110,32 +110,52 @@ public class UibechangesApplication {
 			userRoleService.addRole(rolesupervision);
 			userRoleService.addRole(roleTransfer);
 			
-			Server server = new Server("192.168.75.129", 22, "the server");
-			Server server1 = new Server("192.168.75.130", 22, "the server 2");
+			Server server = new Server("192.168.75.129", 22, "serveur 1");
+			Server server1 = new Server("192.168.75.130", 22, "server 2");
+			Server serversshd = new Server("192.168.1.164", 22, "sshd");
+			Server serversshd2 = new Server("192.168.1.165", 22, "sshd2");
+
 			serverService.addServer(server);
 			serverService.addServer(server1);
-			
+			serverService.addServer(serversshd);
+			serverService.addServer(serversshd2);
+
+
 			SystemUser systemUser = new SystemUser("libelle SftpUser", "sftpuser", "sftppassword", true, Set.of(server));
 			SystemUser systemUser1 = new SystemUser("libelle SshUser", "sshuser", "sshpassword", true, Set.of(server1));
+			SystemUser systemUsersshd = new SystemUser("Sshd User", "sshd", "Azerty2023", true, Set.of(serversshd));
+			SystemUser systemUsersshd2 = new SystemUser("Sshd User 2", "sshd2", "Azerty2023", true, Set.of(serversshd2));
+
 			systemUserService.addSystemUser(systemUser);
 			systemUserService.addSystemUser(systemUser1);
-			
+			systemUserService.addSystemUser(systemUsersshd);
+			systemUserService.addSystemUser(systemUsersshd2);
+
 			Configuration config = new Configuration("the_file.txt", "config libelle", false, false, true, "/home/sftpuser/", 
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server1, systemUser1, server, systemUser);
 			Configuration config2 = new Configuration("the_file2.txt", "config libelle2", true, false, false, "/home/sftpuser/", 
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server, systemUser, server1, systemUser1);
+			Configuration configsshd = new Configuration("test_file.txt", "config sshd to sshd2", true, true, true, "D:/ssh-tests",
+					"D:/ssh-tests-ar", "D:/ssh-test", "D:/ssh-test-ar", serversshd, systemUsersshd, serversshd2, systemUsersshd2);
+			Configuration configsshd2 = new Configuration("test_file.txt", "config sshd2 to sshd", false, false, false, "D:/ssh-test",
+					"D:/ssh-test-ar", "D:/ssh-tests", "D:/ssh-tests-ar", serversshd2, systemUsersshd2, serversshd, systemUsersshd);
 			configurationService.addConfiguration(config);
 			configurationService.addConfiguration(config2);
-			
-			for (int i = 0; i < 100; i++) {
-				Configuration conf = new Configuration("the_file_"+i+".txt", "config libelle"+i, false, false, true, "/home/sftpuser/"+i, 
-						"/home/sftpuser/archive/"+i, "/home/sftpuser/"+i, "/home/sftpuser/archive/"+i, server1, systemUser1, server, systemUser);
-				configurationService.addConfiguration(conf);
-			}
+			configurationService.addConfiguration(configsshd);
+			configurationService.addConfiguration(configsshd2);
+
+//			for (int i = 0; i < 30; i++) {
+//				Server ser = new Server(i<10 ?"192.168.75.10"+i: "192.168.75.1"+i , 22, "serveur 1."+i);
+//				Server ser2 = new Server(i<10 ?"192.168.75.10"+i: "192.168.75.1"+i , 22, "serveur 2."+i);
+//
+//				Configuration conf = new Configuration("fichier"+i+".txt", "config "+i, false, false, true, "/home/sftpuser/"+i,
+//						"/home/sftpuser/archive/"+i, "/home/sftpuser/"+i, "/home/sftpuser/archive/"+i, i%2 == 0 ? ser : server,i%2 == 0 ? systemUser1 : systemUser, i%2 == 0 ? server : server1, i%2 == 0 ?systemUser:systemUser1);
+//				configurationService.addConfiguration(conf);
+//			}
 			
 			Profile profile1 = new Profile();
 			profile1.setLibelle("profile1");
-			profile1.setConfigurations(Set.of(config));
+			profile1.setConfigurations(Set.of(config,configsshd,configsshd2));
 			profileService.addProfile(profile1);
 			
 			Profile profile2 = new Profile();
@@ -148,7 +168,7 @@ public class UibechangesApplication {
 			profile3.setConfigurations(Set.of(config,config2));
 			profileService.addProfile(profile3);
 			
-			User admin = new User("admin", "adminpass", "admin@admin.com", "admin fname", "admin lname", true, Set.of(roleAdmin), Set.of(profile1,profile2,profile3));
+			User admin = new User("admin", "adminpass", "admin@admin.com", "admin fname", "admin lname", true, Set.of(roleAdmin), Set.of(profile1));
 			User gdhbUser = new User("gdhb", "gdhbpass", "gdhb@gdhb.com", "gdhb fname", "ghbh lname", true, Set.of(rolehGDHB), Set.of(profile1,profile2));
 			User supervision = new User("supervision", "supervisionpass", "supervision@supervision.com", "supervision fname", "supervision lname", true, Set.of(rolesupervision), Set.of(profile2));
 			User transfer = new User("transfer", "transferpass", "transfer@transfer.com", "transfer fname", "transfer lname", true, Set.of(roleTransfer), Set.of(profile1,profile2,profile3));

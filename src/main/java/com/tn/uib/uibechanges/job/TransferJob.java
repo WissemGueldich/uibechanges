@@ -77,7 +77,7 @@ public class TransferJob implements org.quartz.Job{
 				System.out.println(fileTransferUtility.getTransfer().getError());
 			}
             transferService.addTransfer(fileTransferUtility.getTransfer());
-			if (!fileTransferUtility.getTransfer().isResult()){
+			if (fileTransferUtility.getTransfer().getType()==1 && !fileTransferUtility.getTransfer().isResult()){
 				job.getMailRecipients().forEach(emailRecipient->{
 					Email email = new Email();
 					email.setSubject("Transfert échoué");

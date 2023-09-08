@@ -1,5 +1,6 @@
 package com.tn.uib.uibechanges.service;
 
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -181,7 +182,9 @@ public class ConfigurationService {
 			report.setMessage("Chemin destination invalide");
 			return  new ResponseEntity<>(report,HttpStatus.NOT_FOUND);
 		}
-
+		if (report.isSourceConnected() && report.isDestinationConnected() && report.isSourcePathValid() && report.isDestinationPathValid()){
+			report.setMessage("Configuration valide");
+		}
 		return new ResponseEntity<>(report,HttpStatus.OK);
 	}
 
@@ -205,48 +208,40 @@ public class ConfigurationService {
 		}
 	}
 
-	public static boolean doesPathExist(String host, int port, String username, String password, String pathToCheck) {
-		try {
-			JSch jSch = new JSch();
-			Session session = jSch.getSession(username, host, port);
-			session.setPassword(password);
-			session.setConfig("StrictHostKeyChecking", "no");
-			session.connect();
+	public boolean doesPathExist(String host, int port, String username, String password, String directoryPath) {
+        try {
+            JSch jsch = new JSch();
+            Session session = jsch.getSession(username, host, port);
+            session.setPassword(password);
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect();
 
-			String command = "[ -e " + pathToCheck + " ] && echo \"Exists\" || echo \"NotExists\"";
-			ChannelExec channel = (ChannelExec) session.openChannel("exec");
-			channel.setCommand(command);
+            String command = "powershell.exe Test-Path -Path '" + directoryPath.replace("'", "''") + "' -PathType Container";
 
-			channel.connect();
+            ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
+            channelExec.setCommand(command);
+            channelExec.setInputStream(null);
+            channelExec.setErrStream(System.err);
 
-			StringBuilder outputBuffer = new StringBuilder();
-			byte[] tmp = new byte[1024];
-			while (true) {
-				while (channel.getInputStream().available() > 0) {
-					int i = channel.getInputStream().read(tmp, 0, 1024);
-					if (i < 0) {
-						break;
-					}
-					outputBuffer.append(new String(tmp, 0, i));
-				}
-				if (channel.isClosed()) {
-					if (channel.getInputStream().available() > 0) {
-						continue;
-					}
-					break;
-				}
-				Thread.sleep(1000);
+            InputStream inputStream = channelExec.getInputStream();
+            channelExec.connect();
+
+			int i = 10;
+			while(channelExec.getExitStatus()!=0 && i>0){
+				Thread.sleep(100);
+				i--;
 			}
 
-			channel.disconnect();
-			session.disconnect();
+			String output = new String(inputStream.readAllBytes()).trim();
 
-			String result = outputBuffer.toString().trim();
-			return result.equals("Exists");
+            inputStream.close();
+            channelExec.disconnect();
+            session.disconnect();
 
-		} catch (Exception e) {
+            return output.equalsIgnoreCase("true");
+        } catch (Exception e) {
 			System.out.println(e);
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 }
