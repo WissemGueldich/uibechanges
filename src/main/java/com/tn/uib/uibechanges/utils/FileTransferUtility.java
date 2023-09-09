@@ -3,9 +3,6 @@ package com.tn.uib.uibechanges.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Date;
 
 import com.jcraft.jsch.*;
@@ -19,7 +16,7 @@ public class FileTransferUtility {
 	private Configuration config;
 	private Session session;
 	private Transfer transfer;
-
+ 	private boolean isWindowsSession;
 	byte[] fileContent;
 	
 	public Session getSession() {
@@ -66,7 +63,8 @@ public class FileTransferUtility {
 		System.out.println("Connecting to server...");
 		try {
 			this.session.connect(5000);
-		} catch (JSchException e) {
+			this.isWindowsSession =  isWindows();
+		} catch (JSchException | IOException | InterruptedException e) {
 			this.transfer.setError("échec de connexion au serveur "+e);
 			this.transfer.setResult(false);
 			return;
@@ -81,7 +79,7 @@ public class FileTransferUtility {
 		System.out.println("Disconnected.");
 	}
 
-	public boolean download() throws IOException, SftpException, InterruptedException, JSchException {
+	public boolean download() throws IOException, InterruptedException, JSchException {
 		try {
 			getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
 					config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
@@ -131,8 +129,14 @@ public class FileTransferUtility {
 		channel.disconnect();
 		System.out.println("Downloaded successfully.");
 		if (config.getArchive()) {
-			execute("powershell.exe copy " + sourceFilePath.substring(1) + " "
-					+ formatPath(config.getSourceArchivingPath()).replace(".", "_archive.").substring(1));
+			if (isWindowsSession){
+				execute("powershell.exe copy " + sourceFilePath.substring(1) + " "
+						+ formatPath(config.getSourceArchivingPath()).replace(".", "_archive.").substring(1));
+			}else {
+				//NOT TESTED !!
+				execute("cp " + sourceFilePath + " "
+						+ formatPath(config.getSourceArchivingPath()).replace(".", "_archive."));
+			}
 		}
 		killSession();
 		return true;
@@ -199,15 +203,28 @@ public class FileTransferUtility {
 		channel.disconnect();
 		System.out.println("Uploaded successfully.");
 		if (config.getArchive()) {
-			execute("powershell.exe copy " + destFilePath.substring(1) + " "
-					+ formatPath(config.getDestinationArchivingPath()).replace(".", "_archive.").substring(1));
+			if (isWindowsSession){
+				execute("powershell.exe copy " + destFilePath.substring(1) + " "
+						+ formatPath(config.getDestinationArchivingPath()).replace(".", "_archive.").substring(1));
+			}else {
+				//NOT TESTED !!
+				execute("cp " + destFilePath + " "
+						+ formatPath(config.getDestinationArchivingPath()).replace(".", "_archive."));
+			}
+
 		}
 		killSession();
 		if (config.getMove()) {
 			try {
 				getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
 						config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
-				execute("powershell.exe del " + formatPath(config.getSourcePath()).substring(1));
+				if (isWindowsSession){
+					execute("powershell.exe del " + formatPath(config.getSourcePath()).substring(1));
+				}else {
+					//NOT TESTED !!
+					execute("rm -f " + formatPath(config.getSourcePath()));
+				}
+
 			} catch (JSchException e2) {
 				this.transfer.setError("Transfer éffectué. échec de suppression du fichier source/ "+e2);
 				this.transfer.setResult(false);
@@ -312,5 +329,32 @@ public class FileTransferUtility {
 			path=path+"/";
 		}
 		return path+config.getFilter();
+	}
+
+    private boolean isWindows() throws IOException, InterruptedException {
+		try {
+			ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
+			channelExec.setCommand("echo %OS%");
+			channelExec.setInputStream(null);
+			channelExec.setErrStream(System.err);
+
+			InputStream inputStream = channelExec.getInputStream();
+			channelExec.connect();
+
+			int i = 10;
+			while(channelExec.getExitStatus()!=0 && i>0){
+				Thread.sleep(100);
+				i--;
+			}
+
+			String output = new String(inputStream.readAllBytes()).trim();
+
+			inputStream.close();
+			channelExec.disconnect();
+			return output.equalsIgnoreCase("Windows_NT");
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
 	}
 }

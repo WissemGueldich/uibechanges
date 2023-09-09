@@ -137,8 +137,8 @@ public class UibechangesApplication {
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server, systemUser, server1, systemUser1);
 			Configuration configsshd = new Configuration("test_file.txt", "config sshd to sshd2", true, true, true, "D:/ssh-tests",
 					"D:/ssh-tests-ar", "D:/ssh-test", "D:/ssh-test-ar", serversshd, systemUsersshd, serversshd2, systemUsersshd2);
-			Configuration configsshd2 = new Configuration("test_file.txt", "config sshd2 to sshd", false, false, false, "D:/ssh-test",
-					"D:/ssh-test-ar", "D:/ssh-tests", "D:/ssh-tests-ar", serversshd2, systemUsersshd2, serversshd, systemUsersshd);
+			Configuration configsshd2 = new Configuration("test_with_excel.xls", "config sshd2 to sshd", false, false, false, "D:/ssh-test",
+					"D:/ssh-test-ar", "D:/ssh-testd", "D:/ssh-testd-ar", serversshd2, systemUsersshd2, serversshd, systemUsersshd);
 			configurationService.addConfiguration(config);
 			configurationService.addConfiguration(config2);
 			configurationService.addConfiguration(configsshd);
