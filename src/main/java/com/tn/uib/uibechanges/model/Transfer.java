@@ -1,6 +1,8 @@
 package com.tn.uib.uibechanges.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -37,6 +39,8 @@ public class Transfer {
 	private Date date;
 
     private String user;
+
+	private String transferedFiles="";
     
 	public Transfer() {
 	}
@@ -103,5 +107,12 @@ public class Transfer {
 	public void setUser(String user) {
 		this.user = user;
 	}
-    
+
+	public String getTransferedFiles() {
+		return transferedFiles;
+	}
+
+	public void setTransferedFiles(String transferedFiles) {
+		this.transferedFiles = transferedFiles;
+	}
 }

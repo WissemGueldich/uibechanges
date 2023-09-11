@@ -112,8 +112,8 @@ public class UibechangesApplication {
 			
 			Server server = new Server("192.168.75.129", 22, "serveur 1");
 			Server server1 = new Server("192.168.75.130", 22, "server 2");
-			Server serversshd = new Server("192.168.1.164", 22, "sshd");
-			Server serversshd2 = new Server("192.168.1.165", 22, "sshd2");
+			Server serversshd = new Server("192.168.1.18", 22, "sshd");
+			Server serversshd2 = new Server("192.168.1.19", 22, "sshd2");
 
 			serverService.addServer(server);
 			serverService.addServer(server1);
@@ -135,9 +135,9 @@ public class UibechangesApplication {
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server1, systemUser1, server, systemUser);
 			Configuration config2 = new Configuration("the_file2.txt", "config libelle2", true, false, false, "/home/sftpuser/", 
 					"/home/sftpuser/archive/", "/home/sftpuser/", "/home/sftpuser/archive/", server, systemUser, server1, systemUser1);
-			Configuration configsshd = new Configuration("test_file.txt", "config sshd to sshd2", true, true, true, "D:/ssh-tests",
+			Configuration configsshd = new Configuration("*.xls", "config sshd to sshd2", true, true, true, "D:/ssh-tests",
 					"D:/ssh-tests-ar", "D:/ssh-test", "D:/ssh-test-ar", serversshd, systemUsersshd, serversshd2, systemUsersshd2);
-			Configuration configsshd2 = new Configuration("test_with_excel.xls", "config sshd2 to sshd", false, false, false, "D:/ssh-test",
+			Configuration configsshd2 = new Configuration("*.txt", "config sshd2 to sshd", false, false, false, "D:/ssh-test",
 					"D:/ssh-test-ar", "D:/ssh-testd", "D:/ssh-testd-ar", serversshd2, systemUsersshd2, serversshd, systemUsersshd);
 			configurationService.addConfiguration(config);
 			configurationService.addConfiguration(config2);

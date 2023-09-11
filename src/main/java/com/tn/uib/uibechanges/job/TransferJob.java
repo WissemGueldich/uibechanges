@@ -62,21 +62,13 @@ public class TransferJob implements org.quartz.Job{
 			FileTransferUtility fileTransferUtility = new FileTransferUtility(1);
 			fileTransferUtility.getTransfer().setUser(job.getLibelle());
 			fileTransferUtility.setConfig(configurations.get(key));
-			try {
-				try {
-					if (fileTransferUtility.transfer().isResult()) {
-						transferService.addTransfer(fileTransferUtility.getTransfer());
-						System.out.println("transfer performed successfully for configuration " + configurations.get(key).getLibelle() + " for job with id "+job.getId());
-					}
-				} catch (InterruptedException e) {
-					transferService.addTransfer(fileTransferUtility.getTransfer());
-					System.out.println("SSH command execution failed, cause: "+fileTransferUtility.getTransfer().getError());
-				}
-			} catch (JSchException | IOException | SftpException e) {
+			if (fileTransferUtility.transfer().isResult()) {
+				transferService.addTransfer(fileTransferUtility.getTransfer());
+				System.out.println("transfer performed successfully for configuration " + configurations.get(key).getLibelle() + " for job with id "+job.getId());
+			}else{
 				transferService.addTransfer(fileTransferUtility.getTransfer());
 				System.out.println(fileTransferUtility.getTransfer().getError());
 			}
-            transferService.addTransfer(fileTransferUtility.getTransfer());
 			if (fileTransferUtility.getTransfer().getType()==1 && !fileTransferUtility.getTransfer().isResult()){
 				job.getMailRecipients().forEach(emailRecipient->{
 					Email email = new Email();
@@ -85,12 +77,9 @@ public class TransferJob implements org.quartz.Job{
 					email.setMsgBody("Ceci est un email automatique de UIB Echanges, pour vous informer que le job '"+ job.getLibelle() +"' a été interropu durant le transfert avec la configuration '" + fileTransferUtility.getTransfer().getConfiguration().getLibelle() + "'\n"+fileTransferUtility.getTransfer().getError()+".\n(" + new Date() + ").");
 					emailService.sendSimpleMail(email);
 				});
-
 			}
-
 			System.out.println(fileTransferUtility.getTransfer().getError());   
 		}
-
         try {
             Trigger trigger = context.getTrigger();
             Scheduler scheduler = context.getScheduler();

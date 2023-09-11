@@ -1,14 +1,14 @@
 package com.tn.uib.uibechanges.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.jcraft.jsch.*;
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.Transfer;
-import java.io.ByteArrayInputStream;
+
+import java.util.List;
 
 
 public class FileTransferUtility {
@@ -18,6 +18,7 @@ public class FileTransferUtility {
 	private Transfer transfer;
  	private boolean isWindowsSession;
 	byte[] fileContent;
+	List<String> files=new ArrayList<>();
 	
 	public Session getSession() {
 		return session;
@@ -33,6 +34,30 @@ public class FileTransferUtility {
 
 	public void setTransfer(Transfer transfer) {
 		this.transfer = transfer;
+	}
+
+	public boolean isWindowsSession() {
+		return isWindowsSession;
+	}
+
+	public void setWindowsSession(boolean windowsSession) {
+		isWindowsSession = windowsSession;
+	}
+
+	public byte[] getFileContent() {
+		return fileContent;
+	}
+
+	public void setFileContent(byte[] fileContent) {
+		this.fileContent = fileContent;
+	}
+
+	public List<String> getFiles() {
+		return files;
+	}
+
+	public void setFiles(List<String> files) {
+		this.files = files;
 	}
 
 	public FileTransferUtility(int type) {
@@ -56,7 +81,7 @@ public class FileTransferUtility {
 		} catch (JSchException e) {
 			this.transfer.setError("échec de création de session "+e);
 			this.transfer.setResult(false);
-			return;
+			throw e;
 		}
 		this.session.setConfig("StrictHostKeyChecking", "no");
 		this.session.setPassword(sftpPassword);
@@ -64,10 +89,10 @@ public class FileTransferUtility {
 		try {
 			this.session.connect(5000);
 			this.isWindowsSession =  isWindows();
-		} catch (JSchException | IOException | InterruptedException e) {
+		} catch (JSchException e) {
 			this.transfer.setError("échec de connexion au serveur "+e);
 			this.transfer.setResult(false);
-			return;
+			throw e;
 		}
 		System.out.println("Connected.");
 
@@ -79,7 +104,68 @@ public class FileTransferUtility {
 		System.out.println("Disconnected.");
 	}
 
-	public boolean download() throws IOException, InterruptedException, JSchException {
+	private void getFilesList(){
+		try {
+			getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
+					config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
+
+			Channel channel = session.openChannel("exec");
+			String command;
+			if (isWindowsSession){
+				command = "powershell.exe $files = Get-ChildItem "+formatPath(config.getSourcePath()).substring(1)+" -file -filter "+config.getFilter()+" ; foreach ($file in $files) { $file.Name }";
+			}else{
+				//NOT TESTED
+				command = "find "+formatPath(config.getSourcePath()).substring(1)+" -type f -name \""+config.getFilter()+"\" -exec basename {} \\";
+			}
+			((ChannelExec) channel).setCommand(command);
+
+			InputStream in = channel.getInputStream();
+			channel.connect();
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				files.add(line);
+			}
+
+			channel.disconnect();
+			killSession();
+
+		} catch ( Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	public Transfer transfer() {
+		getFilesList();
+
+		if (files != null && !files.isEmpty()) {
+			for (String file : files) {
+				System.out.println("Initiating transfer of file: " + file);
+
+				if (!this.download(file)) {
+					System.out.println("File transfer failed for :"+file);
+					this.transfer.setError(this.transfer.getError() +". source :"+ file);
+					this.transfer.setResult(false);
+					return this.transfer;
+				}
+
+				if (!this.upload(file)) {
+					System.out.println("File transfer failed for :"+file);
+					this.transfer.setError(this.transfer.getError()+". destination :" + file);
+					this.transfer.setResult(false);
+					return this.transfer;
+				}
+				this.transfer.setTransferedFiles(this.transfer.getTransferedFiles()+file+"\n");
+			}
+		}
+
+		this.transfer.setError("");
+		this.transfer.setResult(true);
+		System.out.println("File transfer completed.");
+		return this.transfer;
+	}
+	public boolean download(String fileName) {
 		try {
 			getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
 					config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
@@ -107,7 +193,7 @@ public class FileTransferUtility {
 			System.out.println("Failed.");
 			return false;
 		}
-		String sourceFilePath = formatPath(config.getSourcePath());
+		String sourceFilePath = formatPath(config.getSourcePath())+fileName;
 		System.out.println("Starting download...");
 		try {
 			InputStream inputStream = channel.get(sourceFilePath);
@@ -120,7 +206,7 @@ public class FileTransferUtility {
 			fileContent = byteArrayOutputStream.toByteArray();
 			byteArrayOutputStream.close();
 			inputStream.close();
-		} catch (SftpException e) {
+		} catch (SftpException | IOException e) {
 			this.transfer.setError("échec de téléchargement à partir du serveur source / "+e);
 			this.transfer.setResult(false);
 			System.out.println("Failed.");
@@ -130,24 +216,24 @@ public class FileTransferUtility {
 		System.out.println("Downloaded successfully.");
 		if (config.getArchive()) {
 			if (isWindowsSession){
-				execute("powershell.exe copy " + sourceFilePath.substring(1) + " "
-						+ formatPath(config.getSourceArchivingPath()).replace(".", "_archive.").substring(1));
+				execute("powershell.exe copy " + singleQuote(sourceFilePath.substring(1)) + " "
+						+ singleQuote(formatPath(config.getSourceArchivingPath()).substring(1)+fileName.replace(".", "_archive.")));
 			}else {
 				//NOT TESTED !!
 				execute("cp " + sourceFilePath + " "
-						+ formatPath(config.getSourceArchivingPath()).replace(".", "_archive."));
+						+ (formatPath(config.getSourceArchivingPath()).substring(1))+fileName.replace(".", "_archive."));
 			}
 		}
 		killSession();
 		return true;
 	}
 
-	public boolean upload() throws SftpException, IOException, InterruptedException, JSchException {
+	public boolean upload(String fileName){
 		try {
 			getSession(config.getDestinationServer().getAddress(), config.getDestinationServer().getPort(),
 					config.getDestinationUser().getLogin(), config.getDestinationUser().getPassword());
 		} catch (JSchException e2) {
-			this.transfer.setError("échec de connexion au serveur / "+e2);
+			this.transfer.setError("échec de connexion au serveur destination / "+e2);
 			this.transfer.setResult(false);
 			System.out.println("Failed.");
 			return false;
@@ -170,7 +256,7 @@ public class FileTransferUtility {
 			System.out.println("Failed.");
 			return false;
 		}
-		String destFilePath = formatPath(config.getDestinationPath());
+		String destFilePath = formatPath(config.getDestinationPath())+fileName;
 		System.out.println("Starting Upload...");
 		try {
 			ByteArrayInputStream uploadInputStream = new ByteArrayInputStream(fileContent);
@@ -194,7 +280,7 @@ public class FileTransferUtility {
 				}
 			}
 			uploadInputStream.close();
-		} catch (SftpException e) {
+		} catch (SftpException | IOException e) {
 			this.transfer.setError("échec de téléchargement vers le serveur destination / "+e);
 			this.transfer.setResult(false);
 			System.out.println("Failed.");
@@ -204,12 +290,12 @@ public class FileTransferUtility {
 		System.out.println("Uploaded successfully.");
 		if (config.getArchive()) {
 			if (isWindowsSession){
-				execute("powershell.exe copy " + destFilePath.substring(1) + " "
-						+ formatPath(config.getDestinationArchivingPath()).replace(".", "_archive.").substring(1));
+				execute("powershell.exe copy " + singleQuote(destFilePath.substring(1)) + " "
+						+ singleQuote(formatPath(config.getDestinationArchivingPath()).substring(1)+fileName.replace(".", "_archive.")));
 			}else {
 				//NOT TESTED !!
 				execute("cp " + destFilePath + " "
-						+ formatPath(config.getDestinationArchivingPath()).replace(".", "_archive."));
+						+ formatPath(config.getDestinationArchivingPath()).substring(1)+destFilePath.replace(".", "_archive."));
 			}
 
 		}
@@ -219,10 +305,10 @@ public class FileTransferUtility {
 				getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
 						config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
 				if (isWindowsSession){
-					execute("powershell.exe del " + formatPath(config.getSourcePath()).substring(1));
+					execute("powershell.exe del " + singleQuote(formatPath(config.getSourcePath()).substring(1)+fileName));
 				}else {
 					//NOT TESTED !!
-					execute("rm -f " + formatPath(config.getSourcePath()));
+					execute("rm -f " + formatPath(config.getSourcePath()).substring(1)+fileName);
 				}
 
 			} catch (JSchException e2) {
@@ -235,26 +321,7 @@ public class FileTransferUtility {
 		return true;
 	}
 
-
-	public Transfer transfer() throws JSchException, IOException, SftpException, InterruptedException {
-		System.out.println("initiating transfer...");
-		if (!this.download()) {
-			System.out.println("File transfer failed.");
-			return this.transfer;
-		}
-
-		if (!this.upload()) {
-			System.out.println("File transfer failed.");
-			return this.transfer;
-		}
-
-		this.transfer.setError("");
-		this.transfer.setResult(true);
-		System.out.println("File transfer completed.");
-		return this.transfer;
-	}
-
-	private void execute(String command) throws JSchException, IOException, InterruptedException {
+	private void execute(String command) {
 		/*
 		 * server config needed to execute ssh commands for achiving nano
 		 * /etc/ssh/sshd_config remove ForceCommand internal-sftp remove chroot
@@ -274,42 +341,42 @@ public class FileTransferUtility {
 		System.out.println("Executing command: " + command);
 		ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
 		ByteArrayOutputStream errorBuffer = new ByteArrayOutputStream();
-		InputStream in=channel.getInputStream();
-		InputStream err=channel.getExtInputStream();
+
 		try {
+			InputStream in=channel.getInputStream();
+			InputStream err=channel.getExtInputStream();
 			channel.connect();
-		} catch (JSchException e) {
+			byte[] tmp = new byte[1024];
+			while (true) {
+				while (in.available() > 0) {
+					int i = in.read(tmp, 0, 1024);
+					if (i < 0)
+						break;
+					outputBuffer.write(tmp, 0, i);
+				}
+				while (err.available() > 0) {
+					int i = err.read(tmp, 0, 1024);
+					if (i < 0)
+						break;
+					errorBuffer.write(tmp, 0, i);
+				}
+				if (channel.isClosed()) {
+					if ((in.available() > 0) || (err.available() > 0))
+						continue;
+					System.out.println("exit-status: " + channel.getExitStatus());
+					break;
+				}
+				Thread.sleep(1000);
+			}
+			System.out.println("output: " + outputBuffer.toString("UTF-8"));
+			System.out.println("error: " + errorBuffer.toString("UTF-8"));
+		} catch (JSchException | IOException | InterruptedException e) {
 			this.transfer.setError("échec de connexion au canal ssh pour archiver / "+e);
 			this.transfer.setResult(false);
 			System.out.println("Failed.");
 			return;
 		}
-		byte[] tmp = new byte[1024];
-		while (true) {
-			while (in.available() > 0) {
-				int i = in.read(tmp, 0, 1024);
-				if (i < 0)
-					break;
-				outputBuffer.write(tmp, 0, i);
-			}
-			while (err.available() > 0) {
-				int i = err.read(tmp, 0, 1024);
-				if (i < 0)
-					break;
-				errorBuffer.write(tmp, 0, i);
-			}
-			if (channel.isClosed()) {
-				if ((in.available() > 0) || (err.available() > 0))
-					continue;
-				System.out.println("exit-status: " + channel.getExitStatus());
-				break;
-			}
-			Thread.sleep(1000);
-		}
-		System.out.println("output: " + outputBuffer.toString("UTF-8"));
-		System.out.println("error: " + errorBuffer.toString("UTF-8"));
-
-		channel.disconnect();
+        channel.disconnect();
 	}
 
 	public Configuration getConfig() {
@@ -328,10 +395,14 @@ public class FileTransferUtility {
 		if (!path.endsWith("/")){
 			path=path+"/";
 		}
-		return path+config.getFilter();
+		return path;
 	}
 
-    private boolean isWindows() throws IOException, InterruptedException {
+	private String singleQuote(String str){
+		return "'"+str+"'";
+	}
+
+    private boolean isWindows(){
 		try {
 			ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
 			channelExec.setCommand("echo %OS%");
