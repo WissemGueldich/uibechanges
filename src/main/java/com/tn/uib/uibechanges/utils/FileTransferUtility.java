@@ -137,6 +137,17 @@ public class FileTransferUtility {
 	}
 
 	public Transfer transfer() {
+		if (!SSHCommandSanitizer.sanitizePath(config.getSourcePath()) || !SSHCommandSanitizer.sanitizePath(config.getDestinationPath()) || !SSHCommandSanitizer.sanitizePath(config.getSourceArchivingPath()) || !SSHCommandSanitizer.sanitizePath(config.getDestinationArchivingPath())){
+			this.transfer.setResult(false);
+			this.transfer.setError("chemins invalides");
+			return this.transfer;
+		}
+
+		if (!SSHCommandSanitizer.sanitizeFilter(config.getFilter())){
+			this.transfer.setResult(false);
+			this.transfer.setError("filtre invalide");
+			return this.transfer;
+		}
 		getFilesList();
 
 		if (files != null && !files.isEmpty()) {
