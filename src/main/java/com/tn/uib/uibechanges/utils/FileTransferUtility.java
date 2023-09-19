@@ -79,7 +79,7 @@ public class FileTransferUtility {
 		try {
 			this.session = jSch.getSession(sftpUser, host, port);
 		} catch (JSchException e) {
-			this.transfer.setError("échec de création de session "+e);
+			this.transfer.setError("échec de création de session / "+e);
 			this.transfer.setResult(false);
 			throw e;
 		}
@@ -90,7 +90,7 @@ public class FileTransferUtility {
 			this.session.connect(5000);
 			this.isWindowsSession =  isWindows();
 		} catch (JSchException e) {
-			this.transfer.setError("échec de connexion au serveur "+e);
+			this.transfer.setError("échec de connexion au serveur / "+e);
 			this.transfer.setResult(false);
 			throw e;
 		}
@@ -104,13 +104,24 @@ public class FileTransferUtility {
 		System.out.println("Disconnected.");
 	}
 
-	private void getFilesList(){
+	private boolean getFilesList(){
 		try {
 			getSession(config.getSourceServer().getAddress(), config.getSourceServer().getPort(),
 					config.getSourceUser().getLogin(), config.getSourceUser().getPassword());
+		} catch (JSchException e) {
+			return false;
+		}
 
-			Channel channel = session.openChannel("exec");
-			String command;
+		Channel channel = null;
+		try {
+			channel = session.openChannel("exec");
+		} catch (JSchException e) {
+			this.transfer.setError("échec de création du canal sftp avec le serveur source / "+e);
+			this.transfer.setResult(false);
+			System.out.println("Failed.");
+			return false;
+		}
+		String command;
 			if (isWindowsSession){
 				command = "powershell.exe $files = Get-ChildItem "+formatPath(config.getSourcePath()).substring(1)+" -file -filter "+config.getFilter()+" ; foreach ($file in $files) { $file.Name }";
 			}else{
@@ -119,21 +130,48 @@ public class FileTransferUtility {
 			}
 			((ChannelExec) channel).setCommand(command);
 
-			InputStream in = channel.getInputStream();
+		InputStream in = null;
+		try {
+			in = channel.getInputStream();
+		} catch (IOException e) {
+			this.transfer.setError("échec de lecture du serveur source / "+e);
+			this.transfer.setResult(false);
+			System.out.println("Failed.");
+			return false;
+		}
+		try {
 			channel.connect();
+		} catch (JSchException e) {
+			this.transfer.setError("échec de filtrage de fichiers à partir du serveur source / "+e);
+			this.transfer.setResult(false);
+			System.out.println("Failed.");
+			return false;
+		}
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			String line;
-			while ((line = reader.readLine()) != null) {
+		try {
+			while (true) {
+				if (!((line = reader.readLine()) != null))
+					break;
 				files.add(line);
 			}
-
-			channel.disconnect();
-			killSession();
-
-		} catch ( Exception e) {
-			System.out.println(e);
+		} catch (IOException e) {
+			this.transfer.setError("échec de lecture du serveur source / "+e);
+			this.transfer.setResult(false);
+			System.out.println("Failed.");
+			return false;
 		}
+
+		channel.disconnect();
+		killSession();
+		if (files == null || files.isEmpty()) {
+			this.transfer.setError("Pas de fichiers trouvés selon le filtre fourni: "+this.transfer.getConfiguration().getFilter());
+			this.transfer.setResult(false);
+			System.out.println("File transfer aborted. no files found with filter: "+this.transfer.getConfiguration().getFilter());
+			return false;
+		}
+		return true;
 	}
 
 	public Transfer transfer() {
@@ -148,37 +186,32 @@ public class FileTransferUtility {
 			this.transfer.setError("filtre invalide");
 			return this.transfer;
 		}
-		getFilesList();
-
-		if (files != null && !files.isEmpty()) {
-			for (String file : files) {
-				System.out.println("Initiating transfer of file: " + file);
-
-				if (!this.download(file)) {
-					System.out.println("File transfer failed for :"+file);
-					this.transfer.setError(this.transfer.getError() +". source :"+ file);
-					this.transfer.setResult(false);
-					return this.transfer;
-				}
-
-				if (!this.upload(file)) {
-					System.out.println("File transfer failed for :"+file);
-					this.transfer.setError(this.transfer.getError()+". destination :" + file);
-					this.transfer.setResult(false);
-					return this.transfer;
-				}
-				this.transfer.setTransferedFiles(this.transfer.getTransferedFiles()+file+"\n");
-			}
-			this.transfer.setError("");
-			this.transfer.setResult(true);
-			System.out.println("File transfer completed.");
-			return this.transfer;
-		}else {
-			this.transfer.setError("Pas de fichiers trouvés selon le filtre fourni: "+this.transfer.getConfiguration().getFilter());
-			this.transfer.setResult(false);
-			System.out.println("File transfer aborted. no files found with filter: "+this.transfer.getConfiguration().getFilter());
+		if(!getFilesList()){
 			return this.transfer;
 		}
+
+		for (String file : files) {
+			System.out.println("Initiating transfer of file: " + file);
+
+			if (!this.download(file)) {
+				System.out.println("File transfer failed for :"+file);
+				this.transfer.setError(this.transfer.getError() +". source :"+ file);
+				this.transfer.setResult(false);
+				return this.transfer;
+			}
+
+			if (!this.upload(file)) {
+				System.out.println("File transfer failed for :"+file);
+				this.transfer.setError(this.transfer.getError()+". destination :" + file);
+				this.transfer.setResult(false);
+				return this.transfer;
+			}
+			this.transfer.setTransferedFiles(this.transfer.getTransferedFiles()+file+"\n");
+		}
+		this.transfer.setError("");
+		this.transfer.setResult(true);
+		System.out.println("File transfer completed.");
+		return this.transfer;
 	}
 	public boolean download(String fileName) {
 		try {
