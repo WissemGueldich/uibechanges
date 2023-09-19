@@ -1,8 +1,6 @@
 package com.tn.uib.uibechanges.controller;
 
-import java.io.IOException;
 import java.text.ParseException;
-import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,10 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 import com.tn.uib.uibechanges.model.Configuration;
-import com.tn.uib.uibechanges.model.Email;
 import com.tn.uib.uibechanges.model.Transfer;
 import com.tn.uib.uibechanges.service.EmailService;
 import com.tn.uib.uibechanges.service.TransferService;
@@ -44,7 +39,7 @@ public class TransferController {
 	public ResponseEntity<?> transfer (@RequestBody Configuration config) {
 		
 		FileTransferUtility fileTransferUtility = new FileTransferUtility(0);
-		fileTransferUtility.getTransfer().setUser(SecurityContextHolder.getContext().getAuthentication().getName());
+		fileTransferUtility.getTransfer().setInitiator(SecurityContextHolder.getContext().getAuthentication().getName());
 
 		fileTransferUtility.setConfig(config);
 

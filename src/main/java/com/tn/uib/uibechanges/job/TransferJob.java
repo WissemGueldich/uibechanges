@@ -1,6 +1,5 @@
 package com.tn.uib.uibechanges.job;
 
-import java.io.IOException;
 import java.util.*;
 
 import com.tn.uib.uibechanges.model.Email;
@@ -13,8 +12,6 @@ import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 import com.tn.uib.uibechanges.model.Configuration;
 import com.tn.uib.uibechanges.model.ConfigurationJob;
 import com.tn.uib.uibechanges.model.Job;
@@ -60,7 +57,7 @@ public class TransferJob implements org.quartz.Job{
 		SortedSet<Integer> ranks = new TreeSet<>(configurations.keySet());
 		for (Integer key : ranks) {
 			FileTransferUtility fileTransferUtility = new FileTransferUtility(1);
-			fileTransferUtility.getTransfer().setUser(job.getLibelle());
+			fileTransferUtility.getTransfer().setInitiator(job.getLibelle());
 			fileTransferUtility.setConfig(configurations.get(key));
 			if (fileTransferUtility.transfer().isResult()) {
 				transferService.addTransfer(fileTransferUtility.getTransfer());

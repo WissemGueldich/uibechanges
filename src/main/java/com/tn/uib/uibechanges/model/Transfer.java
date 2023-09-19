@@ -1,8 +1,6 @@
 package com.tn.uib.uibechanges.model;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -38,7 +36,7 @@ public class Transfer {
 	@JsonFormat(pattern = "yyyy/MM/dd")
 	private Date date;
 
-    private String user;
+    private String initiator;
 
 	private String transferedFiles="";
     
@@ -100,12 +98,12 @@ public class Transfer {
 		this.configuration = configuration;
 	}
 
-	public String getUser() {
-		return user;
+	public String getInitiator() {
+		return initiator;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
+	public void setInitiator(String initiator) {
+		this.initiator = initiator;
 	}
 
 	public String getTransferedFiles() {

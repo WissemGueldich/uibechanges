@@ -169,12 +169,16 @@ public class FileTransferUtility {
 				}
 				this.transfer.setTransferedFiles(this.transfer.getTransferedFiles()+file+"\n");
 			}
+			this.transfer.setError("");
+			this.transfer.setResult(true);
+			System.out.println("File transfer completed.");
+			return this.transfer;
+		}else {
+			this.transfer.setError("Pas de fichiers trouvés selon le filtre fourni: "+this.transfer.getConfiguration().getFilter());
+			this.transfer.setResult(false);
+			System.out.println("File transfer aborted. no files found with filter: "+this.transfer.getConfiguration().getFilter());
+			return this.transfer;
 		}
-
-		this.transfer.setError("");
-		this.transfer.setResult(true);
-		System.out.println("File transfer completed.");
-		return this.transfer;
 	}
 	public boolean download(String fileName) {
 		try {
