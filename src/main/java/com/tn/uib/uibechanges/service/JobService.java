@@ -268,7 +268,7 @@ public class JobService {
             info.setDays(job.getDays());
             return schedulerService.isJobRunning(TransferJob.class, info, job);
         }
-        return new JobStatus(0,false,true);
+        return new JobStatus(0,false,false);
 	}
 
 }

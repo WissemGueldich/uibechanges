@@ -63,7 +63,7 @@ public class TransferJob implements org.quartz.Job{
 				transferService.addTransfer(fileTransferUtility.getTransfer());
 				System.out.println("transfer performed successfully for configuration " + configurations.get(key).getLibelle() + " for job with id "+job.getId());
 			}else{
-				transferService.addTransfer(fileTransferUtility.getTransfer());
+				//transferService.addTransfer(fileTransferUtility.getTransfer());
 				System.out.println(fileTransferUtility.getTransfer().getError());
 			}
 			if (fileTransferUtility.getTransfer().getType()==1 && !fileTransferUtility.getTransfer().isResult()){

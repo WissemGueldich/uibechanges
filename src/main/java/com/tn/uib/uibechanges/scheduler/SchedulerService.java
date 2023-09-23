@@ -94,7 +94,7 @@ public class SchedulerService {
 					status.setRunning(true);
 				}
 			} catch (ParseException | SchedulerException e) {
-				System.out.println("error unscheduling job");
+				System.out.println("error checking job status");
 				System.out.println(e);
 			}
         }

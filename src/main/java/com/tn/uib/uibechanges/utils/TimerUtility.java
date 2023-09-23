@@ -39,7 +39,7 @@ public class TimerUtility {
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 		String date = formatter.format(now.getTime());
-		SimpleDateFormat parser = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+		SimpleDateFormat parser = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		
 		SimpleScheduleBuilder builder = SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(info.getRepeatInterval()).repeatForever();
 		return TriggerBuilder.newTrigger()
